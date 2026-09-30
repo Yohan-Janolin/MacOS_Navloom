@@ -1,11 +1,4 @@
-//
-//  FaviconImage.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 29/09/2026.
-//
-
-
+import ImageIO
 import AppKit
 
 /// Une image PNG carrée prête à être écrite dans la table favicon_bitmaps.
@@ -18,7 +11,12 @@ nonisolated enum FaviconImage {
 
     /// Vrai si les données sont réellement une image (rejette les pages HTML d'erreur, etc.)
     static func isValid(_ data: Data) -> Bool {
-        NSImage(data: data) != nil
+        guard !data.isEmpty else { return false }
+        if let source = CGImageSourceCreateWithData(data as CFData, nil), CGImageSourceGetCount(source) > 0 {
+            return true
+        }
+        if let image = NSImage(data: data), image.size.width > 0 { return true }
+        return false
     }
 
     /// Convertit une image quelconque (ico, gif, jpeg…) en PNG carré.

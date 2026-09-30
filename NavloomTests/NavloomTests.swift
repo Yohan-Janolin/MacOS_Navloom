@@ -1,10 +1,3 @@
-//
-//  NavloomTests.swift
-//  NavloomTests
-//
-//  Created by Yohan Janolin on 29/09/2026.
-//
-
 import Testing
 @testable import Navloom
 
