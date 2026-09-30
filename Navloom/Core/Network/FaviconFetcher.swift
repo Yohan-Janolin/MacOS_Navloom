@@ -58,7 +58,7 @@ nonisolated final class FaviconFetcher: @unchecked Sendable {
                 let origin = origins[nextIndex]
                 let urls = urlsByKey[origin.key] ?? []
                 nextIndex += 1
-                group.addTask { (origin, await self.resolve(origin: origin, bookmarkURLs: urls)) }
+                group.addTask { (origin, await self.resolveWithDeadline(origin: origin, bookmarkURLs: urls)) }
             }
 
             for await (origin, result) in group {
@@ -70,13 +70,33 @@ nonisolated final class FaviconFetcher: @unchecked Sendable {
                     let nextOrigin = origins[nextIndex]
                     let nextURLs = urlsByKey[nextOrigin.key] ?? []
                     nextIndex += 1
-                    group.addTask { (nextOrigin, await self.resolve(origin: nextOrigin, bookmarkURLs: nextURLs)) }
+                    group.addTask {
+                        (nextOrigin, await self.resolveWithDeadline(origin: nextOrigin, bookmarkURLs: nextURLs))
+                    }
                 }
             }
         }
         return results
     }
 
+    /// Durée maximale pour une origine, tous essais confondus.
+    static let originDeadlineSeconds = 20
+
+    /// Un site très lent ne doit pas monopoliser une place : au-delà de la limite, on abandonne
+    /// et on le classe en échec à réessayer au second passage.
+    private func resolveWithDeadline(origin: Origin, bookmarkURLs: [URL]) async -> HostResult {
+        await withTaskGroup(of: HostResult?.self) { group in
+            group.addTask { await self.resolve(origin: origin, bookmarkURLs: bookmarkURLs) }
+            group.addTask {
+                try? await Task.sleep(for: .seconds(Self.originDeadlineSeconds))
+                return nil
+            }
+            let first = await group.next() ?? nil
+            group.cancelAll()
+            return first ?? .failed("délai global dépassé (\(Self.originDeadlineSeconds) s)", retryable: true)
+        }
+    }
+    
     // MARK: - Une origine
 
     /// Racine du site d'abord, puis (en dernier recours) la page réelle des favoris.

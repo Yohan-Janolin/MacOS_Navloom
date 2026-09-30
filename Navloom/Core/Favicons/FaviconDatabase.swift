@@ -70,6 +70,14 @@ actor FaviconDatabase {
         }
         return urls
     }
+    
+    /// Nombre de pages associées à une favicon (sert à décrire une sauvegarde).
+    func mappingCount() throws -> Int {
+        let stmt = try prepare("SELECT COUNT(*) FROM icon_mapping")
+        defer { sqlite3_finalize(stmt) }
+        guard sqlite3_step(stmt) == SQLITE_ROW else { throw lastError }
+        return Int(sqlite3_column_int64(stmt, 0))
+    }
 
     // MARK: - Transactions
 

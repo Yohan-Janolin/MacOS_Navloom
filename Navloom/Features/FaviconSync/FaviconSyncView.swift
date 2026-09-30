@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 struct FaviconSyncView: View {
-    @State private var model = FaviconSyncViewModel()
+    @Bindable var model: FaviconSyncViewModel
 
     var body: some View {
         Group {
@@ -19,7 +19,7 @@ struct FaviconSyncView: View {
             }
         }
         .navigationTitle("FaviconSync")
-        .task { model.loadBrowsers() }
+        .task { model.loadBrowsersIfNeeded() }
         .onChange(of: model.selectedBrowserID) { model.browserChanged() }
         .onChange(of: model.selectedProfileID) { model.reset() }
         // Tant qu'on attend le feu vert pour écrire, on surveille si le navigateur est fermé.
@@ -118,9 +118,10 @@ struct FaviconSyncView: View {
     }
 
     private var fetchingView: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Spacer()
-            ProgressView(value: Double(model.progressDone), total: Double(max(model.progressTotal, 1)))
+            ThickProgressBar(value: Double(model.progressDone),
+                             total: Double(max(model.progressTotal, 1)))
             HStack {
                 Text("Passage \(model.progressPass) · \(model.progressDone)/\(model.progressTotal)")
                 Spacer()
@@ -206,6 +207,15 @@ struct FaviconSyncView: View {
             if model.phase == .analyzed || model.phase == .fetched {
                 Button("Annuler") { model.reset() }
             }
+
+            if model.fetchResult != nil, model.phase == .fetched || model.phase == .done {
+                Button {
+                    model.exportReport()
+                } label: {
+                    Label("Exporter le rapport", systemImage: "square.and.arrow.up")
+                }
+            }
+
             Spacer()
             primaryAction
                 .buttonStyle(.borderedProminent)
@@ -311,5 +321,5 @@ private struct ResultRowView: View {
 }
 
 #Preview {
-    FaviconSyncView()
+    FaviconSyncView(model: FaviconSyncViewModel())
 }

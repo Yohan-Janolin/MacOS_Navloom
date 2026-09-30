@@ -8,6 +8,7 @@
 
 import SwiftUI
 import AppKit
+import UniformTypeIdentifiers
 
 @MainActor
 @Observable
@@ -75,7 +76,8 @@ final class FaviconSyncViewModel {
 
     // MARK: Sélection du navigateur et du profil
 
-    func loadBrowsers() {
+    func loadBrowsersIfNeeded() {
+        guard !hasLoaded else { return }
         browsers = ChromiumBrowser.installed()
         if !browsers.contains(where: { $0.id == selectedBrowserID }) {
             selectedBrowserID = browsers.first(where: { $0.id == "vivaldi" })?.id ?? browsers.first?.id
@@ -206,6 +208,31 @@ final class FaviconSyncViewModel {
         }
     }
 
+    // MARK: Export du rapport
+
+    func exportReport() {
+        guard let analysis, let fetchResult, let profile = selectedProfile else { return }
+
+        let text = SyncReport.text(browserName: profile.browserName,
+                                   profileName: profile.name,
+                                   analysis: analysis,
+                                   fetchResult: fetchResult,
+                                   summary: summary)
+
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.plainText]
+        panel.nameFieldStringValue = "faviconsync-rapport.txt"
+        panel.canCreateDirectories = true
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+
+        do {
+            try text.write(to: url, atomically: true, encoding: .utf8)
+        } catch {
+            errorMessage = "Impossible d'écrire le rapport : \(error.localizedDescription)"
+        }
+    }
+    
     func revealBackup() {
         guard let url = summary?.backupURL else { return }
         NSWorkspace.shared.activateFileViewerSelecting([url])

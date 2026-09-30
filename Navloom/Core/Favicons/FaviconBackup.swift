@@ -1,27 +1,201 @@
-//
-//  FaviconBackup.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 30/09/2026.
-//
-
-
 import Foundation
 
-/// Copie de sécurité de la base Favicons avant toute écriture.
-/// Stockée dans ~/Library/Application Support/Navloom/Backups/
+/// Une sauvegarde de la base Favicons, décrite par son nom de fichier.
+nonisolated struct BackupEntry: Identifiable, Hashable, Sendable {
+    nonisolated enum Kind: Hashable, Sendable {
+        case beforeWrite      // créée automatiquement avant une écriture
+        case beforeRestore    // créée automatiquement avant une restauration
+    }
+
+    let url: URL
+    /// Profil concerné, avec "/" remplacé par "-" (ex. "vivaldi-Default")
+    let label: String
+    let date: Date
+    let kind: Kind
+    let sizeBytes: Int64
+
+    var id: URL { url }
+}
+
+/// Sauvegardes de la base Favicons.
+/// Nom de fichier : <profil>-Favicons-<date ISO>[-avant-restauration].sqlite
 nonisolated enum FaviconBackup {
-    static func create(from source: URL, label: String) throws -> URL {
+    private static let separator = "-Favicons-"
+    private static let restoreSuffix = "-avant-restauration"
+
+    static var defaultDirectory: URL {
+        URL.applicationSupportDirectory.appending(path: "Navloom/Backups", directoryHint: .isDirectory)
+    }
+
+    /// Dossier des sauvegardes : celui choisi dans les Paramètres, sinon le dossier par défaut.
+    static var directory: URL {
+        if let path = UserDefaults.standard.string(forKey: SettingsKey.backupDirectory), !path.isEmpty {
+            return URL(fileURLWithPath: path, isDirectory: true)
+        }
+        return defaultDirectory
+    }
+
+    static func safeLabel(_ label: String) -> String {
+        label.replacingOccurrences(of: "/", with: "-")
+    }
+
+    // MARK: Création
+
+    @discardableResult
+    static func create(from source: URL,
+                       label: String,
+                       kind: BackupEntry.Kind = .beforeWrite,
+                       in directory: URL = FaviconBackup.directory) throws -> URL {
         let fm = FileManager.default
-        let directory = URL.applicationSupportDirectory
-            .appending(path: "Navloom/Backups", directoryHint: .isDirectory)
         try fm.createDirectory(at: directory, withIntermediateDirectories: true)
 
         let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
-        let safeLabel = label.replacingOccurrences(of: "/", with: "-")
-        let destination = directory.appending(path: "\(safeLabel)-Favicons-\(stamp).sqlite")
+        let suffix = kind == .beforeRestore ? restoreSuffix : ""
+        let destination = directory.appending(path: "\(safeLabel(label))\(separator)\(stamp)\(suffix).sqlite")
 
         try fm.copyItem(at: source, to: destination)
+
+        // Nettoyage automatique des anciennes sauvegardes, s'il est activé dans les Paramètres.
+        if let retention = BackupRetention.current {
+            prune(label: label, retention: retention, in: directory)
+        }
         return destination
+    }
+
+    // MARK: Lecture
+
+    /// Sauvegardes disponibles, les plus récentes d'abord. `label` filtre sur un profil.
+    static func list(label: String? = nil, in directory: URL = FaviconBackup.directory) -> [BackupEntry] {
+        let urls = (try? FileManager.default.contentsOfDirectory(
+            at: directory, includingPropertiesForKeys: [.fileSizeKey])) ?? []
+
+        return urls
+            .compactMap { entry(for: $0) }
+            .filter { label == nil || $0.label == label }
+            .sorted { $0.date > $1.date }
+    }
+
+    /// Décode le nom d'un fichier de sauvegarde. Retourne nil si ce n'en est pas une.
+    static func entry(for url: URL) -> BackupEntry? {
+        guard url.pathExtension == "sqlite" else { return nil }
+
+        var base = url.deletingPathExtension().lastPathComponent
+        var kind = BackupEntry.Kind.beforeWrite
+        if base.hasSuffix(restoreSuffix) {
+            kind = .beforeRestore
+            base.removeLast(restoreSuffix.count)
+        }
+
+        guard let range = base.range(of: separator, options: .backwards) else { return nil }
+        let label = String(base[..<range.lowerBound])
+        let stamp = String(base[range.upperBound...])
+        guard !label.isEmpty, let date = parseStamp(stamp) else { return nil }
+
+        let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize).map { Int64($0) } ?? 0
+        return BackupEntry(url: url, label: label, date: date, kind: kind, sizeBytes: size)
+    }
+
+    /// "2026-09-30T12-15-00Z" → date (les ":" avaient été remplacés pour le nom de fichier).
+    private static func parseStamp(_ stamp: String) -> Date? {
+        let parts = stamp.split(separator: "T", maxSplits: 1)
+        guard parts.count == 2 else { return nil }
+        let iso = String(parts[0]) + "T" + parts[1].replacingOccurrences(of: "-", with: ":")
+        return ISO8601DateFormatter().date(from: iso)
+    }
+
+    /// Vrai si le fichier s'ouvre comme une base SQLite Favicons.
+    static func isReadable(_ url: URL) async -> Bool {
+        guard let database = try? FaviconDatabase(url: url, writable: false) else { return false }
+        return (try? await database.mappingCount()) != nil
+    }
+
+    // MARK: Restauration
+
+    /// Remplace `destination` par la sauvegarde. L'état actuel est sauvegardé d'abord :
+    /// on retourne l'emplacement de cette copie (nil s'il n'y avait rien à sauvegarder).
+    @discardableResult
+    static func restore(_ entry: BackupEntry,
+                        to destination: URL,
+                        label: String,
+                        in directory: URL = FaviconBackup.directory) throws -> URL? {
+        let fm = FileManager.default
+
+        var safety: URL?
+        if fm.fileExists(atPath: destination.path) {
+            safety = try create(from: destination, label: label, kind: .beforeRestore, in: directory)
+        }
+
+        // On copie d'abord à côté de la destination, puis on remplace d'un coup :
+        // la base n'est jamais dans un état à moitié écrit.
+        let temporary = destination.deletingLastPathComponent().appending(path: ".navloom-restore-tmp")
+        try? fm.removeItem(at: temporary)
+        try fm.copyItem(at: entry.url, to: temporary)
+
+        if fm.fileExists(atPath: destination.path) {
+            _ = try fm.replaceItemAt(destination, withItemAt: temporary)
+        } else {
+            try fm.moveItem(at: temporary, to: destination)
+        }
+
+        // Fichiers annexes SQLite de l'ancienne base : ils ne correspondent plus à la nouvelle.
+        for suffix in ["-journal", "-wal", "-shm"] {
+            try? fm.removeItem(at: URL(fileURLWithPath: destination.path + suffix))
+        }
+        return safety
+    }
+
+    // MARK: Suppression et nettoyage
+
+    /// Mise à la corbeille (récupérable), pas de suppression définitive.
+    static func delete(_ entry: BackupEntry) throws {
+        try FileManager.default.trashItem(at: entry.url, resultingItemURL: nil)
+    }
+
+    /// Ne garde que les plus récentes sauvegardes d'un profil, séparément pour chaque type.
+    /// Retourne le nombre de sauvegardes retirées. `remover` : mise à la corbeille par défaut.
+    @discardableResult
+    static func prune(label: String,
+                      retention: BackupRetention,
+                      in directory: URL = FaviconBackup.directory,
+                      remover: (URL) throws -> Void = { try FileManager.default.trashItem(at: $0, resultingItemURL: nil) }) -> Int {
+        let entries = list(label: safeLabel(label), in: directory)   // les plus récentes d'abord
+        let limits: [(BackupEntry.Kind, Int)] = [
+            (.beforeWrite, retention.keepBeforeWrite),
+            (.beforeRestore, retention.keepBeforeRestore),
+        ]
+
+        var removed = 0
+        for (kind, keep) in limits {
+            // On garde toujours au moins une sauvegarde de chaque type.
+            for old in entries.filter({ $0.kind == kind }).dropFirst(max(keep, 1)) {
+                if (try? remover(old.url)) != nil { removed += 1 }
+            }
+        }
+        return removed
+    }
+
+    /// Nettoyage de tous les profils d'un coup (bouton « Nettoyer maintenant »).
+    @discardableResult
+    static func pruneAll(retention: BackupRetention, in directory: URL = FaviconBackup.directory) -> Int {
+        let labels = Set(list(in: directory).map(\.label))
+        return labels.reduce(0) { $0 + prune(label: $1, retention: retention, in: directory) }
+    }
+
+    // MARK: Changement de dossier
+
+    /// Déplace toutes les sauvegardes d'un dossier vers un autre. Retourne le nombre de fichiers déplacés.
+    @discardableResult
+    static func moveAll(from source: URL, to destination: URL) throws -> Int {
+        let fm = FileManager.default
+        try fm.createDirectory(at: destination, withIntermediateDirectories: true)
+
+        var moved = 0
+        for entry in list(in: source) {
+            let target = destination.appending(path: entry.url.lastPathComponent)
+            guard !fm.fileExists(atPath: target.path) else { continue }
+            try fm.moveItem(at: entry.url, to: target)
+            moved += 1
+        }
+        return moved
     }
 }

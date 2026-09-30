@@ -11,8 +11,8 @@ import Foundation
 /// Orchestre les trois étapes : analyser → télécharger → écrire.
 /// Un `actor` : tout le travail se fait hors du thread principal.
 actor FaviconSyncEngine {
-    static let maxConcurrentHosts = 8
-    static let retryConcurrentHosts = 3
+    static let maxConcurrentHosts = 16
+    static let retryConcurrentHosts = 6
     static let retryDelaySeconds = 5
 
     let profile: ChromiumProfile
