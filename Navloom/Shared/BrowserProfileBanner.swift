@@ -1,3 +1,11 @@
+//
+//  BrowserProfileBanner.swift
+//  Navloom
+//
+//  Created by Yohan Janolin on 02/10/2026.
+//
+
+
 import SwiftUI
 
 /// Bandeau coloré : choix du navigateur + choix du profil (FaviconSync et Sauvegardes).
@@ -15,29 +23,34 @@ struct BrowserProfileBanner: View {
         HStack(spacing: 12) {
             Label("Navigateur", systemImage: "globe")
                 .fontWeight(.semibold)
+                .fixedSize()
+
             Picker("Navigateur", selection: $browserID) {
                 ForEach(browsers) { browser in
                     Text(browser.name).tag(Optional(browser.id))
                 }
             }
             .labelsHidden()
-            .frame(maxWidth: 220)
+            .fixedSize()
 
             if !profiles.isEmpty {
                 Divider().frame(height: 20)
 
                 Label("Profil", systemImage: "person.crop.circle")
                     .fontWeight(.semibold)
+                    .fixedSize()
+
                 Picker("Profil", selection: $profileID) {
                     ForEach(profiles) { profile in
                         Text(profile.name).tag(Optional(profile.id))
                     }
                 }
                 .labelsHidden()
-                .frame(maxWidth: 180)
+                .fixedSize(horizontal: !expands, vertical: false)
+                .frame(maxWidth: expands ? .infinity : nil, alignment: .leading)
+            } else if expands {
+                Spacer()
             }
-
-            if expands { Spacer() }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

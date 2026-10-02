@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 extension Color {
     /// Couleur depuis un code hexadécimal : Color(hex: 0xFF7A59)
@@ -8,6 +9,30 @@ extension Color {
                   green: Double((hex >> 8) & 0xFF) / 255,
                   blue: Double(hex & 0xFF) / 255,
                   opacity: 1)
+    }
+}
+
+/// Apparence choisie dans les Paramètres.
+enum AppAppearance: String, CaseIterable, Identifiable {
+    case system, light, dark
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .system: "Système"
+        case .light: "Clair"
+        case .dark: "Sombre"
+        }
+    }
+
+    /// nil = suivre le réglage de macOS
+    var nsAppearance: NSAppearance? {
+        switch self {
+        case .system: nil
+        case .light: NSAppearance(named: .aqua)
+        case .dark: NSAppearance(named: .darkAqua)
+        }
     }
 }
 

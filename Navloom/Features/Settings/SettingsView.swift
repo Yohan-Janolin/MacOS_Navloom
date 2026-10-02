@@ -14,6 +14,7 @@ struct SettingsView: View {
     @AppStorage(SettingsKey.autoPrune) private var autoPrune = false
     @AppStorage(SettingsKey.keepBeforeWrite) private var keepBeforeWrite = BackupRetention.defaultKeepBeforeWrite
     @AppStorage(SettingsKey.keepBeforeRestore) private var keepBeforeRestore = BackupRetention.defaultKeepBeforeRestore
+    @AppStorage(SettingsKey.appearance) private var appearance = AppAppearance.system
 
     private struct PendingMove {
         let from: URL
@@ -27,7 +28,20 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Section {
-                LabeledContent("Emplacement") {
+                Picker("Apparence", selection: $appearance) {
+                    ForEach(AppAppearance.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
+                }
+                .pickerStyle(.segmented)
+            } header: {
+                Text("Général")
+            } footer: {
+                Text("« Système » suit le réglage de macOS. Les deux autres forcent l'apparence, quel que soit ce réglage.")
+            }
+
+            Section {
+                LabeledContent("Emplacement des sauvegardes") {
                     VStack(alignment: .trailing, spacing: 8) {
                         Text((FaviconBackup.directory.path as NSString).abbreviatingWithTildeInPath)
                             .foregroundStyle(.secondary)
@@ -42,13 +56,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-            } header: {
-                Text("Sauvegardes")
-            } footer: {
-                Text("Une sauvegarde est créée automatiquement avant chaque écriture dans la base et avant chaque restauration.")
-            }
 
-            Section {
                 Toggle("Supprimer automatiquement les anciennes sauvegardes", isOn: $autoPrune)
 
                 if autoPrune {
@@ -61,9 +69,9 @@ struct SettingsView: View {
                     Button("Nettoyer maintenant") { cleanNow() }
                 }
             } header: {
-                Text("Nettoyage automatique")
+                Text("FaviconSync")
             } footer: {
-                Text("Le décompte se fait séparément pour chaque profil de navigateur. Les sauvegardes en trop sont mises à la corbeille, pas supprimées définitivement.")
+                Text("Une sauvegarde est créée automatiquement avant chaque écriture dans la base et avant chaque restauration. Le décompte se fait séparément pour chaque profil de navigateur ; les sauvegardes en trop sont mises à la corbeille, pas supprimées définitivement.")
             }
 
             if let message {

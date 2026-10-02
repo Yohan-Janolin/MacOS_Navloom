@@ -18,7 +18,7 @@ struct FaviconSyncView: View {
                 content
             }
         }
-        .navigationTitle("FaviconSync")
+        .navigationTitle("Navloom")
         .task { model.loadBrowsersIfNeeded() }
         .onChange(of: model.selectedBrowserID) { model.browserChanged() }
         .onChange(of: model.selectedProfileID) { model.reset() }
@@ -36,7 +36,12 @@ struct FaviconSyncView: View {
 
     private var content: some View {
         VStack(spacing: 16) {
-            header
+            titleHeader
+            BrowserProfileBanner(browsers: model.browsers,
+                                 profiles: model.profiles,
+                                 browserID: $model.selectedBrowserID,
+                                 profileID: $model.selectedProfileID)
+                .disabled(model.isBusy)
 
             if let message = model.errorMessage {
                 Label(message, systemImage: "exclamationmark.triangle.fill")
@@ -56,26 +61,19 @@ struct FaviconSyncView: View {
         .padding(20)
     }
 
-    private var header: some View {
-        HStack(spacing: 16) {
-            Picker("Navigateur", selection: $model.selectedBrowserID) {
-                ForEach(model.browsers) { browser in
-                    Text(browser.name).tag(Optional(browser.id))
-                }
-            }
-            .frame(maxWidth: 260)
-
-            if model.profiles.count > 1 {
-                Picker("Profil", selection: $model.selectedProfileID) {
-                    ForEach(model.profiles) { profile in
-                        Text(profile.name).tag(Optional(profile.id))
-                    }
-                }
-                .frame(maxWidth: 220)
-            }
-            Spacer()
+    private var titleHeader: some View {
+        VStack(spacing: 4) {
+            Text("FaviconSync")
+                .font(.largeTitle.bold())
+                .foregroundStyle(
+                    LinearGradient(colors: [Brand.coral, Brand.pink],
+                                   startPoint: .leading, endPoint: .trailing)
+                )
+            Text("Retrouve les favicons manquantes de tes favoris")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
-        .disabled(model.isBusy)
+        .frame(maxWidth: .infinity)
     }
 
     private func stats(_ analysis: SyncAnalysis) -> some View {
@@ -127,7 +125,7 @@ struct FaviconSyncView: View {
                 Spacer()
                 Text(model.currentOrigin).lineLimit(1).truncationMode(.middle)
             }
-            .font(.caption)
+            .font(.callout.weight(.semibold))
             .foregroundStyle(.secondary)
             Spacer()
         }
@@ -217,6 +215,14 @@ struct FaviconSyncView: View {
             }
 
             Spacer()
+            if model.phase == .fetched {
+                Button {
+                    model.analyze()
+                } label: {
+                    Label("Relancer l'analyse", systemImage: "arrow.clockwise")
+                }
+                .controlSize(.large)
+            }
             primaryAction
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)

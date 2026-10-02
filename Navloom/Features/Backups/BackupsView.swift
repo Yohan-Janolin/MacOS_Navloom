@@ -97,29 +97,18 @@ struct BackupsView: View {
 
     private var header: some View {
         HStack(spacing: 16) {
-            Picker("Navigateur", selection: $model.selectedBrowserID) {
-                ForEach(model.browsers) { browser in
-                    Text(browser.name).tag(Optional(browser.id))
-                }
-            }
-            .frame(maxWidth: 260)
-
-            if model.profiles.count > 1 {
-                Picker("Profil", selection: $model.selectedProfileID) {
-                    ForEach(model.profiles) { profile in
-                        Text(profile.name).tag(Optional(profile.id))
-                    }
-                }
-                .frame(maxWidth: 220)
-            }
-
+            BrowserProfileBanner(browsers: model.browsers,
+                                 profiles: model.profiles,
+                                 browserID: $model.selectedBrowserID,
+                                 profileID: $model.selectedProfileID,
+                                 expands: false)
             Spacer()
-
             Button {
                 model.revealFolder()
             } label: {
                 Label("Ouvrir le dossier", systemImage: "folder")
             }
+            .controlSize(.large)
         }
         .disabled(model.isRestoring)
     }
