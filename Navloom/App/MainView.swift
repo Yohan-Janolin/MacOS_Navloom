@@ -1,13 +1,12 @@
 import SwiftUI
-import AppKit
 
 struct MainView: View {
     @State private var selection: Feature? = .faviconSync
-    @AppStorage(SettingsKey.appearance) private var appearance = AppAppearance.system
 
     // Les view models vivent ici, au-dessus des écrans :
     // changer d'onglet ne détruit donc plus une recherche en cours.
     @State private var faviconSync = FaviconSyncViewModel()
+    @State private var twins = TwinsViewModel()
     @State private var backups = BackupsViewModel()
 
     var body: some View {
@@ -18,9 +17,6 @@ struct MainView: View {
             detail
         }
         .frame(minWidth: 760, minHeight: 480)
-        .onChange(of: appearance, initial: true) { _, newValue in
-            NSApp?.appearance = newValue.nsAppearance
-        }
     }
 
     // MARK: - Barre latérale
@@ -57,6 +53,8 @@ struct MainView: View {
         switch selection {
         case .faviconSync:
             FaviconSyncView(model: faviconSync)
+        case .twins:
+            TwinsView(model: twins)
         case .backups:
             BackupsView(model: backups)
         case .settings:

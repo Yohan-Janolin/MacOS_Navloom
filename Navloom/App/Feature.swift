@@ -4,13 +4,14 @@ import SwiftUI
 /// Ajouter un outil = ajouter un case ici + une vue dans Features/.
 enum Feature: String, CaseIterable, Identifiable {
     case faviconSync
+    case twins
     case backups
     case settings
 
     var id: String { rawValue }
 
     /// Outils, en haut de la barre latérale.
-    static let tools: [Feature] = [.faviconSync]
+    static let tools: [Feature] = [.faviconSync, .twins]
 
     /// Entrées fixées en bas, sous un séparateur.
     static let footer: [Feature] = [.backups, .settings]
@@ -18,6 +19,7 @@ enum Feature: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .faviconSync: "FaviconSync"
+        case .twins: "Twins"
         case .backups: "Sauvegardes"
         case .settings: "Paramètres"
         }
@@ -27,6 +29,7 @@ enum Feature: String, CaseIterable, Identifiable {
     var systemImage: String {
         switch self {
         case .faviconSync: "star.fill"
+        case .twins: "square.on.square"
         case .backups: "clock.arrow.circlepath"
         case .settings: "gearshape.fill"
         }
@@ -35,6 +38,7 @@ enum Feature: String, CaseIterable, Identifiable {
     var tint: Color {
         switch self {
         case .faviconSync: Brand.coral
+        case .twins: Brand.sky
         case .backups: Brand.teal
         case .settings: Brand.violet
         }

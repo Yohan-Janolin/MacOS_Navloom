@@ -1,11 +1,3 @@
-//
-//  FaviconSyncEngine.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 30/09/2026.
-//
-
-
 import Foundation
 
 /// Orchestre les trois étapes : analyser → télécharger → écrire.

@@ -1,11 +1,3 @@
-//
-//  HTMLIconParser.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 30/09/2026.
-//
-
-
 import Foundation
 
 /// Extraction des icônes déclarées dans une page HTML.

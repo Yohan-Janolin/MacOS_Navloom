@@ -1,11 +1,3 @@
-//
-//  Origin.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 30/09/2026.
-//
-
-
 import Foundation
 
 // MARK: - Hôtes privés (réseau local)

@@ -1,11 +1,3 @@
-//
-//  SettingsKey.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 02/10/2026.
-//
-
-
 import Foundation
 
 /// Clés des réglages dans UserDefaults (partagées avec @AppStorage dans l'écran Paramètres).

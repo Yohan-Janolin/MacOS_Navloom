@@ -1,11 +1,3 @@
-//
-//  NetworkFailure.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 30/09/2026.
-//
-
-
 import Foundation
 
 /// Catégories d'erreurs réseau, avec un libellé lisible pour le rapport.

@@ -1,11 +1,3 @@
-//
-//  SettingsView.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 02/10/2026.
-//
-
-
 import SwiftUI
 import AppKit
 

@@ -1,11 +1,3 @@
-//
-//  SyncReportTests.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 30/09/2026.
-//
-
-
 import Testing
 import Foundation
 @testable import Navloom

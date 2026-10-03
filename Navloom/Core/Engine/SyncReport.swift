@@ -1,11 +1,3 @@
-//
-//  SyncReport.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 30/09/2026.
-//
-
-
 import Foundation
 
 /// Construit le rapport texte d'une synchronisation.

@@ -1,11 +1,3 @@
-//
-//  BackupsViewModel.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 30/09/2026.
-//
-
-
 import SwiftUI
 import AppKit
 
