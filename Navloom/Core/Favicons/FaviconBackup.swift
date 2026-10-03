@@ -39,6 +39,14 @@ nonisolated enum FaviconBackup {
         label.replacingOccurrences(of: "/", with: "-")
     }
 
+    /// Horodatage pour un nom de fichier, en heure locale avec son décalage :
+    /// "2026-10-03T18-39-53+02-00" (les ":" sont remplacés, ils posent problème dans un nom de fichier).
+    static func fileStamp(_ date: Date = Date(), timeZone: TimeZone = .current) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.timeZone = timeZone
+        return formatter.string(from: date).replacingOccurrences(of: ":", with: "-")
+    }
+
     // MARK: Création
 
     @discardableResult
@@ -49,7 +57,7 @@ nonisolated enum FaviconBackup {
         let fm = FileManager.default
         try fm.createDirectory(at: directory, withIntermediateDirectories: true)
 
-        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        let stamp = fileStamp()
         let suffix = kind == .beforeRestore ? restoreSuffix : ""
         let destination = directory.appending(path: "\(safeLabel(label))\(separator)\(stamp)\(suffix).sqlite")
 
@@ -95,12 +103,22 @@ nonisolated enum FaviconBackup {
         return BackupEntry(url: url, label: label, date: date, kind: kind, sizeBytes: size)
     }
 
-    /// "2026-09-30T12-15-00Z" → date (les ":" avaient été remplacés pour le nom de fichier).
-    private static func parseStamp(_ stamp: String) -> Date? {
+    /// Relit un horodatage de nom de fichier, ancien ("2026-09-30T12-15-00Z", en UTC) ou
+    /// récent ("2026-09-30T14-15-00+02-00", en heure locale). Les ":" avaient été remplacés par des "-".
+    static func parseStamp(_ stamp: String) -> Date? {
         let parts = stamp.split(separator: "T", maxSplits: 1)
-        guard parts.count == 2 else { return nil }
-        let iso = String(parts[0]) + "T" + parts[1].replacingOccurrences(of: "-", with: ":")
-        return ISO8601DateFormatter().date(from: iso)
+        guard parts.count == 2, parts[1].count >= 8 else { return nil }
+
+        let time = parts[1].prefix(8).replacingOccurrences(of: "-", with: ":")
+
+        // Décalage horaire : "Z", ou un signe suivi de "hh-mm" (le signe peut être un "-").
+        let tail = parts[1].dropFirst(8)
+        var zone = String(tail)
+        if let sign = tail.first, sign == "+" || sign == "-" {
+            zone = String(sign) + tail.dropFirst().replacingOccurrences(of: "-", with: ":")
+        }
+
+        return ISO8601DateFormatter().date(from: "\(parts[0])T\(time)\(zone)")
     }
 
     /// Vrai si le fichier s'ouvre comme une base SQLite Favicons.

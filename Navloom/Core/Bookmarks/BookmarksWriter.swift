@@ -119,13 +119,13 @@ nonisolated enum BookmarksWriter {
     }
 
     /// Copie le fichier Bookmarks dans le dossier des sauvegardes de Navloom.
-    /// Nom : <profil>-Bookmarks-<date ISO>.json (l'écran Sauvegardes ne liste que les .sqlite).
+    /// Nom : <profil>-Bookmarks-<date locale ISO>.json (l'écran Sauvegardes ne liste que les .sqlite).
     static func backupFile(_ source: URL, label: String, in directory: URL) throws -> URL {
         let fm = FileManager.default
         try fm.createDirectory(at: directory, withIntermediateDirectories: true)
 
-        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
-        let destination = directory.appending(path: "\(FaviconBackup.safeLabel(label))-Bookmarks-\(stamp).json")
+        let destination = directory.appending(
+            path: "\(FaviconBackup.safeLabel(label))-Bookmarks-\(FaviconBackup.fileStamp()).json")
         try fm.copyItem(at: source, to: destination)
         return destination
     }

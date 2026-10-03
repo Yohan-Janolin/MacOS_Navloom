@@ -26,6 +26,24 @@ struct FaviconBackupTests {
         #expect(FaviconBackup.entry(for: URL(fileURLWithPath: "/tmp/quelquechose.sqlite")) == nil)
     }
 
+    @Test func litLesHorodatagesEnUtcEtEnHeureLocale() {
+        let moment = ISO8601DateFormatter().date(from: "2026-09-30T10:15:00Z")
+        // Ancien format (UTC), décalage positif, décalage négatif : un même instant.
+        #expect(FaviconBackup.parseStamp("2026-09-30T10-15-00Z") == moment)
+        #expect(FaviconBackup.parseStamp("2026-09-30T12-15-00+02-00") == moment)
+        #expect(FaviconBackup.parseStamp("2026-09-30T05-15-00-05-00") == moment)
+    }
+
+    @Test func ecritLHorodatageEnHeureLocale() throws {
+        let moment = try #require(ISO8601DateFormatter().date(from: "2026-10-03T16:39:53Z"))
+        let paris = try #require(TimeZone(identifier: "Europe/Paris"))
+
+        let stamp = FaviconBackup.fileStamp(moment, timeZone: paris)
+
+        #expect(stamp == "2026-10-03T18-39-53+02-00")
+        #expect(FaviconBackup.parseStamp(stamp) == moment)
+    }
+
     @Test func restaureEtConserveLEtatPrecedent() throws {
         let fm = FileManager.default
         let root = fm.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
