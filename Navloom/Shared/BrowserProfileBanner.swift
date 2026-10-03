@@ -16,6 +16,8 @@ struct BrowserProfileBanner: View {
     @Binding var profileID: String?
     /// Vrai : le bandeau occupe toute la largeur. Faux : il s'adapte à son contenu.
     var expands = true
+    /// Couleurs du dégradé de fond (de gauche à droite) ; la dernière colore aussi le contour.
+    var colors: [Color] = [Brand.coral, Brand.violet]
 
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -55,10 +57,10 @@ struct BrowserProfileBanner: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
-            LinearGradient(colors: [Brand.coral.opacity(0.18), Brand.violet.opacity(0.18)],
+            LinearGradient(colors: colors.map { $0.opacity(0.18) },
                            startPoint: .leading, endPoint: .trailing),
             in: shape
         )
-        .overlay(shape.strokeBorder(Brand.violet.opacity(0.3), lineWidth: 1))
+        .overlay(shape.strokeBorder((colors.last ?? Brand.violet).opacity(0.3), lineWidth: 1))
     }
 }
