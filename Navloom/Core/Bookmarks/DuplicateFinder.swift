@@ -1,3 +1,8 @@
+//
+//  DuplicateFinder.swift
+//  Navloom
+//
+
 import Foundation
 
 /// Des favoris qui pointent exactement sur la même URL.

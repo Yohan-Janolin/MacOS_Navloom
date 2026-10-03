@@ -1,3 +1,8 @@
+//
+//  DuplicateFinderTests.swift
+//  Navloom
+//
+
 import Testing
 import Foundation
 @testable import Navloom

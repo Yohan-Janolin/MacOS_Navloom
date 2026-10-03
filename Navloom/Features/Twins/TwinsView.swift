@@ -1,3 +1,8 @@
+//
+//  TwinsView.swift
+//  Navloom
+//
+
 import SwiftUI
 
 struct TwinsView: View {
@@ -21,6 +26,23 @@ struct TwinsView: View {
         .task { model.loadBrowsersIfNeeded() }
         .onChange(of: model.selectedBrowserID) { model.browserChanged() }
         .onChange(of: model.selectedProfileID) { model.reset() }
+        // Tant qu'on peut supprimer, on surveille si le navigateur est fermé.
+        .task(id: model.phase) {
+            guard model.phase == .done else { return }
+            while !Task.isCancelled {
+                model.refreshBrowserRunning()
+                try? await Task.sleep(for: .seconds(1))
+            }
+        }
+        .confirmationDialog(
+            "Supprimer \(model.selection.count) favori\(model.selection.count > 1 ? "s" : "") ?",
+            isPresented: $model.showConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Supprimer", role: .destructive) { model.removeSelected() }
+        } message: {
+            Text("Les favoris cochés seront retirés de \(model.selectedBrowser?.name ?? "ce navigateur"). Une sauvegarde du fichier Bookmarks est créée avant.")
+        }
     }
 
     // MARK: - Structure
@@ -41,7 +63,7 @@ struct TwinsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            if model.phase == .done {
+            if model.phase == .done || model.phase == .removing {
                 stats
             }
 
@@ -99,8 +121,56 @@ struct TwinsView: View {
                 ContentUnavailableView("Aucun doublon", systemImage: "checkmark.seal",
                                        description: Text("Aucune URL n'apparaît deux fois dans tes favoris."))
             } else {
-                groupsList
+                VStack(spacing: 12) {
+                    removalNotice
+                    groupsList
+                }
             }
+        case .removing:
+            ProgressView("Suppression des doublons…")
+        case .removed:
+            removedView
+        }
+    }
+
+    /// Bandeau au-dessus de la liste : ce qui bloque la suppression, sinon rappel de la sauvegarde.
+    @ViewBuilder
+    private var removalNotice: some View {
+        if model.isBrowserRunning {
+            notice("\(model.selectedBrowser?.name ?? "Le navigateur") est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir supprimer.",
+                   systemImage: "exclamationmark.triangle.fill", tint: .orange)
+        } else if model.fullySelectedGroupCount > 0 {
+            let count = model.fullySelectedGroupCount
+            notice("Dans \(count) groupe\(count > 1 ? "s" : ""), toutes les copies sont cochées. Décoches-en au moins une pour la garder.",
+                   systemImage: "exclamationmark.triangle.fill", tint: .orange)
+        } else {
+            notice("Une sauvegarde du fichier Bookmarks sera créée automatiquement avant la suppression.",
+                   systemImage: "externaldrive", tint: .secondary)
+        }
+    }
+
+    private func notice(_ text: String, systemImage: String, tint: Color) -> some View {
+        Label(text, systemImage: systemImage)
+            .foregroundStyle(tint)
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    private var removedView: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.green)
+
+            if let summary = model.summary {
+                Text("\(summary.removed) favori\(summary.removed > 1 ? "s" : "") supprimé\(summary.removed > 1 ? "s" : "")")
+                    .font(.title2.bold())
+                Button("Afficher la sauvegarde dans le Finder") { model.revealBackup() }
+            }
+            Text("Relance \(model.selectedBrowser?.name ?? "le navigateur") pour voir le résultat.")
+                .font(.callout)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -120,11 +190,17 @@ struct TwinsView: View {
                 } header: {
                     HStack {
                         Text(group.url)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
                             .lineLimit(1)
                             .truncationMode(.middle)
                         Spacer()
                         Text("\(group.bookmarks.count) favoris")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
                     }
+                    .textCase(nil)
+                    .padding(.vertical, 4)
                 }
             }
         }
@@ -151,12 +227,37 @@ struct TwinsView: View {
 
             Spacer()
 
-            Button(model.phase == .done ? "Nouvelle analyse" : "Chercher les doublons") {
-                model.analyze()
+            primaryActions
+        }
+    }
+
+    @ViewBuilder
+    private var primaryActions: some View {
+        switch model.phase {
+        case .done where !model.groups.isEmpty:
+            Button("Nouvelle analyse") { model.analyze() }
+                .controlSize(.large)
+            Button("Supprimer \(model.selection.count) favori\(model.selection.count > 1 ? "s" : "")") {
+                model.showConfirmation = true
             }
             .buttonStyle(.borderedProminent)
+            .tint(.red)
             .controlSize(.large)
-            .disabled(model.selectedProfile == nil || model.isBusy)
+            .disabled(!model.canRemove)
+        case .done, .removed:
+            Button("Nouvelle analyse") { model.analyze() }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+        case .removing:
+            Button("Suppression en cours…") {}
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(true)
+        case .idle, .analyzing:
+            Button("Chercher les doublons") { model.analyze() }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(model.selectedProfile == nil || model.isBusy)
         }
     }
 }

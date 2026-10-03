@@ -1,11 +1,17 @@
+//
+//  TwinsViewModel.swift
+//  Navloom
+//
+
 import SwiftUI
+import AppKit
 
 @MainActor
 @Observable
 final class TwinsViewModel {
 
     enum Phase: Equatable {
-        case idle, analyzing, done
+        case idle, analyzing, done, removing, removed
     }
 
     // MARK: État observé par la vue
@@ -19,10 +25,15 @@ final class TwinsViewModel {
     private(set) var phase: Phase = .idle
     private(set) var totalBookmarks = 0
     private(set) var groups: [DuplicateGroup] = []
+    private(set) var summary: BookmarksWriteSummary?
     private(set) var errorMessage: String?
+    private(set) var isBrowserRunning = false
 
-    /// Favoris cochés (par identifiant de nœud). Servira à l'étape suivante : la suppression.
+    /// Favoris cochés (par identifiant de nœud) : ce sont ceux qui seront supprimés.
     private(set) var selection: Set<String> = []
+
+    /// Vrai quand la boîte de dialogue de confirmation doit s'afficher.
+    var showConfirmation = false
 
     // MARK: Calculés
 
@@ -34,11 +45,21 @@ final class TwinsViewModel {
         profiles.first { $0.id == selectedProfileID }
     }
 
-    var isBusy: Bool { phase == .analyzing }
+    var isBusy: Bool { phase == .analyzing || phase == .removing }
 
     /// Nombre de favoris en trop : pour 3 favoris identiques, 2 sont des doublons.
     var extraCopies: Int {
         groups.reduce(0) { $0 + $1.bookmarks.count - 1 }
+    }
+
+    /// Groupes dont TOUTES les copies sont cochées : les supprimer ferait disparaître l'URL
+    /// de tes favoris. Tant qu'il en reste, la suppression est bloquée.
+    var fullySelectedGroupCount: Int {
+        groups.filter { group in group.bookmarks.allSatisfy { selection.contains($0.nodeID) } }.count
+    }
+
+    var canRemove: Bool {
+        phase == .done && !selection.isEmpty && fullySelectedGroupCount == 0 && !isBrowserRunning
     }
 
     // MARK: Sélection du navigateur et du profil
@@ -67,7 +88,12 @@ final class TwinsViewModel {
         totalBookmarks = 0
         groups = []
         selection = []
+        summary = nil
         errorMessage = nil
+    }
+
+    func refreshBrowserRunning() {
+        isBrowserRunning = selectedProfile?.isBrowserRunning ?? false
     }
 
     // MARK: Analyse (lecture seule)
@@ -112,5 +138,37 @@ final class TwinsViewModel {
 
     func clearSelection() {
         selection = []
+    }
+
+    // MARK: Suppression (navigateur fermé obligatoire, sauvegarde automatique)
+
+    func removeSelected() {
+        guard let profile = selectedProfile, phase == .done, !selection.isEmpty else { return }
+        refreshBrowserRunning()
+        guard !isBrowserRunning, fullySelectedGroupCount == 0 else { return }
+
+        errorMessage = nil
+        phase = .removing
+
+        let ids = selection
+        let file = profile.bookmarksURL
+        let label = profile.id
+
+        Task {
+            do {
+                summary = try await Task.detached {
+                    try BookmarksWriter.removeBookmarks(ids: ids, in: file, label: label)
+                }.value
+                phase = .removed
+            } catch {
+                errorMessage = error.localizedDescription
+                phase = .done
+            }
+        }
+    }
+
+    func revealBackup() {
+        guard let url = summary?.backupURL else { return }
+        NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 }
