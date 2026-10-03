@@ -28,6 +28,7 @@ final class TwinsViewModel {
     private(set) var summary: BookmarksWriteSummary?
     private(set) var errorMessage: String?
     private(set) var isBrowserRunning = false
+    private(set) var syncStatus: BookmarkSyncStatus = .unknown
 
     /// Favoris cochés (par identifiant de nœud) : ce sont ceux qui seront supprimés.
     private(set) var selection: Set<String> = []
@@ -58,8 +59,11 @@ final class TwinsViewModel {
         groups.filter { group in group.bookmarks.allSatisfy { selection.contains($0.nodeID) } }.count
     }
 
+    /// La suppression est bloquée si la synchro des favoris est active : au lancement suivant,
+    /// le navigateur remettrait les favoris supprimés.
     var canRemove: Bool {
-        phase == .done && !selection.isEmpty && fullySelectedGroupCount == 0 && !isBrowserRunning
+        phase == .done && !selection.isEmpty && fullySelectedGroupCount == 0
+            && !isBrowserRunning && syncStatus != .enabled
     }
 
     // MARK: Sélection du navigateur et du profil
@@ -93,7 +97,17 @@ final class TwinsViewModel {
     }
 
     func refreshBrowserRunning() {
+        let wasRunning = isBrowserRunning
         isBrowserRunning = selectedProfile?.isBrowserRunning ?? false
+
+        // Le navigateur écrit ses réglages en quittant : on relit la synchro quand il vient de se fermer.
+        if wasRunning && !isBrowserRunning {
+            refreshSyncStatus()
+        }
+    }
+
+    func refreshSyncStatus() {
+        syncStatus = selectedProfile.map(BookmarkSyncStatus.detect(for:)) ?? .unknown
     }
 
     // MARK: Analyse (lecture seule)
@@ -109,6 +123,7 @@ final class TwinsViewModel {
                 let bookmarks = try await Task.detached { try BookmarksReader.read(from: url) }.value
                 totalBookmarks = bookmarks.count
                 groups = DuplicateFinder.groups(in: bookmarks)
+                refreshSyncStatus()
                 phase = .done
             } catch {
                 errorMessage = error.localizedDescription
@@ -145,7 +160,8 @@ final class TwinsViewModel {
     func removeSelected() {
         guard let profile = selectedProfile, phase == .done, !selection.isEmpty else { return }
         refreshBrowserRunning()
-        guard !isBrowserRunning, fullySelectedGroupCount == 0 else { return }
+        refreshSyncStatus()
+        guard !isBrowserRunning, syncStatus != .enabled, fullySelectedGroupCount == 0 else { return }
 
         errorMessage = nil
         phase = .removing

@@ -10,6 +10,7 @@ nonisolated struct ChromiumProfile: Identifiable, Hashable, Sendable {
 
     var bookmarksURL: URL { directory.appending(path: "Bookmarks") }
     var faviconsURL: URL { directory.appending(path: "Favicons") }
+    var preferencesURL: URL { directory.appending(path: "Preferences") }
 
     /// Vrai si le navigateur est en cours d'exécution.
     var isBrowserRunning: Bool {

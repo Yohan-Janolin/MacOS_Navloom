@@ -139,14 +139,24 @@ struct TwinsView: View {
         if model.isBrowserRunning {
             notice("\(model.selectedBrowser?.name ?? "Le navigateur") est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir supprimer.",
                    systemImage: "exclamationmark.triangle.fill", tint: .orange)
+        } else if model.syncStatus == .enabled {
+            notice("La synchro des favoris est activée dans \(browserName) : à son prochain lancement, elle remettrait les favoris supprimés. Désactive-la dans les réglages de synchronisation du navigateur, ou supprime les doublons directement dans son gestionnaire de favoris.",
+                   systemImage: "arrow.triangle.2.circlepath", tint: .orange)
         } else if model.fullySelectedGroupCount > 0 {
             let count = model.fullySelectedGroupCount
             notice("Dans \(count) groupe\(count > 1 ? "s" : ""), toutes les copies sont cochées. Décoches-en au moins une pour la garder.",
                    systemImage: "exclamationmark.triangle.fill", tint: .orange)
+        } else if model.syncStatus == .unknown {
+            notice("Navloom ne sait pas lire l'état de la synchro de \(browserName). Si elle est activée, elle peut remettre les favoris supprimés. Une sauvegarde du fichier Bookmarks sera créée avant la suppression.",
+                   systemImage: "info.circle", tint: .secondary)
         } else {
             notice("Une sauvegarde du fichier Bookmarks sera créée automatiquement avant la suppression.",
                    systemImage: "externaldrive", tint: .secondary)
         }
+    }
+
+    private var browserName: String {
+        model.selectedBrowser?.name ?? "le navigateur"
     }
 
     private func notice(_ text: String, systemImage: String, tint: Color) -> some View {
