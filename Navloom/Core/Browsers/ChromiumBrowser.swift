@@ -66,23 +66,58 @@ nonisolated struct ChromiumBrowser: Identifiable, Hashable, Sendable {
         }
         let vivaldi: Vivaldi?
     }
+    
+    /// Ce que Local State dit d'un profil (valeurs déjà nettoyées).
+    nonisolated struct ProfileInfo: Equatable, Sendable {
+        let name: String?
+        let account: String?
+    }
 
     private static func clean(_ text: String?) -> String? {
         guard let text = text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else { return nil }
         return text
     }
+    
+    /// Ajoute le nom du dossier aux libellés qui se répètent, pour que chaque profil reste identifiable.
+    static func disambiguated(labels: [String], folders: [String]) -> [String] {
+        let counts = Dictionary(labels.map { ($0, 1) }, uniquingKeysWith: +)
+        return zip(labels, folders).map { label, folder in
+            counts[label, default: 0] > 1 ? "\(label) · \(folder)" : label
+        }
+    }
 
-    private func infoCache() -> [String: LocalState.Profile.Info] {
-        guard let data = try? Data(contentsOf: root.appending(path: "Local State")),
-              let state = try? JSONDecoder().decode(LocalState.self, from: data) else { return [:] }
-        return state.profile?.info_cache ?? [:]
+    /// Lit le contenu de `Local State` (séparé de la lecture du fichier pour pouvoir être testé).
+    static func parseInfoCache(_ data: Data) -> [String: ProfileInfo] {
+        guard let state = try? JSONDecoder().decode(LocalState.self, from: data),
+              let cache = state.profile?.info_cache else { return [:] }
+        return cache.mapValues { ProfileInfo(name: clean($0.name), account: clean($0.user_name)) }
+    }
+
+    /// Lit le nom de compte Vivaldi dans le contenu de `Preferences`.
+    static func parseVivaldiAccount(_ data: Data) -> String? {
+        guard let prefs = try? JSONDecoder().decode(Preferences.self, from: data) else { return nil }
+        return clean(prefs.vivaldi?.vivaldi_account?.username)
+    }
+
+    /// Libellé affiché : « Nom (compte) », « Nom » seul, ou le nom du dossier en dernier recours.
+    static func label(folder: String, info: ProfileInfo?, fallbackAccount: String? = nil) -> String {
+        let profileName = info?.name ?? folder
+        let account = info?.account ?? fallbackAccount
+        if let account, account != profileName {
+            return "\(profileName) (\(account))"
+        }
+        return profileName
+    }
+
+    private func infoCache() -> [String: ProfileInfo] {
+        guard let data = try? Data(contentsOf: root.appending(path: "Local State")) else { return [:] }
+        return Self.parseInfoCache(data)
     }
 
     private func vivaldiAccount(in directory: URL) -> String? {
         guard id.hasPrefix("vivaldi"),
-              let data = try? Data(contentsOf: directory.appending(path: "Preferences")),
-              let prefs = try? JSONDecoder().decode(Preferences.self, from: data) else { return nil }
-        return Self.clean(prefs.vivaldi?.vivaldi_account?.username)
+              let data = try? Data(contentsOf: directory.appending(path: "Preferences")) else { return nil }
+        return Self.parseVivaldiAccount(data)
     }
 
     /// Profils trouvés sur le disque : "Default" et "Profile 1", "Profile 2"…
@@ -93,23 +128,23 @@ nonisolated struct ChromiumBrowser: Identifiable, Hashable, Sendable {
 
         let cache = infoCache()
 
-        return names
+        // Seuls les profils qui ont un fichier Bookmarks sont gardés (et donc comptés pour les doublons).
+        let folders = names
             .filter { $0 == "Default" || $0.hasPrefix("Profile ") }
             .sorted()
-            .map { folder in
-                let directory = root.appending(path: folder)
-                let info = cache[folder]
-                let profileName = Self.clean(info?.name) ?? folder
-                let account = Self.clean(info?.user_name) ?? vivaldiAccount(in: directory)
+            .filter { fm.fileExists(atPath: root.appending(path: $0).appending(path: "Bookmarks").path) }
 
-                var label = profileName
-                if let account, account != profileName {
-                    label += " (\(account))"
-                }
-                return ChromiumProfile(id: "\(id)/\(folder)", name: label, directory: directory,
-                                       browserName: name, bundleID: bundleID)
-            }
-            .filter { fm.fileExists(atPath: $0.bookmarksURL.path) }
+        let labels = folders.map { folder in
+            Self.label(folder: folder,
+                       info: cache[folder],
+                       fallbackAccount: vivaldiAccount(in: root.appending(path: folder)))
+        }
+
+        return zip(folders, Self.disambiguated(labels: labels, folders: folders)).map { folder, label in
+            ChromiumProfile(id: "\(id)/\(folder)", name: label,
+                            directory: root.appending(path: folder),
+                            browserName: name, bundleID: bundleID)
+        }
     }
 
     /// Navigateurs connus ayant au moins un profil exploitable.
