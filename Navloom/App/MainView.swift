@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @State private var selection: Feature? = .faviconSync
+    @State private var selection: Feature? = .home
 
     // Les view models vivent ici, au-dessus des écrans :
     // changer d'onglet ne détruit donc plus une recherche en cours.
@@ -30,7 +30,7 @@ struct MainView: View {
             }
             .tag(feature)
         }
-        // Sauvegardes et Paramètres : tout en bas, sous un séparateur.
+        // Sauvegardes, Paramètres et À propos : tout en bas, sous un séparateur.
         .safeAreaInset(edge: .bottom, spacing: 0) {
             VStack(spacing: 2) {
                 Divider()
@@ -51,6 +51,8 @@ struct MainView: View {
     @ViewBuilder
     private var detail: some View {
         switch selection {
+        case .home:
+            HomeView()
         case .faviconSync:
             FaviconSyncView(model: faviconSync)
         case .twins:
@@ -59,6 +61,8 @@ struct MainView: View {
             BackupsView(model: backups)
         case .settings:
             SettingsView()
+        case .about:
+            AboutView()
         case nil:
             ContentUnavailableView("Choisis un outil", systemImage: "sidebar.left")
         }

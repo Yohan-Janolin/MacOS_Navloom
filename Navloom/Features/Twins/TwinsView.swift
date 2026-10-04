@@ -140,7 +140,7 @@ struct TwinsView: View {
             notice("\(model.selectedBrowser?.name ?? "Le navigateur") est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir supprimer.",
                    systemImage: "exclamationmark.triangle.fill", tint: .orange)
         } else if model.syncStatus == .enabled {
-            notice("La synchro des favoris est activée dans \(browserName) : à son prochain lancement, elle remettrait les favoris supprimés. Désactive-la dans les réglages de synchronisation du navigateur, ou supprime les doublons directement dans son gestionnaire de favoris.",
+            notice("La synchro des favoris est activée dans \(browserName) : à son prochain lancement, elle remettrait les favoris supprimés. Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil), ou supprime les doublons directement dans son gestionnaire de favoris.",
                    systemImage: "arrow.triangle.2.circlepath", tint: .orange)
         } else if model.fullySelectedGroupCount > 0 {
             let count = model.fullySelectedGroupCount

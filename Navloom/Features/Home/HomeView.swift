@@ -1,0 +1,138 @@
+import SwiftUI
+
+struct HomeView: View {
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 22) {
+                header
+
+                section("Les outils") {
+                    ToolCard(feature: .faviconSync,
+                             text: "Récupère les icônes (favicons) manquantes de tes favoris et les écrit dans le navigateur. Le navigateur doit être fermé au moment d'écrire.")
+                    ToolCard(feature: .twins,
+                             text: "Retrouve les favoris qui pointent sur exactement la même URL et supprime ceux que tu coches. Le navigateur doit être fermé, et la synchro des favoris désactivée (voir plus bas).")
+                    ToolCard(feature: .backups,
+                             text: "Liste les sauvegardes créées avant chaque écriture et permet de restaurer l'une d'elles.")
+                }
+
+                section("Limites") {
+                    InfoCard(systemImage: "globe", tint: Brand.sky,
+                             title: "Navigateurs pris en charge",
+                             text: "Vivaldi, Chrome, Brave, Edge, Opera et Chromium. Arc n'est pas supporté, pas plus que Safari ou Firefox, qui n'utilisent pas le même format de favoris.")
+                    InfoCard(systemImage: "power", tint: .orange,
+                             title: "Navigateur fermé",
+                             text: "Navloom modifie les fichiers du navigateur, qui les réécrirait à sa fermeture. Quitte-le complètement (Cmd + Q) avant d'écrire. Chaque écriture est précédée d'une sauvegarde.")
+                }
+
+                section("Twins et la synchronisation") {
+                    syncGuide
+                }
+            }
+            .frame(maxWidth: 680)
+            .padding(28)
+            .frame(maxWidth: .infinity)
+        }
+        .navigationTitle("Navloom")
+    }
+
+    private var header: some View {
+        VStack(spacing: 4) {
+            Text("Navloom")
+                .font(.largeTitle.bold())
+                .foregroundStyle(LinearGradient(colors: [Brand.coral, Brand.violet],
+                                                startPoint: .leading, endPoint: .trailing))
+            Text("Des outils pour entretenir les favoris de ton navigateur")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var syncGuide: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Pourquoi la synchro gêne", systemImage: "arrow.triangle.2.circlepath")
+                .font(.headline)
+                .foregroundStyle(.orange)
+            Text("Quand la synchro des favoris est active, le navigateur remet au lancement les favoris que Navloom a supprimés. Twins (et bientôt Ghosts) refuse donc de supprimer tant qu'elle est active. Navloom ne peut pas la couper à ta place : elle se règle dans le navigateur, avec ton compte.")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+
+            Divider()
+
+            Text("Avec Vivaldi")
+                .font(.subheadline.bold())
+            VStack(alignment: .leading, spacing: 8) {
+                step(1, "Dans Vivaldi, ouvre Réglages › Synchronisation et décoche « Signets ».")
+                step(2, "Quitte Vivaldi (Cmd + Q), puis supprime tes doublons avec Navloom.")
+                step(3, "Pour réactiver la synchro des favoris sans faire revenir les doublons : retourne dans Réglages › Synchronisation et clique sur « Réinitialiser les données distantes ». Cela efface les données stockées chez Vivaldi, ton mot de passe de chiffrement et te déconnecte.")
+                step(4, "Reconnecte-toi, redéfinis ton mot de passe de chiffrement (tu peux reprendre le même), puis recoche « Signets ».")
+            }
+
+            Text("Pour les autres navigateurs, Navloom ne sait pas lire l'état de la synchro : désactive-la toi-même avant de supprimer.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.orange.opacity(0.10), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private func step(_ number: Int, _ text: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Text("\(number)")
+                .font(.caption.bold())
+                .foregroundStyle(.white)
+                .frame(width: 20, height: 20)
+                .background(Color.orange.gradient, in: Circle())
+            Text(text)
+                .font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.title3.bold())
+            content()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct ToolCard: View {
+    let feature: Feature
+    let text: String
+
+    var body: some View {
+        InfoCard(systemImage: feature.systemImage, tint: feature.tint, title: feature.title, text: text)
+    }
+}
+
+private struct InfoCard: View {
+    let systemImage: String
+    let tint: Color
+    let title: String
+    let text: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            SidebarIcon(systemImage: systemImage, tint: tint)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title).font(.headline)
+                Text(text)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+#Preview {
+    HomeView()
+}
