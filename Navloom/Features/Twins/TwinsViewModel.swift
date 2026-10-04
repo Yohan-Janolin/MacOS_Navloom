@@ -1,8 +1,3 @@
-//
-//  TwinsViewModel.swift
-//  Navloom
-//
-
 import SwiftUI
 import AppKit
 

@@ -40,7 +40,18 @@ struct BackupsView: View {
         ) { entry in
             Button("Restaurer") { model.restore(entry) }
         } message: { entry in
-            Text("La base de favicons de \(model.selectedBrowser?.name ?? "ce navigateur") sera remplacée par la sauvegarde du \(entry.date.formatted(date: .long, time: .shortened)). L'état actuel est sauvegardé automatiquement avant.")
+            Text(restoreMessage(for: entry))
+        }
+    }
+
+    private func restoreMessage(for entry: BackupEntry) -> String {
+        let browser = model.selectedBrowser?.name ?? "ce navigateur"
+        let date = entry.date.formatted(date: .long, time: .shortened)
+        switch entry.category {
+        case .favicons:
+            return "La base de favicons de \(browser) sera remplacée par la sauvegarde du \(date). L'état actuel est sauvegardé automatiquement avant."
+        case .bookmarks:
+            return "Les favoris de \(browser) (fichier Bookmarks) seront remplacés par la sauvegarde du \(date). L'état actuel est sauvegardé automatiquement avant."
         }
     }
 
@@ -50,32 +61,26 @@ struct BackupsView: View {
         VStack(spacing: 16) {
             header
 
-            if model.isBrowserRunning {
-                notice(
-                    "\(model.selectedBrowser?.name ?? "Le navigateur") est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir restaurer.",
-                    systemImage: "exclamationmark.triangle.fill",
-                    tint: .orange
-                )
-            }
+            categoryPicker
+
+            notice
 
             if let banner = model.banner {
-                notice(banner.text,
-                       systemImage: banner.isError ? "xmark.octagon.fill" : "checkmark.circle.fill",
-                       tint: banner.isError ? .red : .green)
+                bannerLabel(banner)
             }
 
             if model.items.isEmpty {
                 ContentUnavailableView(
                     "Aucune sauvegarde",
                     systemImage: "clock.arrow.circlepath",
-                    description: Text("Une sauvegarde est créée automatiquement avant chaque écriture dans la base de favicons.")
+                    description: Text(emptyDescription)
                 )
                 .frame(maxHeight: .infinity)
             } else {
                 List(model.items) { item in
                     BackupRow(
                         item: item,
-                        canRestore: canRestore(item),
+                        canRestore: model.canRestore(item),
                         onRestore: { model.pendingRestore = item.entry },
                         onReveal: { model.reveal(item.entry) },
                         onDelete: { model.delete(item.entry) }
@@ -105,13 +110,51 @@ struct BackupsView: View {
         .disabled(model.isRestoring)
     }
 
-    private func canRestore(_ item: BackupsViewModel.Item) -> Bool {
-        guard !model.isBrowserRunning, !model.isRestoring else { return false }
-        return item.count != .unreadable
+    private var categoryPicker: some View {
+        Picker("", selection: $model.selectedCategory) {
+            ForEach(BackupCategory.allCases) { category in
+                Text("\(category.title) (\(model.count(in: category)))").tag(category)
+            }
+        }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .disabled(model.isRestoring)
     }
 
-    private func notice(_ text: String, systemImage: String, tint: Color) -> some View {
-        Label(text, systemImage: systemImage)
+    private var emptyDescription: String {
+        switch model.selectedCategory {
+        case .favicons:
+            "Une sauvegarde est créée automatiquement avant chaque écriture dans la base de favicons."
+        case .bookmarks:
+            "Une sauvegarde est créée automatiquement avant chaque suppression de favoris (Twins, Ghosts)."
+        }
+    }
+
+    /// Favoris : bandeau complet (le navigateur ouvert ou la synchro active bloquent la restauration).
+    /// Favicons : seul le navigateur ouvert bloque, la synchro n'y change rien.
+    @ViewBuilder
+    private var notice: some View {
+        let browserName = model.selectedBrowser?.name ?? "Le navigateur"
+        switch model.selectedCategory {
+        case .bookmarks:
+            SyncNotice(browserName: browserName,
+                       isBrowserRunning: model.isBrowserRunning,
+                       syncStatus: model.syncStatus,
+                       operation: .restoration)
+        case .favicons:
+            if model.isBrowserRunning {
+                SyncNotice(browserName: browserName,
+                           isBrowserRunning: true,
+                           syncStatus: .disabled,
+                           operation: .restoration)
+            }
+        }
+    }
+
+    private func bannerLabel(_ banner: BackupsViewModel.Banner) -> some View {
+        let tint: Color = banner.isError ? .red : .green
+        return Label(banner.text,
+                     systemImage: banner.isError ? "xmark.octagon.fill" : "checkmark.circle.fill")
             .foregroundStyle(tint)
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -167,7 +210,7 @@ private struct BackupRow: View {
     private var countLabel: String {
         switch item.count {
         case .loading: "lecture…"
-        case .value(let count): "\(count) favicons"
+        case .value(let count): "\(count) \(item.entry.category.itemName)"
         case .unreadable: "illisible"
         }
     }

@@ -1,15 +1,7 @@
-//
-//  LinkCheckResult.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 04/10/2026.
-//
-
-
 import Foundation
 
 /// Verdict pour une URL.
-nonisolated enum LinkCheckResult: Sendable {
+nonisolated enum LinkCheckResult: Sendable, Equatable {
     case alive
     case moved(String)                              // répond, mais redirige ailleurs (info)
     case dead(String)                               // 404 / 410 : la page n'existe plus
@@ -25,9 +17,14 @@ nonisolated enum LinkCheckResult: Sendable {
     }
 }
 
+/// Ce dont le moteur a besoin pour vérifier un lien (permet de le remplacer par un faux dans les tests).
+nonisolated protocol LinkChecking: Sendable {
+    func check(_ url: URL) async -> LinkCheckResult
+}
+
 /// Teste si une page répond encore. Un GET dont on abandonne le corps dès réception des en-têtes
 /// (beaucoup de serveurs répondent mal aux requêtes HEAD).
-nonisolated final class LinkChecker: @unchecked Sendable {
+nonisolated final class LinkChecker: LinkChecking, @unchecked Sendable {
     private let session: URLSession
 
     init() {
@@ -73,36 +70,38 @@ nonisolated final class LinkChecker: @unchecked Sendable {
         case .failure(let failure):
             if case .dns = failure { return .unresolved(failure.label) }
             return .uncertain(failure.label, retryable: failure.isRetryable)
-
         case .response(let http):
-            let code = http.statusCode
-            switch code {
-            case 200..<400:
-                if let note = redirectNote(from: url, to: http.url) { return .moved(note) }
-                return .alive
-            case 404, 410:
-                return .dead("HTTP \(code)")
-            case 401, 403, 405, 429, 451, 999:
-                // Le serveur répond mais refuse un client automatique : la page existe très probablement.
-                return .alive
-            case 500..<600:
-                return .uncertain("HTTP \(code)", retryable: true)
-            default:
-                return .uncertain("HTTP \(code)", retryable: false)
-            }
+            return Self.verdict(statusCode: http.statusCode, from: url, to: http.url)
         }
     }
 
-    // MARK: - Redirections
+    // MARK: - Interprétation d'une réponse (pure, donc testable sans réseau)
 
-    private func normalizedHost(_ url: URL) -> String? {
+    static func verdict(statusCode code: Int, from original: URL, to final: URL?) -> LinkCheckResult {
+        switch code {
+        case 200..<400:
+            if let note = redirectNote(from: original, to: final) { return .moved(note) }
+            return .alive
+        case 404, 410:
+            return .dead("HTTP \(code)")
+        case 401, 403, 405, 429, 451, 999:
+            // Le serveur répond mais refuse un client automatique : la page existe très probablement.
+            return .alive
+        case 500..<600:
+            return .uncertain("HTTP \(code)", retryable: true)
+        default:
+            return .uncertain("HTTP \(code)", retryable: false)
+        }
+    }
+
+    private static func normalizedHost(_ url: URL) -> String? {
         guard let host = url.host?.lowercased() else { return nil }
         return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
     }
 
     /// Une redirection http→https ou vers « /page/ » n'a rien d'anormal ; changer de site, ou atterrir
     /// sur l'accueil alors qu'on visait une page précise (404 déguisée), si.
-    private func redirectNote(from original: URL, to final: URL?) -> String? {
+    static func redirectNote(from original: URL, to final: URL?) -> String? {
         guard let final, let finalHost = normalizedHost(final) else { return nil }
 
         if let originalHost = normalizedHost(original), originalHost != finalHost {

@@ -1,11 +1,3 @@
-//
-//  GhostsViewModel.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 04/10/2026.
-//
-
-
 import SwiftUI
 import AppKit
 import UniformTypeIdentifiers
@@ -15,7 +7,7 @@ import UniformTypeIdentifiers
 final class GhostsViewModel {
 
     enum Phase: Equatable {
-        case idle, scanning, done
+        case idle, scanning, done, removing, removed
     }
 
     enum Category: String, CaseIterable, Identifiable {
@@ -27,9 +19,11 @@ final class GhostsViewModel {
 
     struct Row: Identifiable {
         let id = UUID()
+        let nodeID: String
         let name: String
         let url: String
         let detail: String
+        let folder: String
     }
 
     // MARK: État observé par la vue
@@ -51,9 +45,29 @@ final class GhostsViewModel {
     private(set) var progressTotal = 0
     private(set) var currentURL = ""
 
+    private(set) var isBrowserRunning = false
+    private(set) var syncStatus: BookmarkSyncStatus = .unknown
+    private(set) var summary: BookmarksWriteSummary?
+
+    /// Favoris cochés (par identifiant de nœud) : ce sont ceux qui seront supprimés.
+    private(set) var selection: Set<String> = []
+
+    /// Vrai quand la boîte de dialogue de confirmation doit s'afficher.
+    var showConfirmation = false
+
+    private var scanTask: Task<Void, Never>?
+
+    // MARK: Calculés
+
     var selectedBrowser: ChromiumBrowser? { browsers.first { $0.id == selectedBrowserID } }
     var selectedProfile: ChromiumProfile? { profiles.first { $0.id == selectedProfileID } }
-    var isBusy: Bool { phase == .scanning }
+    var isBusy: Bool { phase == .scanning || phase == .removing }
+
+    /// Même règle que Twins : pas de suppression si le navigateur est ouvert ou si la synchro
+    /// des favoris est active (elle remettrait les favoris supprimés au lancement suivant).
+    var canRemove: Bool {
+        phase == .done && !selection.isEmpty && !isBrowserRunning && syncStatus != .enabled
+    }
 
     // MARK: Sélection du navigateur et du profil
 
@@ -81,6 +95,22 @@ final class GhostsViewModel {
         report = nil
         errorMessage = nil
         rows = [:]
+        selection = []
+        summary = nil
+    }
+
+    func refreshBrowserRunning() {
+        let wasRunning = isBrowserRunning
+        isBrowserRunning = selectedProfile?.isBrowserRunning ?? false
+
+        // Le navigateur écrit ses réglages en quittant : on relit la synchro quand il vient de se fermer.
+        if wasRunning && !isBrowserRunning {
+            refreshSyncStatus()
+        }
+    }
+
+    func refreshSyncStatus() {
+        syncStatus = selectedProfile.map(BookmarkSyncStatus.detect(for:)) ?? .unknown
     }
 
     // MARK: Recherche
@@ -97,7 +127,7 @@ final class GhostsViewModel {
         let engine = GhostsEngine(profile: profile)
         let (stream, continuation) = AsyncStream.makeStream(of: GhostsEvent.self)
 
-        Task {
+        scanTask = Task {
             let listener = Task {
                 for await event in stream { handle(event) }
             }
@@ -106,8 +136,14 @@ final class GhostsViewModel {
                 continuation.finish()
                 await listener.value
 
+                // Arrêt demandé pendant la recherche : les résultats sont incomplets, on les jette.
+                if Task.isCancelled {
+                    phase = .idle
+                    return
+                }
                 report = result
                 buildRows(from: result)
+                refreshSyncStatus()
                 phase = .done
             } catch {
                 continuation.finish()
@@ -116,6 +152,11 @@ final class GhostsViewModel {
                 phase = .idle
             }
         }
+    }
+
+    /// Interrompt la recherche en cours (rien n'a été modifié, donc retour à l'état initial).
+    func cancelScan() {
+        scanTask?.cancel()
     }
 
     private func handle(_ event: GhostsEvent) {
@@ -135,7 +176,11 @@ final class GhostsViewModel {
 
     private func buildRows(from report: GhostsReport) {
         func make(_ issues: [BookmarkIssue]) -> [Row] {
-            issues.map { Row(name: $0.bookmark.name, url: $0.bookmark.url, detail: $0.reason) }
+            issues.map {
+                Row(nodeID: $0.bookmark.nodeID,
+                    name: $0.bookmark.name, url: $0.bookmark.url, detail: $0.reason,
+                    folder: $0.bookmark.folder.isEmpty ? "Racine" : $0.bookmark.folder)
+            }
         }
         rows[.dead] = make(report.dead)
         rows[.uncertain] = make(report.uncertain)
@@ -144,6 +189,73 @@ final class GhostsViewModel {
         if !report.dead.isEmpty { selectedCategory = .dead }
         else if !report.uncertain.isEmpty { selectedCategory = .uncertain }
         else { selectedCategory = .moved }
+    }
+
+    // MARK: Cases à cocher
+
+    func isSelected(_ row: Row) -> Bool {
+        selection.contains(row.nodeID)
+    }
+
+    func toggle(_ row: Row) {
+        guard !row.nodeID.isEmpty else { return }
+        if selection.contains(row.nodeID) {
+            selection.remove(row.nodeID)
+        } else {
+            selection.insert(row.nodeID)
+        }
+    }
+
+    /// « Tout cocher » et « Tout décocher » agissent sur l'onglet affiché ; le compteur, lui,
+    /// reste global (un favori coché dans un autre onglet sera aussi supprimé).
+    func selectAll(in category: Category) {
+        for row in rows[category] ?? [] where !row.nodeID.isEmpty {
+            selection.insert(row.nodeID)
+        }
+    }
+
+    func deselectAll(in category: Category) {
+        for row in rows[category] ?? [] {
+            selection.remove(row.nodeID)
+        }
+    }
+
+    func checkedCount(in category: Category) -> Int {
+        (rows[category] ?? []).filter { selection.contains($0.nodeID) }.count
+    }
+
+    // MARK: Suppression (navigateur fermé obligatoire, sauvegarde automatique)
+
+    func removeSelected() {
+        guard let profile = selectedProfile, phase == .done, !selection.isEmpty else { return }
+        refreshBrowserRunning()
+        refreshSyncStatus()
+        guard !isBrowserRunning, syncStatus != .enabled else { return }
+
+        errorMessage = nil
+        phase = .removing
+
+        let ids = selection
+        let file = profile.bookmarksURL
+        let label = profile.id
+
+        Task {
+            do {
+                summary = try await Task.detached {
+                    try BookmarksWriter.removeBookmarks(ids: ids, in: file, label: label)
+                }.value
+                selection = []
+                phase = .removed
+            } catch {
+                errorMessage = error.localizedDescription
+                phase = .done
+            }
+        }
+    }
+
+    func revealBackup() {
+        guard let url = summary?.backupURL else { return }
+        NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
     // MARK: Actions sur une ligne

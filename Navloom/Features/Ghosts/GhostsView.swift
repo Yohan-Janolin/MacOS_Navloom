@@ -22,6 +22,27 @@ struct GhostsView: View {
         .task { model.loadBrowsersIfNeeded() }
         .onChange(of: model.selectedBrowserID) { model.browserChanged() }
         .onChange(of: model.selectedProfileID) { model.reset() }
+        // Tant qu'on peut supprimer, on surveille si le navigateur est fermé.
+        .task(id: model.phase) {
+            guard model.phase == .done else { return }
+            while !Task.isCancelled {
+                model.refreshBrowserRunning()
+                try? await Task.sleep(for: .seconds(1))
+            }
+        }
+        .confirmationDialog(
+            "Supprimer \(model.selection.count) favori\(model.selection.count > 1 ? "s" : "") ?",
+            isPresented: $model.showConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Supprimer", role: .destructive) { model.removeSelected() }
+        } message: {
+            Text("Les favoris cochés seront retirés de \(browserName). Une sauvegarde du fichier Bookmarks est créée avant.")
+        }
+    }
+
+    private var browserName: String {
+        model.selectedBrowser?.name ?? "le navigateur"
     }
 
     // MARK: - Structure
@@ -33,7 +54,8 @@ struct GhostsView: View {
             BrowserProfileBanner(browsers: model.browsers,
                                  profiles: model.profiles,
                                  browserID: $model.selectedBrowserID,
-                                 profileID: $model.selectedProfileID)
+                                 profileID: $model.selectedProfileID,
+                                 colors: Self.gradient)
                 .disabled(model.isBusy)
 
             if let message = model.errorMessage {
@@ -42,7 +64,7 @@ struct GhostsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            if let report = model.report {
+            if let report = model.report, model.phase == .done || model.phase == .removing {
                 stats(report)
             }
 
@@ -59,7 +81,7 @@ struct GhostsView: View {
             Text("Ghosts")
                 .font(.largeTitle.bold())
                 .foregroundStyle(
-                    LinearGradient(colors: [Brand.violet, Brand.pink],
+                    LinearGradient(colors: Self.gradient,
                                    startPoint: .leading, endPoint: .trailing)
                 )
             Text("Repère les favoris dont la page n'existe plus")
@@ -69,15 +91,18 @@ struct GhostsView: View {
         .frame(maxWidth: .infinity)
     }
 
+    /// Dégradé propre à Ghosts : tons verts (lime → vert).
+    private static let gradient = [Brand.lime, Brand.green]
+
     private func stats(_ report: GhostsReport) -> some View {
         HStack(spacing: 12) {
-            GhostStatCard(title: "Favoris web", value: report.webBookmarks, systemImage: "bookmark")
-            GhostStatCard(title: "Accessibles", value: report.aliveCount,
-                          systemImage: "checkmark.circle", tint: .green)
-            GhostStatCard(title: "Morts", value: report.dead.count,
-                          systemImage: "xmark.circle", tint: .red)
-            GhostStatCard(title: "À vérifier", value: report.uncertain.count,
-                          systemImage: "questionmark.circle", tint: .orange)
+            StatCard(title: "Favoris web", value: report.webBookmarks, systemImage: "bookmark")
+            StatCard(title: "Accessibles", value: report.aliveCount,
+                     systemImage: "checkmark.circle", tint: .green)
+            StatCard(title: "Morts", value: report.dead.count,
+                     systemImage: "xmark.circle", tint: .red)
+            StatCard(title: "À vérifier", value: report.uncertain.count,
+                     systemImage: "questionmark.circle", tint: .orange)
         }
     }
 
@@ -90,7 +115,7 @@ struct GhostsView: View {
             ContentUnavailableView(
                 "Prêt à chasser les fantômes",
                 systemImage: "eye.slash",
-                description: Text("Navloom ouvre chaque favori pour voir si sa page répond encore. Rien n'est modifié : le navigateur peut rester ouvert.")
+                description: Text("Navloom ouvre chaque favori pour voir si sa page répond encore. La recherche ne modifie rien : le navigateur peut rester ouvert. Pour supprimer ensuite des favoris, la synchro des favoris du navigateur doit être désactivée (comme pour Twins).")
             )
         case .scanning:
             scanningView
@@ -101,6 +126,10 @@ struct GhostsView: View {
             } else {
                 resultsView
             }
+        case .removing:
+            ProgressView("Suppression des favoris…")
+        case .removed:
+            removedView
         }
     }
 
@@ -120,8 +149,30 @@ struct GhostsView: View {
         }
     }
 
+    private var removedView: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.green)
+
+            if let summary = model.summary {
+                Text("\(summary.removed) favori\(summary.removed > 1 ? "s" : "") supprimé\(summary.removed > 1 ? "s" : "")")
+                    .font(.title2.bold())
+                Button("Afficher la sauvegarde dans le Finder") { model.revealBackup() }
+            }
+            Text("Relance \(browserName) pour voir le résultat.")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+        }
+    }
+
     private var resultsView: some View {
         VStack(spacing: 12) {
+            SyncNotice(browserName: browserName,
+                       isBrowserRunning: model.isBrowserRunning,
+                       syncStatus: model.syncStatus,
+                       operation: .removal(items: "les liens morts"))
+
             Picker("", selection: $model.selectedCategory) {
                 ForEach(GhostsViewModel.Category.allCases) { category in
                     Text("\(category.rawValue) (\(model.rows[category]?.count ?? 0))").tag(category)
@@ -130,19 +181,23 @@ struct GhostsView: View {
             .pickerStyle(.segmented)
             .labelsHidden()
 
-            Text(hint(for: model.selectedCategory))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            selectionToolbar
 
             let rows = model.rows[model.selectedCategory] ?? []
             List(rows) { row in
-                GhostRowView(row: row, category: model.selectedCategory)
-                    .contextMenu {
-                        Button("Ouvrir dans le navigateur") { model.open(row) }
-                        Button("Copier l'URL") { model.copyURL(row) }
-                    }
-                    .onTapGesture(count: 2) { model.open(row) }
+                GhostRowView(
+                    row: row,
+                    category: model.selectedCategory,
+                    isChecked: Binding(
+                        get: { model.isSelected(row) },
+                        set: { _ in model.toggle(row) }
+                    )
+                )
+                .contextMenu {
+                    Button("Ouvrir dans le navigateur") { model.open(row) }
+                    Button("Copier l'URL") { model.copyURL(row) }
+                }
+                .onTapGesture(count: 2) { model.open(row) }
             }
             .listStyle(.inset(alternatesRowBackgrounds: true))
             .overlay {
@@ -153,10 +208,35 @@ struct GhostsView: View {
         }
     }
 
+    /// Explication de l'onglet, puis raccourcis de sélection (qui agissent sur l'onglet affiché) et compteur.
+    private var selectionToolbar: some View {
+        let category = model.selectedCategory
+        let total = model.rows[category]?.count ?? 0
+        let checked = model.checkedCount(in: category)
+
+        return VStack(spacing: 8) {
+            Text(hint(for: category))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            HStack(spacing: 10) {
+                Button("Tout cocher") { model.selectAll(in: category) }
+                    .disabled(total == 0 || checked == total)
+                Button("Tout décocher") { model.deselectAll(in: category) }
+                    .disabled(checked == 0)
+                Spacer()
+                Text("\(model.selection.count) coché\(model.selection.count > 1 ? "s" : "")")
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+        }
+    }
+
     private func hint(for category: GhostsViewModel.Category) -> String {
         switch category {
         case .dead:
-            "Page introuvable (404/410) ou domaine inexistant. Double-clic pour ouvrir le lien et vérifier."
+            "Page introuvable (404/410) ou domaine inexistant. Attention : certains sites répondent 404 aux visiteurs non connectés alors que la page existe pour toi. Double-clic pour l'ouvrir et vérifier avant de supprimer."
         case .uncertain:
             "Délai dépassé, erreur serveur, certificat invalide… Impossible de conclure : à contrôler à la main."
         case .moved:
@@ -168,68 +248,78 @@ struct GhostsView: View {
 
     private var actionBar: some View {
         HStack {
-            if model.report != nil, model.phase == .done {
-                Button {
-                    model.exportReport()
-                } label: {
-                    Label("Exporter le rapport", systemImage: "square.and.arrow.up")
+            switch model.phase {
+            case .scanning:
+                Button("Arrêter") { model.cancelScan() }
+            case .done:
+                Button("Annuler") { model.reset() }
+                if model.report != nil {
+                    Button {
+                        model.exportReport()
+                    } label: {
+                        Label("Exporter le rapport", systemImage: "square.and.arrow.up")
+                    }
                 }
+            default:
+                EmptyView()
             }
+
             Spacer()
-            primaryAction
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
+
+            primaryActions
         }
     }
 
     @ViewBuilder
-    private var primaryAction: some View {
+    private var primaryActions: some View {
         switch model.phase {
         case .idle:
             Button("Rechercher les liens morts") { model.scan() }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
                 .disabled(model.selectedProfile == nil)
         case .scanning:
-            Button("Recherche en cours…") {}.disabled(true)
+            Button("Recherche en cours…") {}
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(true)
         case .done:
-            Button("Nouvelle recherche") { model.scan() }
-        }
-    }
-}
-
-// MARK: - Sous-vues
-
-private struct GhostStatCard: View {
-    let title: String
-    let value: Int
-    let systemImage: String
-    var tint: Color = .accentColor
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .font(.title2)
-                .foregroundStyle(tint)
-                .frame(width: 32)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(value)")
-                    .font(.title2.bold().monospacedDigit())
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            Button("Nouvelle analyse") { model.scan() }
+                .controlSize(.large)
+            Button("Supprimer \(model.selection.count) favori\(model.selection.count > 1 ? "s" : "")") {
+                model.showConfirmation = true
             }
-            Spacer(minLength: 0)
+            .buttonStyle(.borderedProminent)
+            .tint(.red)
+            .controlSize(.large)
+            .disabled(!model.canRemove)
+        case .removing:
+            Button("Suppression en cours…") {}
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(true)
+        case .removed:
+            Button("Nouvelle analyse") { model.scan() }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
         }
-        .padding(12)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
     }
 }
+
+// MARK: - Ligne d'un résultat
 
 private struct GhostRowView: View {
     let row: GhostsViewModel.Row
     let category: GhostsViewModel.Category
+    @Binding var isChecked: Bool
 
     var body: some View {
         HStack(spacing: 10) {
+            // La case est séparée du texte : un double-clic sur la ligne ouvre le lien sans cocher.
+            Toggle("", isOn: $isChecked)
+                .labelsHidden()
+                .toggleStyle(.checkbox)
+
             Image(systemName: symbol)
                 .foregroundStyle(tint)
                 .frame(width: 20)
@@ -243,14 +333,22 @@ private struct GhostRowView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
+                Label(row.folder, systemImage: "folder")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.head)
             }
             Spacer(minLength: 12)
 
+            // Le motif garde sa place : c'est l'URL qui se raccourcit en premier.
             Text(row.detail)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
-                .frame(maxWidth: 260, alignment: .trailing)
+                .truncationMode(.tail)
+                .frame(maxWidth: 300, alignment: .trailing)
+                .layoutPriority(1)
         }
         .padding(.vertical, 2)
     }

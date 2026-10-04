@@ -1,11 +1,3 @@
-//
-//  GhostsReport.swift
-//  Navloom
-//
-//  Created by Yohan Janolin on 04/10/2026.
-//
-
-
 import Foundation
 
 /// Résultat d'une recherche de liens morts, par favori.
@@ -33,7 +25,9 @@ nonisolated struct GhostsReport: Sendable {
         for reason in groups.keys.sorted() {
             text += "\n  [\(reason)]\n"
             for issue in groups[reason] ?? [] {
+                let folder = issue.bookmark.folder.isEmpty ? "Racine" : issue.bookmark.folder
                 text += "    - \(issue.bookmark.name) (\(issue.bookmark.url))\n"
+                text += "      Dossier : \(folder)\n"
             }
         }
         return text
@@ -53,10 +47,16 @@ actor GhostsEngine {
     static let retryDelaySeconds = 5
 
     let profile: ChromiumProfile
-    private let checker = LinkChecker()
+    private let checker: any LinkChecking
+    private let retryDelay: Int
 
-    init(profile: ChromiumProfile) {
+    /// `checker` et `retryDelaySeconds` ne changent que dans les tests.
+    init(profile: ChromiumProfile,
+         checker: any LinkChecking = LinkChecker(),
+         retryDelaySeconds: Int = GhostsEngine.retryDelaySeconds) {
         self.profile = profile
+        self.checker = checker
+        self.retryDelay = retryDelaySeconds
     }
 
     func scan(onEvent: @escaping @Sendable (GhostsEvent) -> Void) async throws -> GhostsReport {
@@ -86,8 +86,8 @@ actor GhostsEngine {
         // Seconde passe sur les échecs transitoires (délai, 5xx, DNS…).
         let retryURLs = urls.filter { results[$0.absoluteString]?.isRetryable == true }
         if !retryURLs.isEmpty {
-            onEvent(.retrying(count: retryURLs.count, delaySeconds: Self.retryDelaySeconds))
-            try? await Task.sleep(for: .seconds(Self.retryDelaySeconds))
+            onEvent(.retrying(count: retryURLs.count, delaySeconds: retryDelay))
+            try? await Task.sleep(for: .seconds(retryDelay))
             let second = await Self.runAll(retryURLs, checker: checker,
                                            concurrency: Self.retryConcurrent, pass: 2, onEvent: onEvent)
             results.merge(second) { _, new in new }
@@ -128,7 +128,7 @@ actor GhostsEngine {
 
     /// Vérifie une liste d'URLs avec un nombre borné de requêtes simultanées.
     private static func runAll(_ urls: [URL],
-                               checker: LinkChecker,
+                               checker: any LinkChecking,
                                concurrency: Int,
                                pass: Int,
                                onEvent: @escaping @Sendable (GhostsEvent) -> Void) async -> [String: LinkCheckResult] {

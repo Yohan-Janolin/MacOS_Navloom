@@ -7,6 +7,7 @@ struct MainView: View {
     // changer d'onglet ne détruit donc plus une recherche en cours.
     @State private var faviconSync = FaviconSyncViewModel()
     @State private var twins = TwinsViewModel()
+    @State private var ghosts = GhostsViewModel()
     @State private var backups = BackupsViewModel()
 
     var body: some View {
@@ -57,6 +58,8 @@ struct MainView: View {
             FaviconSyncView(model: faviconSync)
         case .twins:
             TwinsView(model: twins)
+        case .ghosts:
+            GhostsView(model: ghosts)
         case .backups:
             BackupsView(model: backups)
         case .settings:

@@ -11,20 +11,22 @@ struct HomeView: View {
                              text: "Récupère les icônes (favicons) manquantes de tes favoris et les écrit dans le navigateur. Le navigateur doit être fermé au moment d'écrire.")
                     ToolCard(feature: .twins,
                              text: "Retrouve les favoris qui pointent sur exactement la même URL et supprime ceux que tu coches. Le navigateur doit être fermé, et la synchro des favoris désactivée (voir plus bas).")
+                    ToolCard(feature: .ghosts,
+                             text: "Ouvre chaque favori pour repérer ceux dont la page n'existe plus (page introuvable, domaine disparu, redirection vers l'accueil) et supprime ceux que tu coches. La recherche peut se faire navigateur ouvert ; pour supprimer, il doit être fermé et la synchro des favoris désactivée (voir plus bas). Double-clic sur un résultat pour le tester dans ton navigateur.")
                     ToolCard(feature: .backups,
-                             text: "Liste les sauvegardes créées avant chaque écriture et permet de restaurer l'une d'elles.")
+                             text: "Liste les sauvegardes créées avant chaque écriture, par outil (FaviconSync, Twins / Ghosts), et permet de restaurer l'une d'elles.")
                 }
 
                 section("Limites") {
                     InfoCard(systemImage: "globe", tint: Brand.sky,
                              title: "Navigateurs pris en charge",
-                             text: "Vivaldi, Chrome, Brave, Edge, Opera et Chromium. Arc n'est pas supporté, pas plus que Safari ou Firefox, qui n'utilisent pas le même format de favoris.")
+                             text: "\(supportedBrowsers). Arc n'est pas supporté, pas plus que Safari ou Firefox, qui n'utilisent pas le même format de favoris.")
                     InfoCard(systemImage: "power", tint: .orange,
                              title: "Navigateur fermé",
                              text: "Navloom modifie les fichiers du navigateur, qui les réécrirait à sa fermeture. Quitte-le complètement (Cmd + Q) avant d'écrire. Chaque écriture est précédée d'une sauvegarde.")
                 }
 
-                section("Twins et la synchronisation") {
+                section("Twins / Ghosts - Problème avec la synchronisation") {
                     syncGuide
                 }
             }
@@ -33,6 +35,13 @@ struct HomeView: View {
             .frame(maxWidth: .infinity)
         }
         .navigationTitle("Navloom")
+    }
+
+    /// Liste tirée de la liste des navigateurs connus : elle ne peut pas être oubliée à l'ajout d'un navigateur.
+    private var supportedBrowsers: String {
+        let names = ChromiumBrowser.known.map(\.name)
+        guard let last = names.last, names.count > 1 else { return names.first ?? "" }
+        return names.dropLast().joined(separator: ", ") + " et " + last
     }
 
     private var header: some View {
@@ -53,7 +62,7 @@ struct HomeView: View {
             Label("Pourquoi la synchro gêne", systemImage: "arrow.triangle.2.circlepath")
                 .font(.headline)
                 .foregroundStyle(.orange)
-            Text("Quand la synchro des favoris est active, le navigateur remet au lancement les favoris que Navloom a supprimés. Twins (et bientôt Ghosts) refuse donc de supprimer tant qu'elle est active. Navloom ne peut pas la couper à ta place : elle se règle dans le navigateur, avec ton compte.")
+            Text("Quand la synchro des favoris est active, le navigateur remet au lancement les favoris que Navloom a supprimés. Twins et Ghosts refusent donc de supprimer tant qu'elle est active. Navloom ne peut pas la couper à ta place : elle se règle dans le navigateur, avec ton compte.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
 
@@ -63,8 +72,8 @@ struct HomeView: View {
                 .font(.subheadline.bold())
             VStack(alignment: .leading, spacing: 8) {
                 step(1, "Dans Vivaldi, ouvre Réglages › Synchronisation et décoche « Signets ».")
-                step(2, "Quitte Vivaldi (Cmd + Q), puis supprime tes doublons avec Navloom.")
-                step(3, "Pour réactiver la synchro des favoris sans faire revenir les doublons : retourne dans Réglages › Synchronisation et clique sur « Réinitialiser les données distantes ». Cela efface les données stockées chez Vivaldi, ton mot de passe de chiffrement et te déconnecte.")
+                step(2, "Quitte Vivaldi (Cmd + Q), puis supprime tes doublons ou tes liens morts avec Navloom.")
+                step(3, "Pour réactiver la synchro des favoris sans faire revenir les favoris supprimés : retourne dans Réglages › Synchronisation et clique sur « Réinitialiser les données distantes ». Cela efface les données stockées chez Vivaldi, ton mot de passe de chiffrement et te déconnecte.")
                 step(4, "Reconnecte-toi, redéfinis ton mot de passe de chiffrement (tu peux reprendre le même), puis recoche « Signets ».")
             }
 

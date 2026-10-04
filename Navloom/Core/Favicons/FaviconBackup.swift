@@ -1,6 +1,44 @@
 import Foundation
 
-/// Une sauvegarde de la base Favicons, décrite par son nom de fichier.
+/// Ce que sauvegarde un fichier : la base Favicons (FaviconSync) ou le fichier Bookmarks (Twins, Ghosts).
+nonisolated enum BackupCategory: String, CaseIterable, Identifiable, Hashable, Sendable {
+    case favicons, bookmarks
+
+    var id: String { rawValue }
+
+    /// Nom de l'onglet dans l'écran Sauvegardes.
+    var title: String {
+        switch self {
+        case .favicons: "FaviconSync"
+        case .bookmarks: "Twins / Ghosts"
+        }
+    }
+
+    var fileExtension: String {
+        switch self {
+        case .favicons: "sqlite"
+        case .bookmarks: "json"
+        }
+    }
+
+    /// Partie fixe du nom de fichier : <profil>-Favicons-<date> ou <profil>-Bookmarks-<date>
+    var separator: String {
+        switch self {
+        case .favicons: "-Favicons-"
+        case .bookmarks: "-Bookmarks-"
+        }
+    }
+
+    /// Ce que contient une sauvegarde, pour l'affichage (« 120 favicons », « 340 favoris »).
+    var itemName: String {
+        switch self {
+        case .favicons: "favicons"
+        case .bookmarks: "favoris"
+        }
+    }
+}
+
+/// Une sauvegarde, décrite par son nom de fichier.
 nonisolated struct BackupEntry: Identifiable, Hashable, Sendable {
     nonisolated enum Kind: Hashable, Sendable {
         case beforeWrite      // créée automatiquement avant une écriture
@@ -12,15 +50,16 @@ nonisolated struct BackupEntry: Identifiable, Hashable, Sendable {
     let label: String
     let date: Date
     let kind: Kind
+    let category: BackupCategory
     let sizeBytes: Int64
 
     var id: URL { url }
 }
 
-/// Sauvegardes de la base Favicons.
+/// Sauvegardes de la base Favicons et du fichier Bookmarks.
 /// Nom de fichier : <profil>-Favicons-<date ISO>[-avant-restauration].sqlite
+///              ou  <profil>-Bookmarks-<date ISO>[-avant-restauration].json
 nonisolated enum FaviconBackup {
-    private static let separator = "-Favicons-"
     private static let restoreSuffix = "-avant-restauration"
 
     static var defaultDirectory: URL {
@@ -52,6 +91,7 @@ nonisolated enum FaviconBackup {
     @discardableResult
     static func create(from source: URL,
                        label: String,
+                       category: BackupCategory = .favicons,
                        kind: BackupEntry.Kind = .beforeWrite,
                        in directory: URL = FaviconBackup.directory) throws -> URL {
         let fm = FileManager.default
@@ -59,7 +99,8 @@ nonisolated enum FaviconBackup {
 
         let stamp = fileStamp()
         let suffix = kind == .beforeRestore ? restoreSuffix : ""
-        let destination = directory.appending(path: "\(safeLabel(label))\(separator)\(stamp)\(suffix).sqlite")
+        let destination = directory.appending(
+            path: "\(safeLabel(label))\(category.separator)\(stamp)\(suffix).\(category.fileExtension)")
 
         try fm.copyItem(at: source, to: destination)
 
@@ -85,7 +126,9 @@ nonisolated enum FaviconBackup {
 
     /// Décode le nom d'un fichier de sauvegarde. Retourne nil si ce n'en est pas une.
     static func entry(for url: URL) -> BackupEntry? {
-        guard url.pathExtension == "sqlite" else { return nil }
+        guard let category = BackupCategory.allCases.first(where: { $0.fileExtension == url.pathExtension }) else {
+            return nil
+        }
 
         var base = url.deletingPathExtension().lastPathComponent
         var kind = BackupEntry.Kind.beforeWrite
@@ -94,13 +137,13 @@ nonisolated enum FaviconBackup {
             base.removeLast(restoreSuffix.count)
         }
 
-        guard let range = base.range(of: separator, options: .backwards) else { return nil }
+        guard let range = base.range(of: category.separator, options: .backwards) else { return nil }
         let label = String(base[..<range.lowerBound])
         let stamp = String(base[range.upperBound...])
         guard !label.isEmpty, let date = parseStamp(stamp) else { return nil }
 
         let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize).map { Int64($0) } ?? 0
-        return BackupEntry(url: url, label: label, date: date, kind: kind, sizeBytes: size)
+        return BackupEntry(url: url, label: label, date: date, kind: kind, category: category, sizeBytes: size)
     }
 
     /// Relit un horodatage de nom de fichier, ancien ("2026-09-30T12-15-00Z", en UTC) ou
@@ -121,10 +164,21 @@ nonisolated enum FaviconBackup {
         return ISO8601DateFormatter().date(from: "\(parts[0])T\(time)\(zone)")
     }
 
-    /// Vrai si le fichier s'ouvre comme une base SQLite Favicons.
-    static func isReadable(_ url: URL) async -> Bool {
-        guard let database = try? FaviconDatabase(url: url, writable: false) else { return false }
-        return (try? await database.mappingCount()) != nil
+    /// Nombre d'éléments d'une sauvegarde (pages associées à une favicon, ou favoris),
+    /// ou nil si le fichier est illisible.
+    static func itemCount(of entry: BackupEntry) async -> Int? {
+        switch entry.category {
+        case .favicons:
+            guard let database = try? FaviconDatabase(url: entry.url, writable: false) else { return nil }
+            return try? await database.mappingCount()
+        case .bookmarks:
+            return (try? BookmarksReader.read(from: entry.url))?.count
+        }
+    }
+
+    /// Vrai si le fichier s'ouvre comme une base Favicons ou un fichier Bookmarks valide.
+    static func isReadable(_ entry: BackupEntry) async -> Bool {
+        await itemCount(of: entry) != nil
     }
 
     // MARK: Restauration
@@ -140,11 +194,12 @@ nonisolated enum FaviconBackup {
 
         var safety: URL?
         if fm.fileExists(atPath: destination.path) {
-            safety = try create(from: destination, label: label, kind: .beforeRestore, in: directory)
+            safety = try create(from: destination, label: label, category: entry.category,
+                                kind: .beforeRestore, in: directory)
         }
 
         // On copie d'abord à côté de la destination, puis on remplace d'un coup :
-        // la base n'est jamais dans un état à moitié écrit.
+        // le fichier n'est jamais dans un état à moitié écrit.
         let temporary = destination.deletingLastPathComponent().appending(path: ".navloom-restore-tmp")
         try? fm.removeItem(at: temporary)
         try fm.copyItem(at: entry.url, to: temporary)
@@ -156,8 +211,10 @@ nonisolated enum FaviconBackup {
         }
 
         // Fichiers annexes SQLite de l'ancienne base : ils ne correspondent plus à la nouvelle.
-        for suffix in ["-journal", "-wal", "-shm"] {
-            try? fm.removeItem(at: URL(fileURLWithPath: destination.path + suffix))
+        if entry.category == .favicons {
+            for suffix in ["-journal", "-wal", "-shm"] {
+                try? fm.removeItem(at: URL(fileURLWithPath: destination.path + suffix))
+            }
         }
         return safety
     }
@@ -169,8 +226,8 @@ nonisolated enum FaviconBackup {
         try FileManager.default.trashItem(at: entry.url, resultingItemURL: nil)
     }
 
-    /// Ne garde que les plus récentes sauvegardes d'un profil, séparément pour chaque type.
-    /// Retourne le nombre de sauvegardes retirées. `remover` : mise à la corbeille par défaut.
+    /// Ne garde que les plus récentes sauvegardes d'un profil, séparément pour chaque catégorie
+    /// et chaque type. Retourne le nombre de sauvegardes retirées. `remover` : corbeille par défaut.
     @discardableResult
     static func prune(label: String,
                       retention: BackupRetention,
@@ -183,10 +240,13 @@ nonisolated enum FaviconBackup {
         ]
 
         var removed = 0
-        for (kind, keep) in limits {
-            // On garde toujours au moins une sauvegarde de chaque type.
-            for old in entries.filter({ $0.kind == kind }).dropFirst(max(keep, 1)) {
-                if (try? remover(old.url)) != nil { removed += 1 }
+        for category in BackupCategory.allCases {
+            for (kind, keep) in limits {
+                // On garde toujours au moins une sauvegarde de chaque type.
+                let old = entries.filter { $0.category == category && $0.kind == kind }
+                for entry in old.dropFirst(max(keep, 1)) {
+                    if (try? remover(entry.url)) != nil { removed += 1 }
+                }
             }
         }
         return removed

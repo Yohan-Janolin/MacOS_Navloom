@@ -1,8 +1,3 @@
-//
-//  TwinsView.swift
-//  Navloom
-//
-
 import SwiftUI
 
 struct TwinsView: View {
@@ -41,8 +36,12 @@ struct TwinsView: View {
         ) {
             Button("Supprimer", role: .destructive) { model.removeSelected() }
         } message: {
-            Text("Les favoris cochés seront retirés de \(model.selectedBrowser?.name ?? "ce navigateur"). Une sauvegarde du fichier Bookmarks est créée avant.")
+            Text("Les favoris cochés seront retirés de \(browserName). Une sauvegarde du fichier Bookmarks est créée avant.")
         }
+    }
+
+    private var browserName: String {
+        model.selectedBrowser?.name ?? "le navigateur"
     }
 
     // MARK: - Structure
@@ -95,11 +94,11 @@ struct TwinsView: View {
 
     private var stats: some View {
         HStack(spacing: 12) {
-            TwinsStat(title: "Favoris", value: model.totalBookmarks, systemImage: "bookmark")
-            TwinsStat(title: "URLs en double", value: model.groups.count,
-                      systemImage: "square.on.square", tint: Brand.sky)
-            TwinsStat(title: "Favoris en trop", value: model.extraCopies,
-                      systemImage: "minus.circle", tint: .orange)
+            StatCard(title: "Favoris", value: model.totalBookmarks, systemImage: "bookmark")
+            StatCard(title: "URLs en double", value: model.groups.count,
+                     systemImage: "square.on.square", tint: Brand.sky)
+            StatCard(title: "Favoris en trop", value: model.extraCopies,
+                     systemImage: "minus.circle", tint: .orange)
         }
     }
 
@@ -122,7 +121,11 @@ struct TwinsView: View {
                                        description: Text("Aucune URL n'apparaît deux fois dans tes favoris."))
             } else {
                 VStack(spacing: 12) {
-                    removalNotice
+                    SyncNotice(browserName: browserName,
+                               isBrowserRunning: model.isBrowserRunning,
+                               syncStatus: model.syncStatus,
+                               operation: .removal(items: "les doublons"))
+                    selectionToolbar
                     groupsList
                 }
             }
@@ -133,38 +136,17 @@ struct TwinsView: View {
         }
     }
 
-    /// Bandeau au-dessus de la liste : ce qui bloque la suppression, sinon rappel de la sauvegarde.
-    @ViewBuilder
-    private var removalNotice: some View {
-        if model.isBrowserRunning {
-            notice("\(model.selectedBrowser?.name ?? "Le navigateur") est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir supprimer.",
-                   systemImage: "exclamationmark.triangle.fill", tint: .orange)
-        } else if model.syncStatus == .enabled {
-            notice("La synchro des favoris est activée dans \(browserName) : à son prochain lancement, elle remettrait les favoris supprimés. Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil), ou supprime les doublons directement dans son gestionnaire de favoris.",
-                   systemImage: "arrow.triangle.2.circlepath", tint: .orange)
-        } else if model.fullySelectedGroupCount > 0 {
-            let count = model.fullySelectedGroupCount
-            notice("Dans \(count) groupe\(count > 1 ? "s" : ""), toutes les copies sont cochées. Décoches-en au moins une pour la garder.",
-                   systemImage: "exclamationmark.triangle.fill", tint: .orange)
-        } else if model.syncStatus == .unknown {
-            notice("Navloom ne sait pas lire l'état de la synchro de \(browserName). Si elle est activée, elle peut remettre les favoris supprimés. Une sauvegarde du fichier Bookmarks sera créée avant la suppression.",
-                   systemImage: "info.circle", tint: .secondary)
-        } else {
-            notice("Une sauvegarde du fichier Bookmarks sera créée automatiquement avant la suppression.",
-                   systemImage: "externaldrive", tint: .secondary)
+    /// Ligne d'outils au-dessus de la liste : raccourcis de sélection à gauche, compteur à droite.
+    private var selectionToolbar: some View {
+        HStack(spacing: 10) {
+            Button("Garder le premier de chaque groupe") { model.selectAllButFirst() }
+            Button("Tout décocher") { model.clearSelection() }
+                .disabled(model.selection.isEmpty)
+            Spacer()
+            Text("\(model.selection.count) coché\(model.selection.count > 1 ? "s" : "")")
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
         }
-    }
-
-    private var browserName: String {
-        model.selectedBrowser?.name ?? "le navigateur"
-    }
-
-    private func notice(_ text: String, systemImage: String, tint: Color) -> some View {
-        Label(text, systemImage: systemImage)
-            .foregroundStyle(tint)
-            .padding(12)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
     }
 
     private var removedView: some View {
@@ -178,7 +160,7 @@ struct TwinsView: View {
                     .font(.title2.bold())
                 Button("Afficher la sauvegarde dans le Finder") { model.revealBackup() }
             }
-            Text("Relance \(model.selectedBrowser?.name ?? "le navigateur") pour voir le résultat.")
+            Text("Relance \(browserName) pour voir le résultat.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
         }
@@ -196,6 +178,8 @@ struct TwinsView: View {
                                 set: { _ in model.toggle(bookmark) }
                             )
                         )
+                        // Au moins une copie reste décochée : la dernière case libre d'un groupe est grisée.
+                        .disabled(isLocked(bookmark, in: group))
                     }
                 } header: {
                     HStack {
@@ -217,22 +201,19 @@ struct TwinsView: View {
         .listStyle(.inset(alternatesRowBackgrounds: true))
     }
 
+    /// Vrai si cocher ce favori ferait disparaître la dernière copie de son groupe.
+    private func isLocked(_ bookmark: Bookmark, in group: DuplicateGroup) -> Bool {
+        guard !model.isSelected(bookmark) else { return false }
+        let uncheckedCount = group.bookmarks.filter { !model.isSelected($0) }.count
+        return uncheckedCount == 1
+    }
+
     // MARK: - Barre d'action
 
     private var actionBar: some View {
         HStack {
             if model.phase == .done {
                 Button("Annuler") { model.reset() }
-
-                if !model.groups.isEmpty {
-                    Button("Garder le premier de chaque groupe") { model.selectAllButFirst() }
-                    Button("Tout décocher") { model.clearSelection() }
-                        .disabled(model.selection.isEmpty)
-
-                    Text("\(model.selection.count) coché\(model.selection.count > 1 ? "s" : "")")
-                        .foregroundStyle(.secondary)
-                        .monospacedDigit()
-                }
             }
 
             Spacer()
@@ -273,32 +254,6 @@ struct TwinsView: View {
 }
 
 // MARK: - Sous-vues
-
-private struct TwinsStat: View {
-    let title: String
-    let value: Int
-    let systemImage: String
-    var tint: Color = .accentColor
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .font(.title2)
-                .foregroundStyle(tint)
-                .frame(width: 32)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(value)")
-                    .font(.title2.bold().monospacedDigit())
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(12)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
-    }
-}
 
 private struct TwinRow: View {
     let bookmark: Bookmark

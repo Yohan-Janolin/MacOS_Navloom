@@ -256,32 +256,6 @@ struct FaviconSyncView: View {
 
 // MARK: - Sous-vues
 
-private struct StatCard: View {
-    let title: String
-    let value: Int
-    let systemImage: String
-    var tint: Color = .accentColor
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .font(.title2)
-                .foregroundStyle(tint)
-                .frame(width: 32)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(value)")
-                    .font(.title2.bold().monospacedDigit())
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(12)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
-    }
-}
-
 private struct ResultRowView: View {
     let row: FaviconSyncViewModel.ResultRow
 
