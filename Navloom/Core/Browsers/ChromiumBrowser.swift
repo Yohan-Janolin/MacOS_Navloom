@@ -32,21 +32,20 @@ nonisolated struct ChromiumBrowser: Identifiable, Hashable, Sendable {
         .init(id: "chromium", name: "Chromium", bundleID: "org.chromium.Chromium", supportFolder: "Chromium"),
         .init(id: "vivaldi", name: "Vivaldi", bundleID: "com.vivaldi.Vivaldi", supportFolder: "Vivaldi"),
         .init(id: "vivaldiSnapshot", name: "Vivaldi Snapshot", bundleID: "com.vivaldi.Vivaldi.snapshot", supportFolder: "Vivaldi Snapshot"),
-        .init(id: "chrome", name: "Google Chrome", bundleID: "com.google.Chrome", supportFolder: "Google/Chrome"),
+        .init(id: "chrome", name: "Chrome", bundleID: "com.google.Chrome", supportFolder: "Google/Chrome"),
         .init(id: "chromeBeta", name: "Chrome Beta", bundleID: "com.google.Chrome.beta", supportFolder: "Google/Chrome Beta"),
         .init(id: "chromeCanary", name: "Chrome Canary", bundleID: "com.google.Chrome.canary", supportFolder: "Google/Chrome Canary"),
         .init(id: "brave", name: "Brave", bundleID: "com.brave.Browser", supportFolder: "BraveSoftware/Brave-Browser"),
         .init(id: "braveBeta", name: "Brave Beta", bundleID: "com.brave.Browser.beta", supportFolder: "BraveSoftware/Brave-Browser-Beta"),
         .init(id: "braveNightly", name: "Brave Nightly", bundleID: "com.brave.Browser.nightly", supportFolder: "BraveSoftware/Brave-Browser-Nightly"),
-        .init(id: "edge", name: "Microsoft Edge", bundleID: "com.microsoft.edgemac", supportFolder: "Microsoft Edge"),
+        .init(id: "edge", name: "Edge", bundleID: "com.microsoft.edgemac", supportFolder: "Microsoft Edge"),
         .init(id: "edgeBeta", name: "Edge Beta", bundleID: "com.microsoft.edgemac.Beta", supportFolder: "Microsoft Edge Beta"),
         .init(id: "edgeDev", name: "Edge Dev", bundleID: "com.microsoft.edgemac.Dev", supportFolder: "Microsoft Edge Dev"),
         .init(id: "edgeCanary", name: "Edge Canary", bundleID: "com.microsoft.edgemac.Canary", supportFolder: "Microsoft Edge Canary"),
         .init(id: "opera", name: "Opera", bundleID: "com.operasoftware.Opera", supportFolder: "com.operasoftware.Opera"),
-        // Identifiants et dossiers relevés sur une vraie installation.
+        .init(id: "operaDeveloper", name: "Opera Developer", bundleID: "com.operasoftware.OperaDeveloper", supportFolder: "com.operasoftware.OperaDeveloper"),
         .init(id: "operaGX", name: "Opera GX", bundleID: "com.operasoftware.OperaGX", supportFolder: "com.operasoftware.OperaGX"),
         .init(id: "operaAir", name: "Opera Air", bundleID: "com.operasoftware.OperaAir", supportFolder: "com.operasoftware.OperaAir"),
-        .init(id: "operaDeveloper", name: "Opera Developer", bundleID: "com.operasoftware.OperaDeveloper", supportFolder: "com.operasoftware.OperaDeveloper"),
     ]
 
     private var root: URL {
@@ -160,6 +159,9 @@ nonisolated struct ChromiumBrowser: Identifiable, Hashable, Sendable {
 
     /// Navigateurs connus ayant au moins un profil exploitable.
     static func installed() -> [ChromiumBrowser] {
-        known.filter { !$0.profiles().isEmpty }
+        #if DEBUG
+        _ = BrowserDiagnostics.printOnce   // diagnostic temporaire : à retirer une fois le problème compris
+        #endif
+        return known.filter { !$0.profiles().isEmpty }
     }
 }
