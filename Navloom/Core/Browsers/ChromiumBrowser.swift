@@ -159,9 +159,6 @@ nonisolated struct ChromiumBrowser: Identifiable, Hashable, Sendable {
 
     /// Navigateurs connus ayant au moins un profil exploitable.
     static func installed() -> [ChromiumBrowser] {
-        #if DEBUG
-        _ = BrowserDiagnostics.printOnce   // diagnostic temporaire : à retirer une fois le problème compris
-        #endif
         return known.filter { !$0.profiles().isEmpty }
     }
 }
