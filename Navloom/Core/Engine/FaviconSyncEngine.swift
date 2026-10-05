@@ -17,7 +17,7 @@ actor FaviconSyncEngine {
     // MARK: 1. Analyse (lecture seule : le navigateur peut rester ouvert)
 
     func analyze() async throws -> SyncAnalysis {
-        let all = try BookmarksReader.read(from: profile.bookmarksURL)
+        let all = try BookmarksReader.readAll(for: profile)
 
         // On ne traite que les liens web (pas vivaldi://, file://, etc.).
         let web = all.filter {

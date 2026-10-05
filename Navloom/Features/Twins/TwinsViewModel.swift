@@ -19,13 +19,15 @@ final class TwinsViewModel {
 
     private(set) var phase: Phase = .idle
     private(set) var totalBookmarks = 0
+    /// Favoris du compte Google (Chrome) : affichés, mais jamais cochables.
+    private(set) var accountBookmarkCount = 0
     private(set) var groups: [DuplicateGroup] = []
     private(set) var summary: BookmarksWriteSummary?
     private(set) var errorMessage: String?
     private(set) var isBrowserRunning = false
     private(set) var syncStatus: BookmarkSyncStatus = .unknown
 
-    /// Favoris cochés (par identifiant de nœud) : ce sont ceux qui seront supprimés.
+    /// Favoris cochés (par identifiant de nœud, favoris locaux uniquement) : ce sont ceux qui seront supprimés.
     private(set) var selection: Set<String> = []
 
     /// Vrai quand la boîte de dialogue de confirmation doit s'afficher.
@@ -49,9 +51,9 @@ final class TwinsViewModel {
     }
 
     /// Groupes dont TOUTES les copies sont cochées : les supprimer ferait disparaître l'URL
-    /// de tes favoris. Tant qu'il en reste, la suppression est bloquée.
+    /// de tes favoris. Une copie du compte n'est jamais cochée, donc elle protège son groupe.
     var fullySelectedGroupCount: Int {
-        groups.filter { group in group.bookmarks.allSatisfy { selection.contains($0.nodeID) } }.count
+        groups.filter { group in group.bookmarks.allSatisfy { isSelected($0) } }.count
     }
 
     /// La suppression est bloquée si la synchro des favoris est active : au lancement suivant,
@@ -85,6 +87,7 @@ final class TwinsViewModel {
         guard !isBusy else { return }
         phase = .idle
         totalBookmarks = 0
+        accountBookmarkCount = 0
         groups = []
         selection = []
         summary = nil
@@ -112,11 +115,11 @@ final class TwinsViewModel {
         reset()
         phase = .analyzing
 
-        let url = profile.bookmarksURL
         Task {
             do {
-                let bookmarks = try await Task.detached { try BookmarksReader.read(from: url) }.value
+                let bookmarks = try await Task.detached { try BookmarksReader.readAll(for: profile) }.value
                 totalBookmarks = bookmarks.count
+                accountBookmarkCount = bookmarks.filter { $0.source == .account }.count
                 groups = DuplicateFinder.groups(in: bookmarks)
                 refreshSyncStatus()
                 phase = .done
@@ -130,10 +133,12 @@ final class TwinsViewModel {
     // MARK: Cases à cocher
 
     func isSelected(_ bookmark: Bookmark) -> Bool {
-        selection.contains(bookmark.nodeID)
+        bookmark.source == .local && selection.contains(bookmark.nodeID)
     }
 
     func toggle(_ bookmark: Bookmark) {
+        // Un favori du compte ne se coche pas ; et deux fichiers peuvent partager un même identifiant.
+        guard bookmark.source == .local, !bookmark.nodeID.isEmpty else { return }
         if selection.contains(bookmark.nodeID) {
             selection.remove(bookmark.nodeID)
         } else {
@@ -141,9 +146,9 @@ final class TwinsViewModel {
         }
     }
 
-    /// Coche tous les doublons sauf le premier de chaque groupe (celui qu'on garde).
+    /// Coche les doublons à supprimer dans chaque groupe (voir `DuplicateFinder.removableKeepingFirst`).
     func selectAllButFirst() {
-        selection = Set(groups.flatMap { $0.bookmarks.dropFirst().map(\.nodeID) })
+        selection = DuplicateFinder.removableKeepingFirst(in: groups)
     }
 
     func clearSelection() {
