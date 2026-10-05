@@ -211,8 +211,9 @@ struct GhostsView: View {
     /// Explication de l'onglet, puis raccourcis de sélection (qui agissent sur l'onglet affiché) et compteur.
     private var selectionToolbar: some View {
         let category = model.selectedCategory
-        let total = model.rows[category]?.count ?? 0
+        let selectable = model.selectableCount(in: category)
         let checked = model.checkedCount(in: category)
+        let hasAccountRows = model.rows[category]?.contains { !$0.isLocal } ?? false
 
         return VStack(spacing: 8) {
             Text(hint(for: category))
@@ -220,9 +221,17 @@ struct GhostsView: View {
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
+            if hasAccountRows {
+                Label("Les favoris du compte Google (icône nuage) ne sont pas cochables : supprime-les à la main dans \(browserName).",
+                      systemImage: "icloud")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
             HStack(spacing: 10) {
                 Button("Tout cocher") { model.selectAll(in: category) }
-                    .disabled(total == 0 || checked == total)
+                    .disabled(selectable == 0 || checked == selectable)
                 Button("Tout décocher") { model.deselectAll(in: category) }
                     .disabled(checked == 0)
                 Spacer()
@@ -316,9 +325,17 @@ private struct GhostRowView: View {
     var body: some View {
         HStack(spacing: 10) {
             // La case est séparée du texte : un double-clic sur la ligne ouvre le lien sans cocher.
-            Toggle("", isOn: $isChecked)
-                .labelsHidden()
-                .toggleStyle(.checkbox)
+            // Un favori du compte Google n'a pas de case : Chrome le remettrait depuis le serveur.
+            if row.isLocal {
+                Toggle("", isOn: $isChecked)
+                    .labelsHidden()
+                    .toggleStyle(.checkbox)
+            } else {
+                Image(systemName: "icloud")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 16)
+                    .help("Favori du compte Google : à supprimer à la main dans le navigateur")
+            }
 
             Image(systemName: symbol)
                 .foregroundStyle(tint)
@@ -333,7 +350,7 @@ private struct GhostRowView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
-                Label(row.folder, systemImage: "folder")
+                Label(row.isLocal ? row.folder : "Compte Google · \(row.folder)", systemImage: "folder")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)

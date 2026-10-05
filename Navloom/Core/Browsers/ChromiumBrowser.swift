@@ -9,6 +9,8 @@ nonisolated struct ChromiumProfile: Identifiable, Hashable, Sendable {
     let bundleID: String
 
     var bookmarksURL: URL { directory.appending(path: "Bookmarks") }
+    /// Chrome connecté à un compte Google y range les favoris enregistrés dans le compte.
+    var accountBookmarksURL: URL { directory.appending(path: "AccountBookmarks") }
     var faviconsURL: URL { directory.appending(path: "Favicons") }
     var preferencesURL: URL { directory.appending(path: "Preferences") }
 
@@ -41,6 +43,10 @@ nonisolated struct ChromiumBrowser: Identifiable, Hashable, Sendable {
         .init(id: "edgeDev", name: "Edge Dev", bundleID: "com.microsoft.edgemac.Dev", supportFolder: "Microsoft Edge Dev"),
         .init(id: "edgeCanary", name: "Edge Canary", bundleID: "com.microsoft.edgemac.Canary", supportFolder: "Microsoft Edge Canary"),
         .init(id: "opera", name: "Opera", bundleID: "com.operasoftware.Opera", supportFolder: "com.operasoftware.Opera"),
+        // Identifiants et dossiers relevés sur une vraie installation.
+        .init(id: "operaGX", name: "Opera GX", bundleID: "com.operasoftware.OperaGX", supportFolder: "com.operasoftware.OperaGX"),
+        .init(id: "operaAir", name: "Opera Air", bundleID: "com.operasoftware.OperaAir", supportFolder: "com.operasoftware.OperaAir"),
+        .init(id: "operaDeveloper", name: "Opera Developer", bundleID: "com.operasoftware.OperaDeveloper", supportFolder: "com.operasoftware.OperaDeveloper"),
     ]
 
     private var root: URL {
@@ -122,18 +128,22 @@ nonisolated struct ChromiumBrowser: Identifiable, Hashable, Sendable {
     }
 
     /// Profils trouvés sur le disque : "Default" et "Profile 1", "Profile 2"…
-    /// Seuls ceux qui contiennent un fichier Bookmarks sont retournés.
+    /// Seuls ceux qui contiennent un fichier Bookmarks (ou AccountBookmarks, pour Chrome) sont retournés.
     func profiles() -> [ChromiumProfile] {
         let fm = FileManager.default
         guard let names = try? fm.contentsOfDirectory(atPath: root.path) else { return [] }
 
         let cache = infoCache()
 
-        // Seuls les profils qui ont un fichier Bookmarks sont gardés (et donc comptés pour les doublons).
+        // Seuls les profils qui ont des favoris sont gardés.
         let folders = names
             .filter { $0 == "Default" || $0.hasPrefix("Profile ") }
             .sorted()
-            .filter { fm.fileExists(atPath: root.appending(path: $0).appending(path: "Bookmarks").path) }
+            .filter { folder in
+                let directory = root.appending(path: folder)
+                return fm.fileExists(atPath: directory.appending(path: "Bookmarks").path)
+                    || fm.fileExists(atPath: directory.appending(path: "AccountBookmarks").path)
+            }
 
         let labels = folders.map { folder in
             Self.label(folder: folder,

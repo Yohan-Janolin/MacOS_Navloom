@@ -126,6 +126,7 @@ struct TwinsView: View {
                                syncStatus: model.syncStatus,
                                operation: .removal(items: "les doublons"))
                     selectionToolbar
+                    accountNote
                     groupsList
                 }
             }
@@ -133,6 +134,18 @@ struct TwinsView: View {
             ProgressView("Suppression des doublons…")
         case .removed:
             removedView
+        }
+    }
+
+    /// Rappel quand le profil contient des favoris du compte Google (Chrome) : visibles, mais pas cochables.
+    @ViewBuilder
+    private var accountNote: some View {
+        if model.accountBookmarkCount > 0 {
+            Label("\(model.accountBookmarkCount) favori\(model.accountBookmarkCount > 1 ? "s" : "") du compte Google (icône nuage) : ils ne sont pas cochables, supprime-les à la main dans \(browserName). Une copie du compte protège son groupe : les copies locales peuvent toutes être cochées.",
+                  systemImage: "icloud")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -203,7 +216,7 @@ struct TwinsView: View {
 
     /// Vrai si cocher ce favori ferait disparaître la dernière copie de son groupe.
     private func isLocked(_ bookmark: Bookmark, in group: DuplicateGroup) -> Bool {
-        guard !model.isSelected(bookmark) else { return false }
+        guard bookmark.source == .local, !model.isSelected(bookmark) else { return false }
         let uncheckedCount = group.bookmarks.filter { !model.isSelected($0) }.count
         return uncheckedCount == 1
     }
@@ -259,19 +272,38 @@ private struct TwinRow: View {
     let bookmark: Bookmark
     @Binding var isChecked: Bool
 
-    var body: some View {
-        Toggle(isOn: $isChecked) {
-            VStack(alignment: .leading, spacing: 1) {
-                Text(bookmark.name).lineLimit(1)
-                Label(bookmark.folder.isEmpty ? "Racine" : bookmark.folder, systemImage: "folder")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.head)
-            }
+    private var folderLabel: String {
+        let folder = bookmark.folder.isEmpty ? "Racine" : bookmark.folder
+        return bookmark.source == .account ? "Compte Google · \(folder)" : folder
+    }
+
+    private var details: some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(bookmark.name).lineLimit(1)
+            Label(folderLabel, systemImage: "folder")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .truncationMode(.head)
         }
-        .toggleStyle(.checkbox)
-        .padding(.vertical, 2)
+    }
+
+    var body: some View {
+        if bookmark.source == .local {
+            Toggle(isOn: $isChecked) { details }
+                .toggleStyle(.checkbox)
+                .padding(.vertical, 2)
+        } else {
+            // Favori du compte Google : pas de case, Chrome le remettrait depuis le serveur.
+            HStack(spacing: 6) {
+                Image(systemName: "icloud")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 16)
+                details
+            }
+            .padding(.vertical, 2)
+            .help("Favori du compte Google : à supprimer à la main dans le navigateur")
+        }
     }
 }
 

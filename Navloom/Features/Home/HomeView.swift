@@ -21,6 +21,9 @@ struct HomeView: View {
                     InfoCard(systemImage: "globe", tint: Brand.sky,
                              title: "Navigateurs pris en charge",
                              text: "\(supportedBrowsers). Arc n'est pas supporté, pas plus que Safari ou Firefox, qui n'utilisent pas le même format de favoris.")
+                    InfoCard(systemImage: "person.crop.circle.badge.exclamationmark", tint: Brand.coral,
+                             title: "Chrome et les favoris du compte Google",
+                             text: "Quand Chrome enregistre les favoris « dans ton compte Google » (Réglages › Dans votre compte Google › Favoris), il les range dans un fichier à part. Navloom les lit : FaviconSync, Twins et Ghosts les prennent en compte, avec une icône nuage. Mais ils ne sont jamais cochables, car Chrome les remettrait depuis le serveur : supprime-les à la main dans Chrome. Seuls tes favoris locaux se suppriment depuis Navloom. Si tu désactives l'option Favoris dans Chrome, il masque ceux du compte et Navloom les ignore aussi (d'après le réglage que Chrome écrit dans ses préférences).")
                     InfoCard(systemImage: "power", tint: .orange,
                              title: "Navigateur fermé",
                              text: "Navloom modifie les fichiers du navigateur, qui les réécrirait à sa fermeture. Quitte-le complètement (Cmd + Q) avant d'écrire. Chaque écriture est précédée d'une sauvegarde.")
@@ -77,7 +80,7 @@ struct HomeView: View {
                 step(4, "Reconnecte-toi, redéfinis ton mot de passe de chiffrement (tu peux reprendre le même), puis recoche « Signets ».")
             }
 
-            Text("Pour les autres navigateurs, Navloom ne sait pas lire l'état de la synchro : désactive-la toi-même avant de supprimer.")
+            Text("Navloom lit l'état de la synchro dans tous les navigateurs pris en charge. Pour Chrome, les favoris du compte Google sont dans un fichier séparé : la synchro complète est la seule à bloquer la suppression (voir « Limites »).")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }

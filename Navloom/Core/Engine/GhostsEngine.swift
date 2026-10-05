@@ -26,8 +26,9 @@ nonisolated struct GhostsReport: Sendable {
             text += "\n  [\(reason)]\n"
             for issue in groups[reason] ?? [] {
                 let folder = issue.bookmark.folder.isEmpty ? "Racine" : issue.bookmark.folder
+                let origin = issue.bookmark.source == .account ? " (favori du compte Google, à supprimer à la main)" : ""
                 text += "    - \(issue.bookmark.name) (\(issue.bookmark.url))\n"
-                text += "      Dossier : \(folder)\n"
+                text += "      Dossier : \(folder)\(origin)\n"
             }
         }
         return text
@@ -60,7 +61,7 @@ actor GhostsEngine {
     }
 
     func scan(onEvent: @escaping @Sendable (GhostsEvent) -> Void) async throws -> GhostsReport {
-        let all = try BookmarksReader.read(from: profile.bookmarksURL)
+        let all = try BookmarksReader.readAll(for: profile)
         let web = all.filter {
             let scheme = URL(string: $0.url)?.scheme?.lowercased() ?? ""
             return scheme == "http" || scheme == "https"

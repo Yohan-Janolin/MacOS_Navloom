@@ -24,6 +24,8 @@ final class GhostsViewModel {
         let url: String
         let detail: String
         let folder: String
+        /// Faux pour un favori du compte Google : affiché, mais jamais cochable.
+        let isLocal: Bool
     }
 
     // MARK: État observé par la vue
@@ -179,7 +181,8 @@ final class GhostsViewModel {
             issues.map {
                 Row(nodeID: $0.bookmark.nodeID,
                     name: $0.bookmark.name, url: $0.bookmark.url, detail: $0.reason,
-                    folder: $0.bookmark.folder.isEmpty ? "Racine" : $0.bookmark.folder)
+                    folder: $0.bookmark.folder.isEmpty ? "Racine" : $0.bookmark.folder,
+                    isLocal: $0.bookmark.source == .local)
             }
         }
         rows[.dead] = make(report.dead)
@@ -194,11 +197,12 @@ final class GhostsViewModel {
     // MARK: Cases à cocher
 
     func isSelected(_ row: Row) -> Bool {
-        selection.contains(row.nodeID)
+        row.isLocal && selection.contains(row.nodeID)
     }
 
     func toggle(_ row: Row) {
-        guard !row.nodeID.isEmpty else { return }
+        // Deux fichiers peuvent partager un même identifiant : un favori du compte ne se coche jamais.
+        guard row.isLocal, !row.nodeID.isEmpty else { return }
         if selection.contains(row.nodeID) {
             selection.remove(row.nodeID)
         } else {
@@ -209,19 +213,24 @@ final class GhostsViewModel {
     /// « Tout cocher » et « Tout décocher » agissent sur l'onglet affiché ; le compteur, lui,
     /// reste global (un favori coché dans un autre onglet sera aussi supprimé).
     func selectAll(in category: Category) {
-        for row in rows[category] ?? [] where !row.nodeID.isEmpty {
+        for row in rows[category] ?? [] where row.isLocal && !row.nodeID.isEmpty {
             selection.insert(row.nodeID)
         }
     }
 
     func deselectAll(in category: Category) {
-        for row in rows[category] ?? [] {
+        for row in rows[category] ?? [] where row.isLocal {
             selection.remove(row.nodeID)
         }
     }
 
+    /// Favoris de l'onglet qu'on peut cocher (hors favoris du compte).
+    func selectableCount(in category: Category) -> Int {
+        (rows[category] ?? []).filter { $0.isLocal && !$0.nodeID.isEmpty }.count
+    }
+
     func checkedCount(in category: Category) -> Int {
-        (rows[category] ?? []).filter { selection.contains($0.nodeID) }.count
+        (rows[category] ?? []).filter { isSelected($0) }.count
     }
 
     // MARK: Suppression (navigateur fermé obligatoire, sauvegarde automatique)
