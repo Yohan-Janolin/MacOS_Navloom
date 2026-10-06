@@ -24,6 +24,9 @@ struct HomeView: View {
                     InfoCard(systemImage: "person.crop.circle.badge.exclamationmark", tint: Brand.coral,
                              title: "Chrome et les favoris du compte Google",
                              text: "Quand Chrome enregistre les favoris « dans ton compte Google » (Réglages › Dans votre compte Google › Favoris), il les range dans un fichier à part. Navloom les lit : FaviconSync, Twins et Ghosts les prennent en compte, avec une icône nuage. Mais ils ne sont jamais cochables, car Chrome les remettrait depuis le serveur : supprime-les à la main dans Chrome. Seuls tes favoris locaux se suppriment depuis Navloom. Si tu désactives l'option Favoris dans Chrome, il masque ceux du compte et Navloom les ignore aussi (d'après le réglage que Chrome écrit dans ses préférences).")
+                    InfoCard(systemImage: "lock.shield.fill", tint: .orange,
+                             title: "Accès complet au disque",
+                             text: "Sur macOS 27, Chrome, Edge et Brave (versions stables) protègent leurs données : tant que Navloom n'a pas l'accès complet au disque, ils n'apparaissent pas dans la liste des navigateurs. Ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + », active-le, puis relance Navloom. Les autres navigateurs n'en ont pas besoin. Navloom ne lit que les favoris, les icônes et quelques réglages (noms de profils, état de la synchro).")
                     InfoCard(systemImage: "power", tint: .orange,
                              title: "Navigateur fermé",
                              text: "Navloom modifie les fichiers du navigateur, qui les réécrirait à sa fermeture. Quitte-le complètement (Cmd + Q) avant d'écrire. Chaque écriture est précédée d'une sauvegarde.")

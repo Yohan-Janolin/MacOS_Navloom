@@ -10,14 +10,35 @@ struct MainView: View {
     @State private var ghosts = GhostsViewModel()
     @State private var backups = BackupsViewModel()
 
+    /// Message « Accès complet au disque » masqué par l'utilisateur, jusqu'au prochain lancement.
+    @State private var hidesDiskAccessNotice = false
+
     var body: some View {
         NavigationSplitView {
             sidebar
                 .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 300)
         } detail: {
-            detail
+            VStack(spacing: 0) {
+                if showsDiskAccessNotice {
+                    FullDiskAccessNotice(blocked: DiskAccess.blockedBrowsersAtLaunch,
+                                         onDismiss: { hidesDiskAccessNotice = true })
+                        .padding(.horizontal, 20)
+                        .padding(.top, 16)
+                }
+                detail
+            }
         }
         .frame(minWidth: 760, minHeight: 480)
+    }
+
+    /// Le message n'a de sens que dans les outils qui lisent les navigateurs, et seulement si
+    /// macOS bloque l'accès à au moins l'un d'eux.
+    private var showsDiskAccessNotice: Bool {
+        guard !hidesDiskAccessNotice, !DiskAccess.blockedBrowsersAtLaunch.isEmpty else { return false }
+        switch selection {
+        case .faviconSync, .twins, .ghosts, .backups: return true
+        default: return false
+        }
     }
 
     // MARK: - Barre latérale
