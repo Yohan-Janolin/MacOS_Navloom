@@ -18,6 +18,7 @@ struct MainView: View {
             detail
         }
         .frame(minWidth: 760, minHeight: 480)
+        .diskAccessAlert()
     }
 
     // MARK: - Barre latérale

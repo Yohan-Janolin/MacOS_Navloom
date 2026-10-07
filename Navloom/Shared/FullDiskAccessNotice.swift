@@ -1,41 +1,62 @@
 import SwiftUI
 import AppKit
 
-/// Bandeau affiché au-dessus des outils quand macOS interdit à Navloom de lire les données de
-/// certains navigateurs (ils n'apparaissent alors pas dans la liste). Explique l'autorisation à
-/// accorder et propose d'ouvrir le réglage, puis de relancer l'app.
-struct FullDiskAccessNotice: View {
-    let blocked: [ChromiumBrowser]
-    let onDismiss: () -> Void
+/// Message « Accès complet au disque » : sous macOS 27, Chrome, Edge et Brave (versions stables)
+/// n'apparaissent dans la liste que si Navloom a cette autorisation. Quand macOS en bloque un,
+/// une alerte système l'explique au lancement et propose d'ouvrir le réglage, puis de relancer l'app.
+/// (Une alerte plutôt qu'un bandeau : elle n'ajoute rien à la mise en page des outils.)
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Label("Accès complet au disque requis", systemImage: "lock.shield.fill")
-                .font(.headline)
-                .foregroundStyle(.orange)
+/// Navigateurs bloqués, calculés une seule fois hors de l'interface : une autorisation accordée
+/// ensuite ne s'applique de toute façon qu'après un redémarrage de l'app.
+@MainActor
+@Observable
+final class DiskAccessNoticeState {
+    private(set) var blocked: [ChromiumBrowser] = []
+    private var hasLoaded = false
 
-            Text("macOS bloque l'accès aux données de \(DiskAccess.joinedNames(blocked.map(\.name))) : ils n'apparaissent donc pas dans la liste des navigateurs. Pour les utiliser, ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + » s'il n'y est pas, active-le, puis relance Navloom.")
-                .font(.callout)
-                .fixedSize(horizontal: false, vertical: true)
-
-            HStack(spacing: 10) {
-                Button("Ouvrir les réglages") { Self.openFullDiskAccessSettings() }
-                    .buttonStyle(.borderedProminent)
-                Button("Relancer Navloom") { Self.relaunch() }
-                Button("Masquer", action: onDismiss)
-                Spacer()
-            }
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+    func loadIfNeeded() async {
+        guard !hasLoaded else { return }
+        hasLoaded = true
+        blocked = await Task.detached { ChromiumBrowser.blockedByMacOS() }.value
     }
 
-    // MARK: - Actions
+    var message: String {
+        "macOS bloque l'accès aux données de \(DiskAccess.joinedNames(blocked.map(\.name))) : ils n'apparaissent donc pas dans la liste des navigateurs.\n\nPour les utiliser, ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + » s'il n'y est pas, active-le, puis relance Navloom."
+    }
+}
+
+private struct DiskAccessAlertModifier: ViewModifier {
+    @State private var state = DiskAccessNoticeState()
+    @State private var isPresented = false
+
+    func body(content: Content) -> some View {
+        content
+            .task {
+                await state.loadIfNeeded()
+                isPresented = !state.blocked.isEmpty
+            }
+            .alert("Accès complet au disque requis", isPresented: $isPresented) {
+                Button("Ouvrir les réglages") { DiskAccessActions.openFullDiskAccessSettings() }
+                Button("Relancer Navloom") { DiskAccessActions.relaunch() }
+                Button("Plus tard", role: .cancel) {}
+            } message: {
+                Text(state.message)
+            }
+    }
+}
+
+extension View {
+    /// À poser une seule fois, sur la fenêtre principale.
+    func diskAccessAlert() -> some View {
+        modifier(DiskAccessAlertModifier())
+    }
+}
+
+enum DiskAccessActions {
 
     /// Ouvre le volet « Accès complet au disque ». Deux adresses sont essayées (la forme a changé
     /// avec Réglages Système) ; à défaut, on ouvre simplement Réglages Système.
-    private static func openFullDiskAccessSettings() {
+    static func openFullDiskAccessSettings() {
         let addresses = [
             "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_AllFiles",
             "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles",
@@ -48,7 +69,7 @@ struct FullDiskAccessNotice: View {
 
     /// Lance une nouvelle instance de Navloom puis quitte celle-ci : l'autorisation n'est prise en
     /// compte qu'au démarrage. Si le lancement échoue, l'app reste ouverte.
-    private static func relaunch() {
+    static func relaunch() {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
         process.arguments = ["-n", Bundle.main.bundlePath]
@@ -59,58 +80,4 @@ struct FullDiskAccessNotice: View {
         }
         NSApplication.shared.terminate(nil)
     }
-}
-
-// MARK: - Affichage dans les outils
-
-/// État partagé par tous les outils : navigateurs bloqués (calculés une seule fois, hors de
-/// l'interface) et message masqué ou non. Une autorisation accordée ensuite ne s'applique de
-/// toute façon qu'après un redémarrage de l'app, d'où le calcul unique.
-@MainActor
-@Observable
-final class DiskAccessNoticeState {
-    static let shared = DiskAccessNoticeState()
-
-    private(set) var blocked: [ChromiumBrowser] = []
-    var isDismissed = false
-    private var hasLoaded = false
-
-    var isVisible: Bool { !isDismissed && !blocked.isEmpty }
-
-    func loadIfNeeded() async {
-        guard !hasLoaded else { return }
-        hasLoaded = true
-        blocked = await Task.detached { ChromiumBrowser.blockedByMacOS() }.value
-    }
-}
-
-/// Place le message « Accès complet au disque » au-dessus d'un outil, s'il y a lieu.
-/// Le contenu de l'outil reste dessiné à l'identique tant que le message n'a pas lieu d'être.
-private struct DiskAccessNoticeModifier: ViewModifier {
-    private let state = DiskAccessNoticeState.shared
-
-    func body(content: Content) -> some View {
-        VStack(spacing: 0) {
-            if state.isVisible {
-                FullDiskAccessNotice(blocked: state.blocked,
-                                     onDismiss: { state.isDismissed = true })
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
-            }
-            content
-        }
-        .task { await state.loadIfNeeded() }
-    }
-}
-
-extension View {
-    /// À poser sur l'écran d'un outil qui lit les navigateurs.
-    func diskAccessNotice() -> some View {
-        modifier(DiskAccessNoticeModifier())
-    }
-}
-
-#Preview {
-    FullDiskAccessNotice(blocked: Array(ChromiumBrowser.known.prefix(3)), onDismiss: {})
-        .padding()
 }
