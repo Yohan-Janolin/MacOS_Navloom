@@ -9,12 +9,10 @@ struct FullDiskAccessNotice: View {
     let onDismiss: () -> Void
 
     var body: some View {
-        let tint = Color.orange
-
         VStack(alignment: .leading, spacing: 10) {
             Label("Accès complet au disque requis", systemImage: "lock.shield.fill")
                 .font(.headline)
-                .foregroundStyle(tint)
+                .foregroundStyle(.orange)
 
             Text("macOS bloque l'accès aux données de \(DiskAccess.joinedNames(blocked.map(\.name))) : ils n'apparaissent donc pas dans la liste des navigateurs. Pour les utiliser, ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + » s'il n'y est pas, active-le, puis relance Navloom.")
                 .font(.callout)
@@ -24,16 +22,13 @@ struct FullDiskAccessNotice: View {
                 Button("Ouvrir les réglages") { Self.openFullDiskAccessSettings() }
                     .buttonStyle(.borderedProminent)
                 Button("Relancer Navloom") { Self.relaunch() }
-                Spacer()
                 Button("Masquer", action: onDismiss)
-                    .buttonStyle(.link)
-                    .help("Masque ce message jusqu'au prochain lancement")
+                Spacer()
             }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(tint.opacity(0.3), lineWidth: 1))
+        .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
     }
 
     // MARK: - Actions
