@@ -18,6 +18,7 @@ struct FaviconSyncView: View {
                 content
             }
         }
+        .diskAccessNotice()
         .navigationTitle("Navloom")
         .task { model.loadBrowsersIfNeeded() }
         .onChange(of: model.selectedBrowserID) { model.browserChanged() }

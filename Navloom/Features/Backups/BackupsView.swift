@@ -17,6 +17,7 @@ struct BackupsView: View {
                 content
             }
         }
+        .diskAccessNotice()
         .navigationTitle("Sauvegardes")
         .task { model.loadBrowsersIfNeeded() }
         .onAppear { model.reloadBackups() }   // une nouvelle sauvegarde a pu apparaître entre-temps

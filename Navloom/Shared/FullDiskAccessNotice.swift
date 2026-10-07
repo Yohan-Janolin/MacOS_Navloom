@@ -66,6 +66,55 @@ struct FullDiskAccessNotice: View {
     }
 }
 
+// MARK: - Affichage dans les outils
+
+/// État partagé par tous les outils : navigateurs bloqués (calculés une seule fois, hors de
+/// l'interface) et message masqué ou non. Une autorisation accordée ensuite ne s'applique de
+/// toute façon qu'après un redémarrage de l'app, d'où le calcul unique.
+@MainActor
+@Observable
+final class DiskAccessNoticeState {
+    static let shared = DiskAccessNoticeState()
+
+    private(set) var blocked: [ChromiumBrowser] = []
+    var isDismissed = false
+    private var hasLoaded = false
+
+    var isVisible: Bool { !isDismissed && !blocked.isEmpty }
+
+    func loadIfNeeded() async {
+        guard !hasLoaded else { return }
+        hasLoaded = true
+        blocked = await Task.detached { ChromiumBrowser.blockedByMacOS() }.value
+    }
+}
+
+/// Place le message « Accès complet au disque » au-dessus d'un outil, s'il y a lieu.
+/// Le contenu de l'outil reste dessiné à l'identique tant que le message n'a pas lieu d'être.
+private struct DiskAccessNoticeModifier: ViewModifier {
+    private let state = DiskAccessNoticeState.shared
+
+    func body(content: Content) -> some View {
+        VStack(spacing: 0) {
+            if state.isVisible {
+                FullDiskAccessNotice(blocked: state.blocked,
+                                     onDismiss: { state.isDismissed = true })
+                    .padding(.horizontal, 20)
+                    .padding(.top, 16)
+            }
+            content
+        }
+        .task { await state.loadIfNeeded() }
+    }
+}
+
+extension View {
+    /// À poser sur l'écran d'un outil qui lit les navigateurs.
+    func diskAccessNotice() -> some View {
+        modifier(DiskAccessNoticeModifier())
+    }
+}
+
 #Preview {
     FullDiskAccessNotice(blocked: Array(ChromiumBrowser.known.prefix(3)), onDismiss: {})
         .padding()

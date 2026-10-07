@@ -5,10 +5,6 @@ import Foundation
 /// Dans ce cas le dossier existe, mais on ne peut pas le lister (erreur « Operation not permitted »).
 nonisolated enum DiskAccess {
 
-    /// Navigateurs dont macOS interdit la lecture au lancement de l'app. Calculé une seule fois :
-    /// une autorisation accordée ensuite ne s'applique qu'après un redémarrage de l'app.
-    static let blockedBrowsersAtLaunch: [ChromiumBrowser] = ChromiumBrowser.blockedByMacOS()
-
     /// Vrai si l'erreur est un refus de permission (protection de macOS ou droits Unix).
     static func isPermissionDenied(_ error: Error) -> Bool {
         let nsError = error as NSError
