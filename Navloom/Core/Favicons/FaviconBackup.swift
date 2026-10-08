@@ -6,11 +6,11 @@ nonisolated enum BackupCategory: String, CaseIterable, Identifiable, Hashable, S
 
     var id: String { rawValue }
 
-    /// Nom de l'onglet dans l'écran Sauvegardes.
+    /// Ce que contient le fichier (l'outil qui l'a créé est un autre critère : voir `BackupTool`).
     var title: String {
         switch self {
-        case .favicons: "FaviconSync"
-        case .bookmarks: "Twins / Ghosts"
+        case .favicons: "Favicons"
+        case .bookmarks: "Favoris"
         }
     }
 
@@ -38,6 +38,26 @@ nonisolated enum BackupCategory: String, CaseIterable, Identifiable, Hashable, S
     }
 }
 
+/// L'outil de Navloom qui a écrit dans le navigateur (et donc créé la sauvegarde).
+/// Il est noté dans le nom du fichier : <profil>-Bookmarks-<date>-<outil>.json
+nonisolated enum BackupTool: String, CaseIterable, Identifiable, Hashable, Sendable {
+    case faviconSync = "faviconsync"
+    case twins
+    case ghosts
+    case echo
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .faviconSync: "FaviconSync"
+        case .twins: "Twins"
+        case .ghosts: "Ghosts"
+        case .echo: "Echo"
+        }
+    }
+}
+
 /// Une sauvegarde, décrite par son nom de fichier.
 nonisolated struct BackupEntry: Identifiable, Hashable, Sendable {
     nonisolated enum Kind: Hashable, Sendable {
@@ -51,14 +71,23 @@ nonisolated struct BackupEntry: Identifiable, Hashable, Sendable {
     let date: Date
     let kind: Kind
     let category: BackupCategory
+    /// Outil noté dans le nom du fichier ; nil pour les sauvegardes d'avant cette étiquette.
+    let tool: BackupTool?
     let sizeBytes: Int64
 
     var id: URL { url }
+
+    /// L'outil, y compris pour les anciennes sauvegardes quand on peut le déduire : avant Echo, seul
+    /// FaviconSync écrivait dans la base de favicons. Les anciennes sauvegardes de favoris viennent de
+    /// Twins ou de Ghosts, sans moyen de savoir lequel : nil.
+    var effectiveTool: BackupTool? {
+        tool ?? (category == .favicons ? .faviconSync : nil)
+    }
 }
 
 /// Sauvegardes de la base Favicons et du fichier Bookmarks.
-/// Nom de fichier : <profil>-Favicons-<date ISO>[-avant-restauration].sqlite
-///              ou  <profil>-Bookmarks-<date ISO>[-avant-restauration].json
+/// Nom de fichier : <profil>-Favicons-<date ISO>[-<outil>][-avant-restauration].sqlite
+///              ou  <profil>-Bookmarks-<date ISO>[-<outil>][-avant-restauration].json
 nonisolated enum FaviconBackup {
     private static let restoreSuffix = "-avant-restauration"
 
@@ -92,13 +121,15 @@ nonisolated enum FaviconBackup {
     static func create(from source: URL,
                        label: String,
                        category: BackupCategory = .favicons,
+                       tool: BackupTool? = nil,
                        kind: BackupEntry.Kind = .beforeWrite,
                        in directory: URL = FaviconBackup.directory) throws -> URL {
         let fm = FileManager.default
         try fm.createDirectory(at: directory, withIntermediateDirectories: true)
 
         let stamp = fileStamp()
-        let suffix = kind == .beforeRestore ? restoreSuffix : ""
+        let toolSuffix = tool.map { "-\($0.rawValue)" } ?? ""
+        let suffix = toolSuffix + (kind == .beforeRestore ? restoreSuffix : "")
         let destination = directory.appending(
             path: "\(safeLabel(label))\(category.separator)\(stamp)\(suffix).\(category.fileExtension)")
 
@@ -137,13 +168,21 @@ nonisolated enum FaviconBackup {
             base.removeLast(restoreSuffix.count)
         }
 
+        // L'outil vient juste après la date (qui se termine par un chiffre ou « Z », jamais par un nom d'outil).
+        var tool: BackupTool?
+        if let found = BackupTool.allCases.first(where: { base.hasSuffix("-\($0.rawValue)") }) {
+            tool = found
+            base.removeLast(found.rawValue.count + 1)
+        }
+
         guard let range = base.range(of: category.separator, options: .backwards) else { return nil }
         let label = String(base[..<range.lowerBound])
         let stamp = String(base[range.upperBound...])
         guard !label.isEmpty, let date = parseStamp(stamp) else { return nil }
 
         let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize).map { Int64($0) } ?? 0
-        return BackupEntry(url: url, label: label, date: date, kind: kind, category: category, sizeBytes: size)
+        return BackupEntry(url: url, label: label, date: date, kind: kind, category: category,
+                           tool: tool, sizeBytes: size)
     }
 
     /// Relit un horodatage de nom de fichier, ancien ("2026-09-30T12-15-00Z", en UTC) ou
@@ -195,7 +234,7 @@ nonisolated enum FaviconBackup {
         var safety: URL?
         if fm.fileExists(atPath: destination.path) {
             safety = try create(from: destination, label: label, category: entry.category,
-                                kind: .beforeRestore, in: directory)
+                                tool: entry.tool, kind: .beforeRestore, in: directory)
         }
 
         // On copie d'abord à côté de la destination, puis on remplace d'un coup :
@@ -226,8 +265,16 @@ nonisolated enum FaviconBackup {
         try FileManager.default.trashItem(at: entry.url, resultingItemURL: nil)
     }
 
-    /// Ne garde que les plus récentes sauvegardes d'un profil, séparément pour chaque catégorie
-    /// et chaque type. Retourne le nombre de sauvegardes retirées. `remover` : corbeille par défaut.
+    /// Un lot de sauvegardes comptées ensemble par le nettoyage : même fichier sauvegardé, même outil.
+    private nonisolated struct PruneGroup: Hashable {
+        let category: BackupCategory
+        let tool: BackupTool?
+    }
+
+    /// Ne garde que les plus récentes sauvegardes d'un profil, séparément pour chaque catégorie, chaque
+    /// outil et chaque type (« avant écriture », « avant restauration »). Les sauvegardes d'Echo ne
+    /// font donc pas disparaître celles de Twins. Retourne le nombre de sauvegardes retirées.
+    /// `remover` : corbeille par défaut.
     @discardableResult
     static func prune(label: String,
                       retention: BackupRetention,
@@ -239,11 +286,13 @@ nonisolated enum FaviconBackup {
             (.beforeRestore, retention.keepBeforeRestore),
         ]
 
+        let groups = Dictionary(grouping: entries) { PruneGroup(category: $0.category, tool: $0.effectiveTool) }
+
         var removed = 0
-        for category in BackupCategory.allCases {
+        for group in groups.values {
             for (kind, keep) in limits {
                 // On garde toujours au moins une sauvegarde de chaque type.
-                let old = entries.filter { $0.category == category && $0.kind == kind }
+                let old = group.filter { $0.kind == kind }   // les plus récentes d'abord
                 for entry in old.dropFirst(max(keep, 1)) {
                     if (try? remover(entry.url)) != nil { removed += 1 }
                 }

@@ -63,7 +63,7 @@ struct SettingsView: View {
             } header: {
                 Text("Sauvegardes")
             } footer: {
-                Text("Une sauvegarde est créée automatiquement avant chaque écriture (base de favicons pour FaviconSync, fichier Bookmarks pour Twins et Ghosts) et avant chaque restauration. Le décompte se fait séparément pour chaque profil de navigateur et chaque outil ; les sauvegardes en trop sont mises à la corbeille, pas supprimées définitivement.")
+                Text("Une sauvegarde est créée automatiquement avant chaque écriture (base de favicons pour FaviconSync, fichier Bookmarks pour Twins et Ghosts, les deux pour Echo) et avant chaque restauration. Le décompte se fait séparément pour chaque profil de navigateur et chaque outil ; les sauvegardes en trop sont mises à la corbeille, pas supprimées définitivement.")
             }
 
             if let message {

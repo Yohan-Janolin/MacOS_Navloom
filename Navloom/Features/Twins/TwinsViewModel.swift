@@ -173,7 +173,7 @@ final class TwinsViewModel {
         Task {
             do {
                 summary = try await Task.detached {
-                    try BookmarksWriter.removeBookmarks(ids: ids, in: file, label: label)
+                    try BookmarksWriter.removeBookmarks(ids: ids, in: file, label: label, tool: .twins)
                 }.value
                 phase = .removed
             } catch {

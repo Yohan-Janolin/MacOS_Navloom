@@ -1,6 +1,38 @@
 import SwiftUI
 import AppKit
 
+/// Ce que l'écran Sauvegardes affiche : tout, les sauvegardes d'un outil, ou les anciennes sauvegardes
+/// de favoris (d'avant que le nom de fichier note l'outil : Twins ou Ghosts, on ne sait pas lequel).
+nonisolated enum BackupFilter: Hashable, Identifiable, Sendable {
+    case all
+    case tool(BackupTool)
+    case legacy
+
+    var id: String {
+        switch self {
+        case .all: "all"
+        case .tool(let tool): tool.rawValue
+        case .legacy: "legacy"
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .all: "Tout"
+        case .tool(let tool): tool.title
+        case .legacy: "Anciennes"
+        }
+    }
+
+    func includes(_ entry: BackupEntry) -> Bool {
+        switch self {
+        case .all: true
+        case .tool(let tool): entry.effectiveTool == tool
+        case .legacy: entry.effectiveTool == nil
+        }
+    }
+}
+
 @MainActor
 @Observable
 final class BackupsViewModel {
@@ -30,8 +62,8 @@ final class BackupsViewModel {
     var selectedBrowserID: String?
     var selectedProfileID: String?
 
-    /// Onglet affiché : sauvegardes de FaviconSync ou de Twins / Ghosts.
-    var selectedCategory: BackupCategory = .favicons
+    /// Filtre affiché : toutes les sauvegardes, ou celles d'un outil.
+    var selectedFilter: BackupFilter = .all
 
     private var allItems: [Item] = []
     private(set) var isBrowserRunning = false
@@ -50,13 +82,21 @@ final class BackupsViewModel {
         profiles.first { $0.id == selectedProfileID }
     }
 
-    /// Sauvegardes de l'onglet affiché.
+    /// Sauvegardes du filtre affiché.
     var items: [Item] {
-        allItems.filter { $0.entry.category == selectedCategory }
+        allItems.filter { selectedFilter.includes($0.entry) }
     }
 
-    func count(in category: BackupCategory) -> Int {
-        allItems.filter { $0.entry.category == category }.count
+    func count(in filter: BackupFilter) -> Int {
+        allItems.filter { filter.includes($0.entry) }.count
+    }
+
+    /// Un filtre pour chaque outil, plus « Anciennes » tant qu'il en reste.
+    var filters: [BackupFilter] {
+        var result: [BackupFilter] = [.all]
+        result += BackupTool.allCases.map { BackupFilter.tool($0) }
+        if count(in: .legacy) > 0 { result.append(.legacy) }
+        return result
     }
 
     // MARK: Sélection
@@ -99,10 +139,14 @@ final class BackupsViewModel {
         refreshSyncStatus()
         guard let profile = selectedProfile else {
             allItems = []
+            selectedFilter = .all
             return
         }
         let entries = FaviconBackup.list(label: FaviconBackup.safeLabel(profile.id))
         allItems = entries.map { Item(entry: $0) }
+
+        // Le filtre « Anciennes » disparaît quand il n'en reste plus.
+        if !filters.contains(selectedFilter) { selectedFilter = .all }
 
         // Le contenu de chaque sauvegarde est compté ensuite, une par une.
         Task { await loadCounts(for: entries) }

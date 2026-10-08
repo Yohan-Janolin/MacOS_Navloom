@@ -251,7 +251,7 @@ final class GhostsViewModel {
         Task {
             do {
                 summary = try await Task.detached {
-                    try BookmarksWriter.removeBookmarks(ids: ids, in: file, label: label)
+                    try BookmarksWriter.removeBookmarks(ids: ids, in: file, label: label, tool: .ghosts)
                 }.value
                 selection = []
                 phase = .removed

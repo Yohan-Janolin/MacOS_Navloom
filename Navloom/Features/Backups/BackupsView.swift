@@ -61,7 +61,7 @@ struct BackupsView: View {
         VStack(spacing: 16) {
             header
 
-            categoryPicker
+            filterPicker
 
             notice
 
@@ -110,10 +110,11 @@ struct BackupsView: View {
         .disabled(model.isRestoring)
     }
 
-    private var categoryPicker: some View {
-        Picker("", selection: $model.selectedCategory) {
-            ForEach(BackupCategory.allCases) { category in
-                Text("\(category.title) (\(model.count(in: category)))").tag(category)
+    /// Un filtre par outil : chaque sauvegarde est rangée sous l'outil qui l'a créée.
+    private var filterPicker: some View {
+        Picker("", selection: $model.selectedFilter) {
+            ForEach(model.filters) { filter in
+                Text("\(filter.title) (\(model.count(in: filter)))").tag(filter)
             }
         }
         .pickerStyle(.segmented)
@@ -122,32 +123,38 @@ struct BackupsView: View {
     }
 
     private var emptyDescription: String {
-        switch model.selectedCategory {
-        case .favicons:
+        switch model.selectedFilter {
+        case .all:
+            "Une sauvegarde est créée automatiquement avant chaque écriture dans les fichiers d'un navigateur."
+        case .tool(.faviconSync):
             "Une sauvegarde est créée automatiquement avant chaque écriture dans la base de favicons."
-        case .bookmarks:
-            "Une sauvegarde est créée automatiquement avant chaque suppression de favoris (Twins, Ghosts)."
+        case .tool(.twins):
+            "Une sauvegarde est créée automatiquement avant chaque suppression de doublons."
+        case .tool(.ghosts):
+            "Une sauvegarde est créée automatiquement avant chaque suppression de liens morts."
+        case .tool(.echo):
+            "Une sauvegarde est créée automatiquement avant chaque ajout de favoris : le fichier Bookmarks et, si les icônes sont copiées, la base de favicons."
+        case .legacy:
+            "Aucune ancienne sauvegarde."
         }
     }
 
-    /// Favoris : bandeau complet (le navigateur ouvert ou la synchro active bloquent la restauration).
-    /// Favicons : seul le navigateur ouvert bloque, la synchro n'y change rien.
+    /// Dès qu'une sauvegarde de favoris est affichée : bandeau complet (le navigateur ouvert ou la synchro
+    /// active bloquent la restauration). Pour les seules favicons, seul le navigateur ouvert bloque :
+    /// la synchro n'y change rien.
     @ViewBuilder
     private var notice: some View {
         let browserName = model.selectedBrowser?.name ?? "Le navigateur"
-        switch model.selectedCategory {
-        case .bookmarks:
+        if model.items.contains(where: { $0.entry.category == .bookmarks }) {
             SyncNotice(browserName: browserName,
                        isBrowserRunning: model.isBrowserRunning,
                        syncStatus: model.syncStatus,
                        operation: .restoration)
-        case .favicons:
-            if model.isBrowserRunning {
-                SyncNotice(browserName: browserName,
-                           isBrowserRunning: true,
-                           syncStatus: .disabled,
-                           operation: .restoration)
-            }
+        } else if model.isBrowserRunning {
+            SyncNotice(browserName: browserName,
+                       isBrowserRunning: true,
+                       syncStatus: .disabled,
+                       operation: .restoration)
         }
     }
 
@@ -159,6 +166,45 @@ struct BackupsView: View {
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+// MARK: - Outil d'une sauvegarde
+
+private extension BackupTool {
+    /// L'entrée de la barre latérale correspondante : même nom, même icône, même couleur.
+    var feature: Feature {
+        switch self {
+        case .faviconSync: .faviconSync
+        case .twins: .twins
+        case .ghosts: .ghosts
+        case .echo: .echo
+        }
+    }
+}
+
+/// Pastille « outil » : le même symbole et la même couleur que dans la barre latérale.
+private struct ToolPill: View {
+    let tool: BackupTool?
+
+    var body: some View {
+        let style = appearance
+        Label(style.title, systemImage: style.systemImage)
+            .font(.caption.bold())
+            .foregroundStyle(style.tint)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background(style.tint.opacity(0.15), in: Capsule())
+            .help(style.help)
+    }
+
+    private var appearance: (title: String, systemImage: String, tint: Color, help: String) {
+        if let tool {
+            return (tool.title, tool.feature.systemImage, tool.feature.tint,
+                    "Sauvegarde créée par \(tool.title)")
+        }
+        return ("Twins ou Ghosts", "questionmark.circle", .secondary,
+                "Sauvegarde de favoris créée avant que Navloom note quel outil l'a faite : Twins ou Ghosts.")
     }
 }
 
@@ -179,7 +225,10 @@ private struct BackupRow: View {
                 .frame(width: 28)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.entry.date.formatted(date: .long, time: .shortened))
+                HStack(spacing: 8) {
+                    Text(item.entry.date.formatted(date: .long, time: .shortened))
+                    ToolPill(tool: item.entry.effectiveTool)
+                }
                 Text("\(kindLabel) · \(countLabel) · \(sizeLabel)")
                     .font(.caption)
                     .foregroundStyle(item.count == .unreadable ? AnyShapeStyle(.red) : AnyShapeStyle(.secondary))

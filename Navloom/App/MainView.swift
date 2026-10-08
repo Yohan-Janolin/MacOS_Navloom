@@ -8,6 +8,7 @@ struct MainView: View {
     @State private var faviconSync = FaviconSyncViewModel()
     @State private var twins = TwinsViewModel()
     @State private var ghosts = GhostsViewModel()
+    @State private var echo = EchoViewModel()
     @State private var backups = BackupsViewModel()
 
     var body: some View {
@@ -61,6 +62,8 @@ struct MainView: View {
             TwinsView(model: twins)
         case .ghosts:
             GhostsView(model: ghosts)
+        case .echo:
+            EchoView(model: echo)
         case .backups:
             BackupsView(model: backups)
         case .settings:

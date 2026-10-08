@@ -71,6 +71,79 @@ actor FaviconDatabase {
         return Int(sqlite3_column_int64(stmt, 0))
     }
 
+    // MARK: - Copie entre navigateurs (Echo)
+
+    /// L'icône d'une page par page : pour chaque URL qui en a une, l'URL de l'image et ses bitmaps.
+    /// Les pages sans icône (ou dont les bitmaps sont vides) sont absentes du résultat.
+    func favicons(forPages pageURLs: [String]) throws -> [String: StoredFavicon] {
+        let stmt = try prepare("""
+            SELECT f.id, f.url, b.width, b.image_data
+            FROM icon_mapping m
+            JOIN favicons f ON f.id = m.icon_id
+            JOIN favicon_bitmaps b ON b.icon_id = f.id
+            WHERE m.page_url = ? AND f.icon_type = 1
+              AND b.image_data IS NOT NULL AND LENGTH(b.image_data) > 0
+            ORDER BY f.id, b.width
+            """)
+        defer { sqlite3_finalize(stmt) }
+
+        var result: [String: StoredFavicon] = [:]
+        for pageURL in pageURLs where result[pageURL] == nil {
+            sqlite3_reset(stmt)
+            sqlite3_clear_bindings(stmt)
+            sqlite3_bind_text(stmt, 1, pageURL, -1, sqliteTransient)
+
+            // Une page peut pointer sur plusieurs icônes : on garde la première, avec tous ses bitmaps.
+            var chosenID: Int64?
+            var iconURL = ""
+            var bitmaps: [FaviconBitmap] = []
+
+            var status = sqlite3_step(stmt)
+            while status == SQLITE_ROW {
+                let iconID = sqlite3_column_int64(stmt, 0)
+                if chosenID == nil {
+                    chosenID = iconID
+                    if let text = sqlite3_column_text(stmt, 1) { iconURL = String(cString: text) }
+                }
+                if iconID != chosenID { break }
+
+                let width = Int(sqlite3_column_int(stmt, 2))
+                let count = Int(sqlite3_column_bytes(stmt, 3))
+                if count > 0, let bytes = sqlite3_column_blob(stmt, 3) {
+                    bitmaps.append(FaviconBitmap(size: width, png: Data(bytes: bytes, count: count)))
+                }
+                status = sqlite3_step(stmt)
+            }
+            guard status == SQLITE_ROW || status == SQLITE_DONE else { throw lastError }
+
+            if chosenID != nil, !bitmaps.isEmpty {
+                result[pageURL] = StoredFavicon(iconURL: iconURL, bitmaps: bitmaps)
+            }
+        }
+        return result
+    }
+
+    /// Identifiant d'une icône déjà présente (même URL d'image, avec au moins un bitmap), pour la
+    /// réutiliser au lieu d'en créer une seconde.
+    func iconID(forIconURL iconURL: String) throws -> Int64? {
+        let stmt = try prepare("""
+            SELECT id FROM favicons
+            WHERE url = ? AND icon_type = 1
+              AND EXISTS (SELECT 1 FROM favicon_bitmaps b
+                          WHERE b.icon_id = favicons.id
+                            AND b.image_data IS NOT NULL AND LENGTH(b.image_data) > 0)
+            LIMIT 1
+            """)
+        defer { sqlite3_finalize(stmt) }
+        sqlite3_bind_text(stmt, 1, iconURL, -1, sqliteTransient)
+
+        switch sqlite3_step(stmt) {
+        case SQLITE_ROW: return sqlite3_column_int64(stmt, 0)
+        case SQLITE_DONE: return nil
+        default: throw lastError
+        }
+    }
+
     // MARK: - Transactions
 
     func begin() throws { try execute("BEGIN TRANSACTION") }
@@ -143,4 +216,12 @@ actor FaviconDatabase {
     private func execute(_ sql: String) throws {
         guard sqlite3_exec(handle, sql, nil, nil, nil) == SQLITE_OK else { throw lastError }
     }
+}
+
+/// L'icône d'une page, telle qu'elle est rangée dans une base Favicons.
+/// `FaviconBitmap.size` est la largeur lue dans la base ; `png` contient les octets d'origine
+/// (Chromium y range du PNG, mais Echo ne le suppose pas : voir `EchoEngine`).
+nonisolated struct StoredFavicon: Sendable {
+    let iconURL: String
+    let bitmaps: [FaviconBitmap]
 }

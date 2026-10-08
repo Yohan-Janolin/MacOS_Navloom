@@ -86,6 +86,7 @@ nonisolated enum BookmarksWriter {
     static func removeBookmarks(ids: Set<String>,
                                 in file: URL,
                                 label: String,
+                                tool: BackupTool? = nil,
                                 backupDirectory: URL = FaviconBackup.directory) throws -> BookmarksWriteSummary {
         guard !ids.isEmpty else { throw BookmarksWriteError.nothingToRemove }
 
@@ -102,7 +103,7 @@ nonisolated enum BookmarksWriter {
             throw BookmarksWriteError.verificationFailed
         }
 
-        let backup = try backupFile(file, label: label, in: backupDirectory)
+        let backup = try backupFile(file, label: label, tool: tool, in: backupDirectory)
 
         let permissions = (try? FileManager.default.attributesOfItem(atPath: file.path))?[.posixPermissions]
         try output.write(to: file, options: .atomic)
@@ -114,8 +115,8 @@ nonisolated enum BookmarksWriter {
     }
 
     /// Copie le fichier Bookmarks dans le dossier des sauvegardes de Navloom.
-    /// Nom : <profil>-Bookmarks-<date locale ISO>.json (catégorie « Twins / Ghosts » de l'écran Sauvegardes).
-    static func backupFile(_ source: URL, label: String, in directory: URL) throws -> URL {
-        try FaviconBackup.create(from: source, label: label, category: .bookmarks, in: directory)
+    /// Nom : <profil>-Bookmarks-<date locale ISO>-<outil>.json (voir `FaviconBackup`).
+    static func backupFile(_ source: URL, label: String, tool: BackupTool? = nil, in directory: URL) throws -> URL {
+        try FaviconBackup.create(from: source, label: label, category: .bookmarks, tool: tool, in: directory)
     }
 }

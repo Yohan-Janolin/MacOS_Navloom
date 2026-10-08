@@ -113,7 +113,7 @@ actor FaviconSyncEngine {
             throw SyncError.browserRunning(profile.browserName)
         }
 
-        let backupURL = try FaviconBackup.create(from: profile.faviconsURL, label: profile.id)
+        let backupURL = try FaviconBackup.create(from: profile.faviconsURL, label: profile.id, tool: .faviconSync)
 
         let database = try FaviconDatabase(url: profile.faviconsURL, writable: true)
         try await database.begin()
