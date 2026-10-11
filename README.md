@@ -31,10 +31,14 @@ Navloom is a set of tools for Web Browsers on MacOS.
 
 ## ✨ Features
 
-- **FaviconSync:** Retrieves missing icons (favicons) for your bookmarks and writes them to the browser. The browser must be closed during the writing process.
-- **Twins:** Find the bookmarks that point to exactly the same URL and delete the ones you select. The browser must be closed, and bookmark synchronization disabled (see below).
-- **Echo:** It compares a browser's favorites with those of one or more other browsers and adds them—along with their icons—to the destination browser. Backups are created beforehand.
-- **Ghosts:** Open each bookmark to identify those where the page no longer exists (page not found, domain gone, redirect to homepage) and delete the ones you check. You can perform the search while the browser is open, but to delete items, the browser must be closed and bookmark synchronization disabled (see below). Double-click a result to test it in your browser.
+- **FaviconSync:**  
+    Retrieves missing icons (favicons) for your bookmarks and writes them to the browser. The browser must be closed during the writing process.
+- **Twins:**  
+    Find the bookmarks that point to exactly the same URL and delete the ones you select. The browser must be closed, and bookmark synchronization disabled (see below).
+- **Echo:**  
+    It compares a browser's favorites with those of one or more other browsers and adds them—along with their icons—to the destination browser. Backups are created beforehand.
+- **Ghosts:**  
+    Open each bookmark to identify those where the page no longer exists (page not found, domain gone, redirect to homepage) and delete the ones you check. You can perform the search while the browser is open, but to delete items, the browser must be closed and bookmark synchronization disabled (see below). Double-click a result to test it in your browser.
 
 ## 📦 Getting Started
 
