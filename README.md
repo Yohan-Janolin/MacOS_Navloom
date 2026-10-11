@@ -15,13 +15,13 @@
 Navloom is a set of tools for Web Browsers on MacOS.
 
 > [!IMPORTANT]
-> When Chrome saves bookmarks to your Google account (Settings > In your Google account > Bookmarks), it stores them in a separate file. Navloom reads them: FaviconSync, Twins, and Ghosts include them, marked with a cloud icon. However, they cannot be selected for deletion, as Chrome would simply restore them from the server; you must delete them manually within Chrome. Only your local bookmarks can be deleted via Navloom. If you disable the Bookmarks option in Chrome, it hides the account-based bookmarks, and Navloom ignores them as well (based on the setting Chrome writes to its preferences).
+> **Sync Issues:** When Chrome saves bookmarks to your Google account (Settings > In your Google account > Bookmarks), it stores them in a separate file. Navloom reads them: FaviconSync, Twins, and Ghosts include them, marked with a cloud icon. However, they cannot be selected for deletion, as Chrome would simply restore them from the server; you must delete them manually within Chrome. Only your local bookmarks can be deleted via Navloom. If you disable the Bookmarks option in Chrome, it hides the account-based bookmarks, and Navloom ignores them as well (based on the setting Chrome writes to its preferences).
 
 > [!IMPORTANT]
 > **Full Disk Access:** On macOS, Chrome, Edge, and Brave (stable versions) protect their data: unless Navloom has Full Disk Access, they do not appear in the list of browsers. Open System Settings > Privacy & Security > Full Disk Access, add Navloom using the "+" button, enable it, and then relaunch Navloom. Other browsers do not require this. Navloom only reads bookmarks, icons, and a few settings (profile names, sync status).
 
 > [!NOTE]
-> Supported Web Browsers:
+> **Supported Web Browsers:**
 >   - Chromium
 >   - Google Chrome, Google Chrome Beta, Google Chrome Canary
 >   - Microsoft Edge, Microsoft Edge Beta, Microsoft Edge Dev, Microsoft Edge Canary
