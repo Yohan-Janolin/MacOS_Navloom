@@ -78,21 +78,47 @@ nonisolated enum TransferPlanner {
 @MainActor
 enum TabWriter {
 
-    /// Script qui crée une fenêtre et y ouvre les URL dans l'ordre, la première au premier plan.
-    static func script(bundleID: String, window: TransferWindow) -> String {
-        guard let first = window.urls.first else { return "" }
-        let properties = window.isPrivate ? " with properties {mode:\"incognito\"}" : ""
+    /// Comment une fenêtre a été ouverte (pour le bilan et les tests).
+    enum Method: Equatable {
+        case appleScript
+        /// Le navigateur refuse de créer une fenêtre par AppleScript (Opera) : ligne de commande.
+        case commandLine
+    }
+
+    /// Navigateurs dont on sait déjà qu'ils refusent `make new window` : inutile de réessayer.
+    private static var noWindowCreation: Set<String> = []
+
+    /// Étape 1 : créer une fenêtre vide et renvoyer son identifiant.
+    static func createWindowScript(bundleID: String, isPrivate: Bool) -> String {
+        let properties = isPrivate ? " with properties {mode:\"incognito\"}" : ""
+        return """
+        tell application id \(quoted(bundleID))
+            set w to make new window\(properties)
+            return (id of w) as text
+        end tell
+        """
+    }
+
+    /// Étape 2 : remplir la fenêtre créée, la première URL au premier plan.
+    static func fillWindowScript(bundleID: String, windowID: Int, urls: [String]) -> String {
+        guard let first = urls.first else { return "" }
         var lines = [
             "tell application id \(quoted(bundleID))",
-            "    set w to make new window\(properties)",
+            "    set w to window id \(windowID)",
             "    set URL of active tab of w to \(quoted(first))",
         ]
-        for url in window.urls.dropFirst() {
+        for url in urls.dropFirst() {
             lines.append("    make new tab at end of tabs of w with properties {URL:\(quoted(url))}")
         }
         lines.append("    set active tab index of w to 1")
         lines.append("end tell")
         return lines.joined(separator: "\n")
+    }
+
+    /// Arguments de lancement Chromium : une nouvelle fenêtre (privée ou non) avec ces URL.
+    /// Si le navigateur est déjà ouvert, l'instance lancée les lui transmet puis se ferme.
+    static func commandLineArguments(for window: TransferWindow) -> [String] {
+        [window.isPrivate ? "--incognito" : "--new-window"] + window.urls
     }
 
     /// Chaîne AppleScript : guillemets et barres obliques inverses neutralisés.
@@ -103,18 +129,63 @@ enum TabWriter {
         return "\"\(escaped)\""
     }
 
-    static func open(_ window: TransferWindow, in browser: ChromiumBrowser) -> Result<Void, TabReadError> {
-        guard let script = NSAppleScript(source: script(bundleID: browser.bundleID, window: window)) else {
+    /// Ouvre une fenêtre avec ses onglets : par AppleScript si le navigateur sait créer une fenêtre,
+    /// sinon en ligne de commande. Une fois la fenêtre créée, une erreur n'entraîne pas de second essai
+    /// (on ne veut pas de fenêtre en double).
+    static func open(_ window: TransferWindow, in browser: ChromiumBrowser) async -> Result<Method, TabReadError> {
+        guard !window.urls.isEmpty else { return .success(.appleScript) }
+
+        if !noWindowCreation.contains(browser.bundleID) {
+            switch run(createWindowScript(bundleID: browser.bundleID, isPrivate: window.isPrivate)) {
+            case .success(let descriptor):
+                // Renvoyé en texte : les identifiants Chromium dépassent souvent la taille d'un entier AppleScript.
+                guard let windowID = descriptor.stringValue.flatMap({ Int($0) }) else {
+                    return .failure(.script(code: 0, message: "Identifiant de fenêtre illisible"))
+                }
+                return run(fillWindowScript(bundleID: browser.bundleID, windowID: windowID, urls: window.urls))
+                    .map { _ in .appleScript }
+            case .failure(let error) where error == .permissionDenied:
+                return .failure(error)
+            case .failure:
+                // Opera : « Le gestionnaire AppleEvent a échoué » (-10000) sur make new window.
+                noWindowCreation.insert(browser.bundleID)
+            }
+        }
+        return await openWithCommandLine(window, in: browser)
+    }
+
+    private static func openWithCommandLine(_ window: TransferWindow, in browser: ChromiumBrowser) async -> Result<Method, TabReadError> {
+        guard let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: browser.bundleID) else {
+            return .failure(.notRunning)
+        }
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.arguments = commandLineArguments(for: window)
+        // Équivalent de « open -n » : sans cela, macOS se contente d'activer l'instance ouverte
+        // et les arguments sont perdus.
+        configuration.createsNewApplicationInstance = true
+        configuration.activates = false
+        do {
+            _ = try await NSWorkspace.shared.openApplication(at: appURL, configuration: configuration)
+            // Laisse l'instance de passage transmettre les URL à la fenêtre principale.
+            try? await Task.sleep(for: .seconds(1))
+            return .success(.commandLine)
+        } catch {
+            return .failure(.script(code: 0, message: "Lancement impossible : \(error.localizedDescription)"))
+        }
+    }
+
+    private static func run(_ source: String) -> Result<NSAppleEventDescriptor, TabReadError> {
+        guard let script = NSAppleScript(source: source) else {
             return .failure(.script(code: 0, message: "Script AppleScript invalide"))
         }
         var errorInfo: NSDictionary?
-        _ = script.executeAndReturnError(&errorInfo)
+        let descriptor = script.executeAndReturnError(&errorInfo)
         if let errorInfo {
             let code = (errorInfo[NSAppleScript.errorNumber] as? NSNumber)?.intValue ?? 0
             let message = errorInfo[NSAppleScript.errorMessage] as? String ?? "erreur inconnue"
             return .failure(TabReader.error(code: code, message: message))
         }
-        return .success(())
+        return .success(descriptor)
     }
 
     /// Lance le navigateur s'il est fermé et attend qu'il soit prêt (15 secondes au plus).

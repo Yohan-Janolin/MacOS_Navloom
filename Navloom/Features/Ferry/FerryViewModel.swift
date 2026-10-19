@@ -263,7 +263,7 @@ final class FerryViewModel {
             if await TabWriter.launchIfNeeded(target) {
                 windows: for (offset, window) in plan.windows.enumerated() {
                     await Task.yield()
-                    switch TabWriter.open(window, in: target) {
+                    switch await TabWriter.open(window, in: target) {
                     case .success:
                         summary.openedWindows += 1
                         summary.openedTabs += window.urls.count

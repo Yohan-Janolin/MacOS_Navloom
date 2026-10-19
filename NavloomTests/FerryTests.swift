@@ -590,21 +590,30 @@ struct TabWriterTests {
         #expect(TabWriter.quoted(#"https://a.fr/?q="x"\y"#) == #""https://a.fr/?q=\"x\"\\y""#)
     }
 
-    @Test func scriptDUneFenetre() {
-        let script = TabWriter.script(bundleID: "com.brave.Browser",
-                                      window: TransferWindow(urls: ["https://a.fr/", "https://b.fr/"], isPrivate: false))
+    @Test func creationDeFenetre() {
+        let script = TabWriter.createWindowScript(bundleID: "com.brave.Browser", isPrivate: false)
         #expect(script.contains(#"tell application id "com.brave.Browser""#))
         #expect(script.contains("set w to make new window\n"))
-        #expect(script.contains(#"set URL of active tab of w to "https://a.fr/""#))
-        #expect(script.contains(#"make new tab at end of tabs of w with properties {URL:"https://b.fr/"}"#))
+        #expect(script.contains("return (id of w) as text"))
     }
 
-    @Test func fenetrePrivee() {
-        let script = TabWriter.script(bundleID: "x", window: TransferWindow(urls: ["https://a.fr/"], isPrivate: true))
+    @Test func creationDeFenetrePrivee() {
+        let script = TabWriter.createWindowScript(bundleID: "x", isPrivate: true)
         #expect(script.contains(#"make new window with properties {mode:"incognito"}"#))
     }
 
-    @Test func fenetreVide() {
-        #expect(TabWriter.script(bundleID: "x", window: TransferWindow(urls: [], isPrivate: false)).isEmpty)
+    @Test func remplissageDeLaFenetre() {
+        let script = TabWriter.fillWindowScript(bundleID: "x", windowID: 42, urls: ["https://a.fr/", "https://b.fr/"])
+        #expect(script.contains("set w to window id 42"))
+        #expect(script.contains(#"set URL of active tab of w to "https://a.fr/""#))
+        #expect(script.contains(#"make new tab at end of tabs of w with properties {URL:"https://b.fr/"}"#))
+        #expect(TabWriter.fillWindowScript(bundleID: "x", windowID: 1, urls: []).isEmpty)
+    }
+
+    @Test func argumentsDeLigneDeCommande() {
+        #expect(TabWriter.commandLineArguments(for: TransferWindow(urls: ["https://a.fr/", "https://b.fr/"], isPrivate: false))
+                == ["--new-window", "https://a.fr/", "https://b.fr/"])
+        #expect(TabWriter.commandLineArguments(for: TransferWindow(urls: ["https://a.fr/"], isPrivate: true))
+                == ["--incognito", "https://a.fr/"])
     }
 }
