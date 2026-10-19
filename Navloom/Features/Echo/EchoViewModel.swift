@@ -24,6 +24,9 @@ final class EchoViewModel {
     var destinationBrowserID: String?
     var destinationProfileID: String?
 
+    /// Ajouter ce qui manque, ou rendre la cible identique à la source.
+    var syncMode: EchoSyncMode = .merge
+
     var matchMode: EchoMatchMode = .anywhere
 
     /// Variantes d'URL à considérer comme identiques (le « / » final est toujours ignoré).
@@ -79,14 +82,19 @@ final class EchoViewModel {
         selectedProfile != nil && destinationProfile != nil && !isSameProfile && !isBusy
     }
 
-    var hasBookmarksToAdd: Bool {
-        !(report?.plan.toAdd.isEmpty ?? true)
+    /// Il y a quelque chose à écrire dans la cible, selon le mode choisi.
+    var hasChanges: Bool {
+        guard let report else { return false }
+        switch syncMode {
+        case .merge: return !report.plan.toAdd.isEmpty
+        case .mirror: return !report.mirror.isIdentical
+        }
     }
 
-    /// L'ajout est bloqué si la destination est ouverte, ou si sa synchro des favoris est active :
-    /// au lancement suivant, elle mélangerait les favoris ajoutés avec ceux du compte.
+    /// L'écriture est bloquée si la cible est ouverte, ou si sa synchro des favoris est active :
+    /// au lancement suivant, elle mélangerait les favoris écrits avec ceux du compte.
     var canApply: Bool {
-        phase == .done && hasBookmarksToAdd && !isDestinationRunning && destinationSyncStatus != .enabled
+        phase == .done && hasChanges && !isDestinationRunning && destinationSyncStatus != .enabled
     }
 
     // MARK: Sélection
@@ -197,6 +205,7 @@ final class EchoViewModel {
         errorMessage = nil
         phase = .applying
 
+        let syncMode = syncMode
         let mode = matchMode
         let options = urlOptions
         let copy = copyFavicons
@@ -204,7 +213,8 @@ final class EchoViewModel {
         Task {
             do {
                 summary = try await Task.detached {
-                    try await EchoEngine.apply(report, mode: mode, options: options, copyFavicons: copy)
+                    try await EchoEngine.apply(report, syncMode: syncMode, mode: mode,
+                                               options: options, copyFavicons: copy)
                 }.value
                 phase = .applied
             } catch {

@@ -9,6 +9,8 @@ struct SyncNotice: View {
         case restoration
         /// Echo : ajout de favoris dans le navigateur de destination.
         case addition
+        /// Echo : copie complète (ajouts et suppressions) dans le navigateur de destination.
+        case mirror
     }
 
     let browserName: String
@@ -31,6 +33,7 @@ struct SyncNotice: View {
         case .removal: verb = "supprimer"
         case .restoration: verb = "restaurer"
         case .addition: verb = "ajouter"
+        case .mirror: verb = "copier"
         }
 
         if isBrowserRunning {
@@ -48,6 +51,15 @@ struct SyncNotice: View {
         case (.enabled, .addition):
             return ("La synchro des favoris est activée dans \(browserName) : à son prochain lancement, elle peut mélanger les favoris ajoutés avec ceux de ton compte (doublons, ou retour à l'état du compte). Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil) avant d'ajouter.",
                     "arrow.triangle.2.circlepath", .orange)
+        case (.enabled, .mirror):
+            return ("La synchro des favoris est activée dans \(browserName) : à son prochain lancement, elle remettrait les favoris supprimés et mélangerait la copie avec ceux de ton compte. Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil) avant la copie complète.",
+                    "arrow.triangle.2.circlepath", .orange)
+        case (.unknown, .mirror):
+            return ("Navloom ne sait pas lire l'état de la synchro de \(browserName). Si elle est activée, elle peut défaire la copie. Des sauvegardes sont créées automatiquement avant l'écriture.",
+                    "info.circle", .secondary)
+        case (.disabled, .mirror):
+            return ("Des sauvegardes du fichier Bookmarks (et de la base Favicons, si les icônes sont copiées) seront créées automatiquement avant la copie : tu pourras revenir en arrière depuis l'écran Sauvegardes.",
+                    "externaldrive", .secondary)
         case (.unknown, .removal):
             return ("Navloom ne sait pas lire l'état de la synchro de \(browserName). Si elle est activée, elle peut remettre les favoris supprimés. Une sauvegarde du fichier Bookmarks sera créée avant la suppression.",
                     "info.circle", .secondary)

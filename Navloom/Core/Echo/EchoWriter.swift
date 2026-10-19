@@ -49,6 +49,124 @@ nonisolated enum EchoWriter {
         return EchoMergeResult(data: output, added: bookmarks.count, createdFolders: created)
     }
 
+    // MARK: - Copie complète
+
+    /// Réécrit les racines de la cible pour qu'elles soient l'image de celles de la source :
+    /// mêmes dossiers, même ordre, mêmes noms. Ce qui n'est pas dans la source disparaît.
+    ///
+    /// - Les nœuds de la cible identiques à ceux de la source (même dossier de même nom, même favori
+    ///   de même nom et URL) sont gardés tels quels, avec leurs dates et leurs champs propres au navigateur.
+    /// - Les dossiers gérés par le navigateur (Speed Dial et Corbeille de Vivaldi) ne sont pas touchés.
+    /// - Une racine de la source absente de la cible est ajoutée à la fin de « Autres favoris ».
+    static func mirroring(source sourceData: Data, into data: Data, now: Date = Date()) throws -> Data {
+        guard let sourceRoot = try JSONSerialization.jsonObject(with: sourceData) as? [String: Any],
+              let sourceRoots = sourceRoot["roots"] as? [String: Any],
+              var root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              var roots = root["roots"] as? [String: Any],
+              roots["other"] is [String: Any] else {
+            throw EchoError.invalidFormat
+        }
+        root.removeValue(forKey: "roots")
+
+        var nextID = maxNodeID(in: roots) + 1
+        let stamp = chromiumTimestamp(now)
+        var leftovers: [[String: Any]] = []
+
+        for key in EchoReader.rootKeys {
+            let wanted = filteredChildren((sourceRoots[key] as? [String: Any])?["children"] as? [[String: Any]] ?? [])
+            guard var node = roots.removeValue(forKey: key) as? [String: Any] else {
+                // La cible n'a pas cette racine : son contenu va dans « Autres favoris ».
+                if !wanted.isEmpty {
+                    leftovers += rebuild(wanted, reusing: [], nextID: &nextID, stamp: stamp)
+                }
+                continue
+            }
+            var current = (node.removeValue(forKey: "children") as? [[String: Any]]) ?? []
+            let managed = extractBrowserManaged(from: &current)
+            node["children"] = managed + rebuild(wanted, reusing: current, nextID: &nextID, stamp: stamp)
+            node["date_modified"] = stamp
+            roots[key] = node
+        }
+
+        if !leftovers.isEmpty, var other = roots.removeValue(forKey: "other") as? [String: Any] {
+            other["children"] = ((other["children"] as? [[String: Any]]) ?? []) + leftovers
+            roots["other"] = other
+        }
+        root["roots"] = roots
+        root.removeValue(forKey: "checksum")
+
+        return try JSONSerialization.data(withJSONObject: root,
+                                          options: [.prettyPrinted, .withoutEscapingSlashes])
+    }
+
+    /// Ce que la source donne à copier : favoris web et dossiers, sans les dossiers gérés par le navigateur.
+    private static func filteredChildren(_ children: [[String: Any]]) -> [[String: Any]] {
+        children.compactMap { child in
+            if EchoReader.isWebURL(child) { return child }
+            guard child["type"] as? String == "folder", !EchoReader.isBrowserManaged(child) else { return nil }
+            var folder = child
+            folder["children"] = filteredChildren(child["children"] as? [[String: Any]] ?? [])
+            return folder
+        }
+    }
+
+    /// Retire de la cible (à n'importe quelle profondeur) les dossiers gérés par le navigateur et les rend.
+    private static func extractBrowserManaged(from children: inout [[String: Any]]) -> [[String: Any]] {
+        var managed: [[String: Any]] = []
+        var kept: [[String: Any]] = []
+        for var child in children {
+            if EchoReader.isBrowserManaged(child) {
+                managed.append(child)
+            } else if child["type"] as? String == "folder", var inner = child["children"] as? [[String: Any]] {
+                child["children"] = [[String: Any]]()
+                managed += extractBrowserManaged(from: &inner)
+                child["children"] = inner
+                kept.append(child)
+            } else {
+                kept.append(child)
+            }
+        }
+        children = kept
+        return managed
+    }
+
+    /// Construit la liste d'enfants voulue. Un nœud existant identique est gardé, sinon un nouveau est créé.
+    private static func rebuild(_ wanted: [[String: Any]],
+                                reusing existing: [[String: Any]],
+                                nextID: inout Int,
+                                stamp: String) -> [[String: Any]] {
+        var pool = existing
+        var result: [[String: Any]] = []
+
+        for item in wanted {
+            let name = item["name"] as? String ?? ""
+            let isFolder = item["type"] as? String == "folder"
+            let url = item["url"] as? String
+
+            let match = pool.firstIndex { candidate in
+                guard candidate["name"] as? String == name else { return false }
+                if isFolder { return candidate["type"] as? String == "folder" }
+                return candidate["type"] as? String == "url" && candidate["url"] as? String == url
+            }
+            var node: [String: Any]
+            var previous: [[String: Any]] = []
+            if let match {
+                node = pool.remove(at: match)
+                previous = (node.removeValue(forKey: "children") as? [[String: Any]]) ?? []
+            } else {
+                node = newNode(type: isFolder ? "folder" : "url", name: name, id: &nextID, stamp: stamp)
+                if !isFolder { node["url"] = url ?? "" }
+            }
+
+            if isFolder {
+                node["children"] = rebuild(item["children"] as? [[String: Any]] ?? [],
+                                           reusing: previous, nextID: &nextID, stamp: stamp)
+            }
+            result.append(node)
+        }
+        return result
+    }
+
     // MARK: - Arbre
 
     private static func insert(_ bookmark: EchoBookmark,

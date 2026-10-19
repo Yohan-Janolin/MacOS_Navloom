@@ -8,6 +8,8 @@ struct BrowserProfileBanner: View {
     @Binding var profileID: String?
     /// Vrai : le bandeau occupe toute la largeur. Faux : il s'adapte à son contenu.
     var expands = true
+    /// Titre du choix de navigateur (« Navigateur source », « Navigateur cible »…).
+    var browserTitle = "Navigateur"
     /// Couleurs du dégradé de fond (de gauche à droite) ; la dernière colore aussi le contour.
     var colors: [Color] = [Brand.coral, Brand.violet]
 
@@ -15,9 +17,10 @@ struct BrowserProfileBanner: View {
         let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
 
         HStack(spacing: 12) {
-            Label("Navigateur", systemImage: "globe")
+            Label(browserTitle, systemImage: "globe")
                 .fontWeight(.semibold)
-                .fixedSize()
+                .lineLimit(1)
+                .layoutPriority(1)
 
             Picker("Navigateur", selection: $browserID) {
                 ForEach(browsers) { browser in
@@ -32,7 +35,8 @@ struct BrowserProfileBanner: View {
 
                 Label("Profil", systemImage: "person.crop.circle")
                     .fontWeight(.semibold)
-                    .fixedSize()
+                    .lineLimit(1)
+                    .layoutPriority(1)
 
                 Picker("Profil", selection: $profileID) {
                     ForEach(profiles) { profile in

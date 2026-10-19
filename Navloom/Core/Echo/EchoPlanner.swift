@@ -43,6 +43,63 @@ nonisolated enum EchoPlanner {
                         newFolders: missingFolders.count)
     }
 
+    /// Copie complète : ce qu'il faudrait ajouter et supprimer pour que la cible soit l'image de la source.
+    /// Les favoris sont comparés exactement (racine, dossiers, nom, URL) ; les options d'URL ne servent pas ici.
+    static func mirrorPlan(source: EchoSnapshot, destination: EchoSnapshot) -> EchoMirrorPlan {
+        // Une racine que la cible n'a pas (« Favoris mobiles ») est copiée dans « Autres favoris ».
+        func moved(_ bookmark: EchoBookmark) -> EchoBookmark {
+            guard !destination.rootKeys.contains(bookmark.rootKey) else { return bookmark }
+            return EchoBookmark(rootKey: "other", folderPath: bookmark.folderPath,
+                                name: bookmark.name, url: bookmark.url)
+        }
+
+        let expected = source.bookmarks.map(moved)
+        var targetLeft: [String: Int] = [:]
+        for bookmark in destination.bookmarks { targetLeft[EchoReader.exactKey(bookmark), default: 0] += 1 }
+        var sourceLeft: [String: Int] = [:]
+        for bookmark in expected { sourceLeft[EchoReader.exactKey(bookmark), default: 0] += 1 }
+
+        var toAdd: [EchoBookmark] = []
+        var unchanged = 0
+        for bookmark in expected {
+            let k = EchoReader.exactKey(bookmark)
+            if let left = targetLeft[k], left > 0 {
+                targetLeft[k] = left - 1
+                unchanged += 1
+            } else {
+                toAdd.append(bookmark)
+            }
+        }
+
+        var toRemove: [EchoBookmark] = []
+        for bookmark in destination.bookmarks {
+            let k = EchoReader.exactKey(bookmark)
+            if let left = sourceLeft[k], left > 0 {
+                sourceLeft[k] = left - 1
+            } else {
+                toRemove.append(bookmark)
+            }
+        }
+
+        let sourceFolders = Set(source.folders.map { folder in
+            destination.rootKeys.contains(folder.rootKey) ? folder : EchoFolder(rootKey: "other", path: folder.path)
+        })
+
+        // Déjà identiques : mêmes dossiers, mêmes favoris, même ordre, rien de non web à retirer.
+        let usedRoots = Set(source.bookmarks.map(\.rootKey)).union(source.folders.map(\.rootKey))
+        let sameRoots = usedRoots.isSubset(of: destination.rootKeys)
+        let identical = sameRoots && source.layout == destination.layout && destination.ignoredCount == 0
+
+        return EchoMirrorPlan(toAdd: toAdd,
+                              toRemove: toRemove,
+                              nonWebToRemove: destination.ignoredCount,
+                              unchanged: unchanged,
+                              foldersToAdd: sourceFolders.subtracting(destination.folders).count,
+                              foldersToRemove: destination.folders.subtracting(sourceFolders).count,
+                              expected: expected,
+                              isIdentical: identical)
+    }
+
     /// Forme comparable d'une URL : schéma et nom de domaine en minuscules, « / » final ignoré,
     /// plus les variantes choisies dans `options`. Le reste (chemin, ancre…) compte comme une différence.
     static func normalized(_ url: String, options: EchoURLOptions = EchoURLOptions()) -> String {

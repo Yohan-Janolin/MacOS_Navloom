@@ -22,15 +22,41 @@ nonisolated enum EchoReader {
 
         var bookmarks: [EchoBookmark] = []
         var folders = Set<EchoFolder>()
+        var layout: [String] = []
+        var present = Set<String>()
         var ignored = 0
 
         for key in rootKeys {
             guard let node = roots[key] as? [String: Any] else { continue }
+            present.insert(key)
             collect(children: node["children"] as? [[String: Any]] ?? [],
                     rootKey: key, path: [],
-                    bookmarks: &bookmarks, folders: &folders, ignored: &ignored)
+                    bookmarks: &bookmarks, folders: &folders, layout: &layout, ignored: &ignored)
         }
-        return EchoSnapshot(bookmarks: bookmarks, folders: folders, ignoredCount: ignored)
+        return EchoSnapshot(bookmarks: bookmarks, folders: folders, ignoredCount: ignored,
+                            rootKeys: present, layout: layout)
+    }
+
+    /// Dossiers gérés par le navigateur lui-même (Vivaldi : Speed Dial et Corbeille). Echo ne les copie
+    /// ni ne les compte, et une copie complète n'y touche pas.
+    static func isBrowserManaged(_ node: [String: Any]) -> Bool {
+        guard node["type"] as? String == "folder",
+              let meta = node["meta_info"] as? [String: Any] else { return false }
+        return ["Speeddial", "Trash"].contains { key in
+            (meta[key] as? String)?.lowercased() == "true"
+        }
+    }
+
+    static func isWebURL(_ node: [String: Any]) -> Bool {
+        guard node["type"] as? String == "url", let url = node["url"] as? String else { return false }
+        let scheme = URL(string: url)?.scheme?.lowercased() ?? ""
+        return scheme == "http" || scheme == "https"
+    }
+
+    /// Clé exacte d'un favori (racine, dossiers, nom, URL) : sert à comparer deux profils sans aucune tolérance.
+    static func exactKey(_ bookmark: EchoBookmark) -> String {
+        (["B", bookmark.rootKey, bookmark.folderPath.joined(separator: "\u{1E}"), bookmark.name, bookmark.url])
+            .joined(separator: "\u{1F}")
     }
 
     private static func collect(children: [[String: Any]],
@@ -38,24 +64,28 @@ nonisolated enum EchoReader {
                                 path: [String],
                                 bookmarks: inout [EchoBookmark],
                                 folders: inout Set<EchoFolder>,
+                                layout: inout [String],
                                 ignored: inout Int) {
         for child in children {
             let type = child["type"] as? String
             let name = child["name"] as? String ?? ""
 
             if type == "url", let url = child["url"] as? String {
-                let scheme = URL(string: url)?.scheme?.lowercased() ?? ""
-                if scheme == "http" || scheme == "https" {
-                    bookmarks.append(EchoBookmark(rootKey: rootKey, folderPath: path, name: name, url: url))
+                if isWebURL(child) {
+                    let bookmark = EchoBookmark(rootKey: rootKey, folderPath: path, name: name, url: url)
+                    bookmarks.append(bookmark)
+                    layout.append(exactKey(bookmark))
                 } else {
                     ignored += 1
                 }
             } else if type == "folder" {
+                if isBrowserManaged(child) { continue }
                 let subPath = path + [name]
                 folders.insert(EchoFolder(rootKey: rootKey, path: subPath))
+                layout.append((["F", rootKey] + subPath).joined(separator: "\u{1F}"))
                 collect(children: child["children"] as? [[String: Any]] ?? [],
                         rootKey: rootKey, path: subPath,
-                        bookmarks: &bookmarks, folders: &folders, ignored: &ignored)
+                        bookmarks: &bookmarks, folders: &folders, layout: &layout, ignored: &ignored)
             }
         }
     }

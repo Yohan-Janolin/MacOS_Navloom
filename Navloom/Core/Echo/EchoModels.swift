@@ -34,6 +34,42 @@ nonisolated struct EchoSnapshot: Sendable {
     let folders: Set<EchoFolder>
     /// Favoris non web (vivaldi://, opera://, file://…) : on ne les copie pas d'un navigateur à l'autre.
     let ignoredCount: Int
+    /// Racines présentes dans le fichier (une racine absente de la cible reçoit ses favoris dans « Autres favoris »).
+    var rootKeys: Set<String> = ["bookmark_bar", "other", "synced"]
+    /// Dossiers et favoris web dans l'ordre de l'arbre : sert à savoir si deux profils sont déjà identiques.
+    var layout: [String] = []
+}
+
+/// Fusion (on ajoute ce qui manque, on ne supprime rien) ou copie complète (la cible devient la copie de la source).
+nonisolated enum EchoSyncMode: String, CaseIterable, Identifiable, Sendable {
+    case merge
+    case mirror
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .merge: "Ajouter les favoris manquants"
+        case .mirror: "Copie complète (image parfaite)"
+        }
+    }
+
+    /// Libellé court pour le sélecteur segmenté (un libellé long élargirait la fenêtre).
+    var shortTitle: String {
+        switch self {
+        case .merge: "Ajouter les manquants"
+        case .mirror: "Copie complète"
+        }
+    }
+
+    var hint: String {
+        switch self {
+        case .merge:
+            "La cible garde tous ses favoris ; seuls ceux qui lui manquent sont ajoutés."
+        case .mirror:
+            "La cible devient identique à la source : dossiers, ordre et noms. Les favoris de la cible qui ne sont pas dans la source sont supprimés (une sauvegarde est faite avant)."
+        }
+    }
 }
 
 /// Comment décider qu'un favori de la source est déjà présent dans la destination.
@@ -45,7 +81,7 @@ nonisolated enum EchoMatchMode: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .anywhere: "URL absente de la destination"
+        case .anywhere: "URL absente de la cible"
         case .sameFolder: "URL absente du même dossier"
         }
     }
@@ -53,9 +89,9 @@ nonisolated enum EchoMatchMode: String, CaseIterable, Identifiable, Sendable {
     var hint: String {
         switch self {
         case .anywhere:
-            "Un favori est ignoré si son URL existe déjà n'importe où dans la destination. C'est le plus prudent : aucun doublon n'est créé. Le « / » final d'une URL est ignoré."
+            "Un favori est ignoré si son URL existe déjà n'importe où dans la cible : c'est le plus prudent, aucun doublon n'est créé."
         case .sameFolder:
-            "Un favori est ignoré seulement si son URL existe déjà dans le même dossier. Si tu ranges autrement dans la destination, cela peut créer des doublons. Le « / » final d'une URL est ignoré."
+            "Un favori est ignoré seulement si son URL existe déjà dans le même dossier de la cible : si tu ranges autrement, cela peut créer des doublons."
         }
     }
 }
@@ -83,18 +119,43 @@ nonisolated struct EchoPlan: Sendable {
     let newFolders: Int
 }
 
+/// Ce qu'une copie complète changerait dans la cible. Les favoris sont comparés tels quels
+/// (racine, dossiers, nom, URL exacte) : une copie parfaite ne tolère aucune variante.
+nonisolated struct EchoMirrorPlan: Sendable, Equatable {
+    /// Favoris de la source qui manquent dans la cible.
+    let toAdd: [EchoBookmark]
+    /// Favoris web de la cible qui ne sont pas dans la source : ils seront supprimés.
+    let toRemove: [EchoBookmark]
+    /// Favoris non web de la cible (opera://…) : supprimés aussi, car la source n'en copie aucun.
+    let nonWebToRemove: Int
+    let unchanged: Int
+    let foldersToAdd: Int
+    let foldersToRemove: Int
+    /// Tous les favoris web de la source (ceux de la cible après la copie) : pour les icônes et la vérification.
+    let expected: [EchoBookmark]
+    /// La cible a déjà exactement la structure de la source.
+    let isIdentical: Bool
+
+    var removalCount: Int { toRemove.count + nonWebToRemove }
+}
+
 nonisolated struct EchoReport: Sendable {
     let source: ChromiumProfile
     let destination: ChromiumProfile
     let sourceCount: Int
     let ignoredCount: Int
     let plan: EchoPlan
+    let mirror: EchoMirrorPlan
 }
 
 /// Ce qu'une écriture a fait dans la destination.
 nonisolated struct EchoApplySummary: Sendable {
+    let mode: EchoSyncMode
     let added: Int
     let createdFolders: Int
+    /// Copie complète : favoris (web ou non) et dossiers supprimés de la cible.
+    let removed: Int
+    let removedFolders: Int
     /// Favoris ajoutés qui ont maintenant leur icône.
     let faviconsCopied: Int
     /// Favoris ajoutés dont la source n'avait pas d'icône (FaviconSync pourra les chercher).
@@ -109,6 +170,8 @@ nonisolated struct EchoApplySummary: Sendable {
 
 nonisolated enum EchoWriteError: LocalizedError {
     case nothingToAdd
+    case nothingToChange
+    case sourceEmpty
     case browserRunning(String)
     case syncEnabled(String)
     case destinationChanged
@@ -118,12 +181,16 @@ nonisolated enum EchoWriteError: LocalizedError {
         switch self {
         case .nothingToAdd:
             "Aucun favori à ajouter."
+        case .nothingToChange:
+            "La cible est déjà identique à la source."
+        case .sourceEmpty:
+            "La source ne contient aucun favori web : une copie complète viderait la cible. Rien n'a été modifié."
         case .browserRunning(let browser):
-            "\(browser) est ouvert. Ferme-le complètement (Cmd + Q) avant d'ajouter des favoris : rien n'a été modifié."
+            "\(browser) est ouvert. Ferme-le complètement (Cmd + Q) avant d'écrire dans ses favoris : rien n'a été modifié."
         case .syncEnabled(let browser):
-            "La synchro des favoris est activée dans \(browser) : elle mélangerait les favoris ajoutés avec ceux du compte. Rien n'a été modifié."
+            "La synchro des favoris est activée dans \(browser) : elle mélangerait les favoris écrits avec ceux du compte. Rien n'a été modifié."
         case .destinationChanged:
-            "Les favoris de la source ou de la destination ont changé depuis la comparaison. Relance la comparaison : rien n'a été modifié dans le fichier Bookmarks."
+            "Les favoris de la source ou de la cible ont changé depuis la comparaison. Relance la comparaison : rien n'a été modifié dans le fichier Bookmarks."
         case .verificationFailed:
             "La vérification du résultat a échoué : rien n'a été modifié."
         }

@@ -14,7 +14,7 @@ struct HomeView: View {
                     ToolCard(feature: .ghosts,
                              text: "Ouvre chaque favori pour repérer ceux dont la page n'existe plus (page introuvable, domaine disparu, redirection vers l'accueil) et supprime ceux que tu coches. La recherche peut se faire navigateur ouvert ; pour supprimer, il doit être fermé et la synchro des favoris désactivée (voir plus bas). Double-clic sur un résultat pour le tester dans ton navigateur.")
                     ToolCard(feature: .echo,
-                             text: "Compare les favoris d'un navigateur à ceux d'un ou plusieurs autres et les ajoute au navigateur de destination, avec leurs icônes. Des sauvegardes sont créées avant.")
+                             text: "Réplique les favoris d'un navigateur (la source) vers un autre (la cible), avec leurs icônes, que les navigateurs importent mal. Deux modes : ajouter les favoris manquants, ou copie complète, qui rend la cible identique à la source (ce qui n'y est pas est supprimé). La comparaison se fait navigateurs ouverts ; pour écrire, la cible doit être fermée et sa synchro des favoris désactivée (voir plus bas). Des sauvegardes sont créées avant.")
                     ToolCard(feature: .backups,
                              text: "Liste les sauvegardes créées avant chaque écriture, par outil (FaviconSync, Twins, Ghosts, Echo), et permet de restaurer l'une d'elles.")
                 }
@@ -69,7 +69,7 @@ struct HomeView: View {
             Label("Pourquoi la synchro gêne", systemImage: "arrow.triangle.2.circlepath")
                 .font(.headline)
                 .foregroundStyle(.orange)
-            Text("Quand la synchro des favoris est active, le navigateur remet au lancement les favoris que Navloom a supprimés. Twins et Ghosts refusent donc de supprimer, et Echo d'ajouter, tant qu'elle est active. Navloom ne peut pas la couper à ta place : elle se règle dans le navigateur, avec ton compte.")
+            Text("Quand la synchro des favoris est active, le navigateur remet au lancement les favoris que Navloom a supprimés. Twins et Ghosts refusent donc de supprimer, et Echo d’écrire dans la cible, tant qu’elle est active. Navloom ne peut pas la couper à ta place : elle se règle dans le navigateur, avec ton compte.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
 
