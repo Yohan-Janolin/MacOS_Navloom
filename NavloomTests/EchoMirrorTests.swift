@@ -190,8 +190,11 @@ struct EchoMirrorWriterTests {
 
         #expect(root["checksum"] == nil)
         #expect(root["version"] as? Int == 1)
-        #expect(root["sync_transaction_version"] as? String == "7")
-        #expect(try mRoots(result).keys.sorted() == ["bookmark_bar", "other"])
+        // Chromium range « sync_transaction_version » dans « roots », à côté des racines
+        // (voir wFile et EchoWriteTests) : il doit y rester, intact.
+        let roots = try mRoots(result)
+        #expect(roots["sync_transaction_version"] as? String == "7")
+        #expect(roots.keys.sorted() == ["bookmark_bar", "other", "sync_transaction_version"])
     }
 
     @Test func neToucheNiAuSpeedDialNiALaCorbeilleDeLaCible() throws {
