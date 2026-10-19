@@ -41,6 +41,9 @@ nonisolated enum SessionFile {
         case setSelectedNavigationIndex = 7
         case setSelectedTabInIndex = 8
         case setPinnedState = 12
+        /// Chromium : date de dernière activité (ignorée). Vivaldi : bloc JSON propre à l'onglet
+        /// (espace de travail, pile d'onglets…). Les deux se distinguent par leur contenu.
+        case lastActiveTimeOrVivaldiExtData = 21
         case tabClosed = 16
         case windowClosed = 17
         /// Données ajoutées à une fenêtre / un onglet (observé chez Opera).
@@ -124,6 +127,14 @@ nonisolated enum SessionFile {
                 guard let tabID = raw.int32(at: 0), payload.count >= 5 else { continue }
                 var value = tab(tabID)
                 value.isPinned = payload[4] != 0
+                tabs[tabID] = value
+            case .lastActiveTimeOrVivaldiExtData:
+                // Vivaldi : numéro d'onglet puis texte JSON. Une date Chromium ne commence pas par « { ».
+                var pickle = PickleReader(payload)
+                guard let tabID = pickle.int32(), let json = pickle.bytes(),
+                      json.first == UInt8(ascii: "{") else { continue }
+                var value = tab(tabID)
+                value.extraData[BrowserWorkspaces.vivaldiExtDataKey] = Data(json)
                 tabs[tabID] = value
             case .tabClosed:
                 guard let tabID = raw.int32(at: 0) else { continue }

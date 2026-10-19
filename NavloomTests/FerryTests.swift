@@ -239,6 +239,16 @@ private struct SNSSBuilder {
         record(254, Self.pickle(Self.le(window) + Self.string(key) + Self.bytes(Data(value.utf8))))
     }
 
+    /// Vivaldi : bloc JSON de l'onglet (commande 21).
+    mutating func vivaldiExt(_ tab: Int32, _ json: String) {
+        record(21, Self.pickle(Self.le(tab) + Self.string(json)))
+    }
+
+    /// Chromium : date de dernière activité (commande 21 aussi, mais sans pickle).
+    mutating func lastActiveTime(_ tab: Int32) {
+        record(21, Self.le(tab) + withUnsafeBytes(of: Int64(13436885930575060).littleEndian) { Data($0) })
+    }
+
     mutating func truncatedRecord() {
         data += Data([0x40, 0x00, 6, 1, 2])
     }
@@ -304,6 +314,19 @@ struct SessionFileTests {
         #expect(SessionFile.parse(b.data).first?.tabs.count == 1)
     }
 
+    @Test func blocJSONDeVivaldi() throws {
+        var b = SNSSBuilder()
+        b.tab(1, window: 9, index: 0, url: "https://reddit.com/", title: "Reddit")
+        b.tab(2, window: 9, index: 1, url: "http://192.168.1.45:3789/", title: "HomeLab-901")
+        b.lastActiveTime(1)
+        b.vivaldiExt(2, #"{"ext_id":"fe9c","workspaceId":1.791027980791e+12}"#)
+        let tabs = try #require(SessionFile.parse(b.data).first?.tabs)
+        #expect(BrowserWorkspaces.workspaceID(of: tabs[0], style: .vivaldi) == BrowserWorkspaces.vivaldiDefaultID)
+        #expect(BrowserWorkspaces.workspaceID(of: tabs[1], style: .vivaldi) == "1791027980791")
+        // La date Chromium n'a rien ajouté au premier onglet.
+        #expect(tabs[0].extraData.isEmpty)
+    }
+
     @Test func pasUnFichierDeSession() {
         #expect(SessionFile.parse(Data("hello world".utf8)).isEmpty)
     }
@@ -326,7 +349,9 @@ struct BrowserWorkspacesTests {
           "names":{"0":"Home","1":"Network-901","2":"A étudier"},
           "next_id":3,"order":["1","0","2"]}}}}
         """#
-        let spaces = BrowserWorkspaces.parse(preferences: Data(json.utf8))
+        let parsed = BrowserWorkspaces.parse(preferences: Data(json.utf8))
+        #expect(parsed?.style == .opera)
+        let spaces = parsed?.list ?? []
         #expect(spaces.map(\.id) == ["1", "0", "2"])
         #expect(spaces.map(\.name) == ["Network-901", "Home", "A étudier"])
         #expect(spaces[1].icon == "home-icon")
@@ -335,8 +360,34 @@ struct BrowserWorkspacesTests {
     }
 
     @Test func sansEspaces() {
-        #expect(BrowserWorkspaces.parse(preferences: Data(#"{"ui":{}}"#.utf8)).isEmpty)
-        #expect(BrowserWorkspaces.parse(preferences: Data("pas du json".utf8)).isEmpty)
+        #expect(BrowserWorkspaces.parse(preferences: Data(#"{"ui":{}}"#.utf8)) == nil)
+        #expect(BrowserWorkspaces.parse(preferences: Data("pas du json".utf8)) == nil)
+        #expect(BrowserWorkspaces.parse(preferences: Data(#"{"vivaldi":{"workspaces":{"list":[]}}}"#.utf8)) == nil)
+    }
+
+    @Test func espacesDeVivaldi() {
+        // Extrait réel : l'identifiant est écrit en nombre à virgule ; l'icône est un SVG (ignoré).
+        let json = #"""
+        {"vivaldi":{"workspaces":{"enabled":true,"list":[
+          {"icon":"<svg></svg>","id":1791027980791.0,"name":"Network-901"},
+          {"id":1791027999000,"title":"Sans nom de clé name","emoji":"🚀"},
+          {"name":"Sans identifiant"}
+        ]}}}
+        """#
+        let parsed = BrowserWorkspaces.parse(preferences: Data(json.utf8))
+        #expect(parsed?.style == .vivaldi)
+        let spaces = parsed?.list ?? []
+        #expect(spaces.map(\.id) == [BrowserWorkspaces.vivaldiDefaultID, "1791027980791", "1791027999000"])
+        #expect(spaces.map(\.name) == ["Espace par défaut", "Network-901", "Sans nom de clé name"])
+        #expect(spaces[2].emoji == "🚀")
+    }
+
+    @Test func identifiantsNumeriques() {
+        #expect(BrowserWorkspaces.workspaceKey(NSNumber(value: 1.791027980791e12)) == "1791027980791")
+        #expect(BrowserWorkspaces.workspaceKey(NSNumber(value: 1791027980791 as Int64)) == "1791027980791")
+        #expect(BrowserWorkspaces.workspaceKey("1.791027980791e+12") == "1791027980791")
+        #expect(BrowserWorkspaces.workspaceKey(nil) == nil)
+        #expect(BrowserWorkspaces.workspaceKey("abc") == nil)
     }
 
     @Test func symboles() {
@@ -351,9 +402,11 @@ struct BrowserWorkspacesTests {
 
 struct TabMergerTests {
 
-    private let workspaces = [TabWorkspace(id: "0", name: "Home"),
-                              TabWorkspace(id: "1", name: "Network-901"),
-                              TabWorkspace(id: "2", name: "A étudier")]
+    private let workspaces = ProfileWorkspaces(style: .opera, list: [
+        TabWorkspace(id: "0", name: "Home"),
+        TabWorkspace(id: "1", name: "Network-901"),
+        TabWorkspace(id: "2", name: "A étudier"),
+    ])
 
     private func sessionWindow() -> SessionWindow {
         func tab(_ id: Int, _ index: Int, _ url: String, _ space: String) -> SessionTab {
@@ -392,8 +445,8 @@ struct TabMergerTests {
 
     @Test func leProfilNApparaitQuAvecPlusieursProfils() throws {
         let plain = SessionWindow(id: 100, tabs: [SessionTab(id: 1, windowID: 100, url: "https://reddit.com/")])
-        let one = [ProfileSession(profileName: "Travail", windows: [plain], workspaces: [])]
-        let two = one + [ProfileSession(profileName: "Perso", windows: [], workspaces: [])]
+        let one = [ProfileSession(profileName: "Travail", windows: [plain], workspaces: nil)]
+        let two = one + [ProfileSession(profileName: "Perso", windows: [], workspaces: nil)]
 
         #expect(try #require(TabMerger.merge(live: live(), sessions: one).first).profileName == nil)
         let merged = try #require(TabMerger.merge(live: live(), sessions: two).first)
@@ -406,6 +459,59 @@ struct TabMergerTests {
     @Test func fenetreInconnueDuFichierInchangee() {
         let session = ProfileSession(profileName: "Default", windows: [], workspaces: workspaces)
         #expect(TabMerger.merge(live: live(), sessions: [session]) == live())
+    }
+
+    // Vivaldi : AppleScript voit tous les onglets, le fichier dit dans quel espace ils sont.
+
+    private let vivaldiSpaces = ProfileWorkspaces(style: .vivaldi, list: [
+        TabWorkspace(id: BrowserWorkspaces.vivaldiDefaultID, name: "Espace par défaut"),
+        TabWorkspace(id: "1791027980791", name: "Network-901"),
+    ])
+
+    private func vivaldiSession(urls: [String], spaces: [String?]) -> SessionWindow {
+        let tabs = zip(urls, spaces).enumerated().map { offset, pair in
+            SessionTab(id: offset + 1, windowID: 7, index: offset, url: pair.0, title: pair.0,
+                       extraData: pair.1.map {
+                           [BrowserWorkspaces.vivaldiExtDataKey: Data(#"{"workspaceId":\#($0)}"#.utf8)]
+                       } ?? [:])
+        }
+        return SessionWindow(id: 7, tabs: tabs)
+    }
+
+    private func vivaldiLive(_ urls: [String], active: Int) -> [OpenWindow] {
+        TabSnapshot.windows(browserID: "vivaldi", windowIDs: [7], modes: ["normal"],
+                            urls: [urls], titles: [urls], activeIndexes: [active])
+    }
+
+    @Test func vivaldiRangeLesOngletsParEspace() throws {
+        let session = vivaldiSession(urls: ["https://reddit.com/", "http://192.168.1.45:3789/", "http://192.168.1.45:3456/login"],
+                                     spaces: [nil, "1.791027980791e+12", "1.791027980791e+12"])
+        // L'URL du 3e onglet a changé depuis l'écriture du fichier : l'ordre suffit à le reconnaître.
+        let live = vivaldiLive(["https://reddit.com/", "http://192.168.1.45:3789/", "http://192.168.1.45:3456/containers"], active: 2)
+        let window = try #require(TabMerger.merge(live: live,
+                                                  sessions: [ProfileSession(profileName: "Travail", windows: [session], workspaces: vivaldiSpaces)]).first)
+
+        #expect(window.tabs.map(\.workspaceID) == [BrowserWorkspaces.vivaldiDefaultID, "1791027980791", "1791027980791"])
+        #expect(window.activeWorkspaceID == "1791027980791")
+        #expect(window.tabGroups.map { $0.workspace?.name } == ["Espace par défaut", "Network-901"])
+        #expect(window.tabs[2].url.hasSuffix("/containers"))
+    }
+
+    @Test func vivaldiSansEspaceUtilisePasDIntertitres() throws {
+        let session = vivaldiSession(urls: ["https://a.fr/", "https://b.fr/"], spaces: [nil, nil])
+        let live = vivaldiLive(["https://a.fr/", "https://b.fr/"], active: 1)
+        let window = try #require(TabMerger.merge(live: live,
+                                                  sessions: [ProfileSession(profileName: "Travail", windows: [session], workspaces: vivaldiSpaces)]).first)
+        #expect(window.workspaces.isEmpty)
+        #expect(window.tabs.allSatisfy { $0.workspaceID == nil })
+    }
+
+    @Test func vivaldiOngletNeufRejointLEspaceAffiche() throws {
+        let session = vivaldiSession(urls: ["https://a.fr/", "https://b.fr/"], spaces: [nil, "1791027980791"])
+        let live = vivaldiLive(["https://a.fr/", "https://b.fr/", "https://nouveau.fr/"], active: 2)
+        let window = try #require(TabMerger.merge(live: live,
+                                                  sessions: [ProfileSession(profileName: "Travail", windows: [session], workspaces: vivaldiSpaces)]).first)
+        #expect(window.tabs.last?.workspaceID == "1791027980791")
     }
 
     @Test func rapportParEspace() {
