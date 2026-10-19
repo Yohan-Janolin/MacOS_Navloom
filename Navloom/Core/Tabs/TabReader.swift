@@ -52,7 +52,8 @@ enum TabReader {
             set tabURLs to URL of every tab of every window
             set tabTitles to title of every tab of every window
             set activeIdx to active tab index of every window
-            return {winIDs, winModes, tabURLs, tabTitles, activeIdx}
+            set tabIDs to id of every tab of every window
+            return {winIDs, winModes, tabURLs, tabTitles, activeIdx, tabIDs}
         end tell
         """
     }
@@ -99,13 +100,15 @@ enum TabReader {
         let urls = part(2).map { items(of: $0).map(string) }
         let titles = part(3).map { items(of: $0).map(string) }
         let activeIndexes = part(4).map(integer)
+        let tabIDs = part(5).map { items(of: $0).map(integer) }
 
         return TabSnapshot.windows(browserID: browserID,
                                    windowIDs: windowIDs,
                                    modes: modes,
                                    urls: urls,
                                    titles: titles,
-                                   activeIndexes: activeIndexes)
+                                   activeIndexes: activeIndexes,
+                                   tabIDs: tabIDs)
     }
 
     /// Éléments d'une liste AppleScript (numérotés à partir de 1).

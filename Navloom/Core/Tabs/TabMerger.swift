@@ -80,7 +80,9 @@ nonisolated enum TabMerger {
                            title: tab.title,
                            url: tab.url,
                            isActive: workspaceID == activeWorkspaceID && tab.index == session.selectedTabIndex,
-                           workspaceID: workspaceID)
+                           workspaceID: workspaceID,
+                           // Les identifiants du fichier de session sont ceux du navigateur (comme pour les fenêtres).
+                           tabID: tab.id)
         }
 
         // L'espace qu'AppleScript lit : celui où se trouvent la plupart des onglets reconnus.
@@ -98,7 +100,8 @@ nonisolated enum TabMerger {
                                 title: tab.title,
                                 url: tab.url,
                                 isActive: false,
-                                workspaceID: liveWorkspace))
+                                workspaceID: liveWorkspace,
+                                tabID: tab.tabID))
         }
 
         return tabs.sorted { ($0.workspaceID ?? "", $0.index) < ($1.workspaceID ?? "", $1.index) }

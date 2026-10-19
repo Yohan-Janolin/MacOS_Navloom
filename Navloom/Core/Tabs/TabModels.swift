@@ -12,6 +12,9 @@ nonisolated struct OpenTab: Identifiable, Hashable, Sendable {
     var isActive: Bool
     /// Espace (Opera) auquel appartient l'onglet ; nil si le navigateur n'en a pas.
     var workspaceID: String? = nil
+    /// Identifiant donné par le navigateur (AppleScript, ou fichier de session pour les espaces
+    /// qu'AppleScript ne voit pas). Sert à fermer l'onglet après un transfert.
+    var tabID: Int? = nil
 
     var host: String? {
         URL(string: url)?.host()

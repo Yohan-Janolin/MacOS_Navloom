@@ -40,6 +40,8 @@ final class FerryViewModel {
     var singleWindow = false
     /// Rouvrir en navigation privée les onglets qui l'étaient.
     var keepPrivate = true
+    /// Fermer les onglets d'origine une fois leur copie ouverte (décoché par défaut : c'est destructif).
+    var closeOriginals = false
     var showTransferConfirmation = false
     private(set) var transferProgress: (done: Int, total: Int)?
     private(set) var transferSummary: TransferSummary?
@@ -259,6 +261,8 @@ final class FerryViewModel {
         Task {
             var summary = TransferSummary(browserName: target.name,
                                           skipped: plan.skippedInternal + plan.skippedSameBrowser)
+            /// Onglets d'origine des fenêtres ouvertes avec succès : les seuls qu'on peut fermer.
+            var transferred: [TabOrigin] = []
 
             if await TabWriter.launchIfNeeded(target) {
                 windows: for (offset, window) in plan.windows.enumerated() {
@@ -267,6 +271,7 @@ final class FerryViewModel {
                     case .success:
                         summary.openedWindows += 1
                         summary.openedTabs += window.urls.count
+                        transferred += window.origins
                     case .failure(let error):
                         summary.errors.append(error.message)
                         // Sans autorisation, inutile d'insister fenêtre après fenêtre.
@@ -278,6 +283,10 @@ final class FerryViewModel {
                 summary.errors.append("\(target.name) n'a pas pu être lancé.")
             }
 
+            if closeOriginals, !transferred.isEmpty {
+                summary.closing = closeTransferred(transferred, target: target)
+            }
+
             transferProgress = nil
             transferSummary = summary
             if summary.openedTabs > 0 {
@@ -285,6 +294,31 @@ final class FerryViewModel {
                 read()
             }
         }
+    }
+
+    /// Ferme les originaux dont la copie est vraiment ouverte dans la cible (vérifié en la relisant).
+    private func closeTransferred(_ origins: [TabOrigin], target: ChromiumBrowser) -> CloseSummary {
+        let targetURLs: Set<String>
+        if case .success(let windows) = TabReader.read(target) {
+            targetURLs = Set(windows.flatMap { $0.tabs.map(\.url) })
+        } else {
+            targetURLs = []
+        }
+        let (confirmed, missing) = TabWriter.confirmed(origins, targetURLs: targetURLs)
+        var closing = TabWriter.close(confirmed, browsers: browsers.map(\.browser))
+        closing.unconfirmed += missing.count
+        return closing
+    }
+
+    /// Onglets que la fermeture concernerait (pour la confirmation).
+    var tabsToCloseCount: Int {
+        transferPlan.windows.reduce(0) { $0 + $1.origins.count }
+    }
+
+    /// Navigateurs d'où partiraient les onglets (pour la confirmation).
+    var sourceBrowserNames: [String] {
+        let ids = Set(transferPlan.windows.flatMap { $0.origins.map(\.browserID) })
+        return browsers.map(\.browser).filter { ids.contains($0.id) }.map(\.name)
     }
 
     // MARK: - Actions

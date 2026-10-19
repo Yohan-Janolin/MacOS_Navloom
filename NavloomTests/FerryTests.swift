@@ -552,8 +552,9 @@ struct TransferPlannerTests {
             .init(browserID: "opera", window: window(3, isPrivate: true), tabs: tabs("https://secret.fr/")),
         ], targetBrowserID: "brave", singleWindow: true, keepPrivate: true)
         // La fenêtre privée reste à part, même en mode « une seule fenêtre ».
-        #expect(plan.windows == [TransferWindow(urls: ["https://a.fr/", "https://c.fr/"], isPrivate: false),
-                                 TransferWindow(urls: ["https://secret.fr/"], isPrivate: true)])
+        #expect(plan.windows.map(\.urls) == [["https://a.fr/", "https://c.fr/"], ["https://secret.fr/"]])
+        #expect(plan.windows.map(\.isPrivate) == [false, true])
+        #expect(plan.windows.map { $0.origins.count } == [2, 1])
     }
 
     @Test func navigationPriveeNonConservee() {
@@ -615,5 +616,71 @@ struct TabWriterTests {
                 == ["--new-window", "https://a.fr/", "https://b.fr/"])
         #expect(TabWriter.commandLineArguments(for: TransferWindow(urls: ["https://a.fr/"], isPrivate: true))
                 == ["--incognito", "https://a.fr/"])
+    }
+}
+
+// MARK: - Fermeture des onglets d'origine
+
+struct TabOriginTests {
+
+    private func tab(_ url: String, id: Int?) -> OpenTab {
+        OpenTab(id: url, index: 1, title: "", url: url, isActive: false, tabID: id)
+    }
+
+    @Test func lesOriginesSuiventLesURL() {
+        let window = OpenWindow(id: "w", windowID: 77, position: 1, isPrivate: false, tabs: [])
+        let plan = TransferPlanner.plan(sources: [
+            .init(browserID: "opera", window: window,
+                  tabs: [tab("https://a.fr/", id: 1), tab("opera://startpage", id: 2), tab("https://b.fr/", id: 3)]),
+        ], targetBrowserID: "brave", singleWindow: false, keepPrivate: true)
+        let origins = plan.windows.first?.origins ?? []
+        // La page interne n'est ni copiée ni fermée.
+        #expect(origins.map(\.tabID) == [1, 3])
+        #expect(origins.allSatisfy { $0.windowID == 77 && $0.browserID == "opera" })
+        #expect(origins.map(\.url) == plan.windows.first?.urls)
+    }
+
+    @Test func lIdentifiantDOngletEstLu() {
+        let windows = TabSnapshot.windows(browserID: "vivaldi", windowIDs: [5], modes: nil,
+                                          urls: [["https://a.fr/", "https://b.fr/"]], titles: [],
+                                          activeIndexes: [1], tabIDs: [[111, 222]])
+        #expect(windows.first?.tabs.map(\.tabID) == [111, 222])
+    }
+}
+
+@MainActor
+struct TabCloserTests {
+
+    private let origins = [
+        TabOrigin(browserID: "opera", windowID: 1934698273, tabID: 1934698275, url: #"https://a.fr/?q="x""#),
+        TabOrigin(browserID: "opera", windowID: 1934698273, tabID: nil, url: "https://b.fr/"),
+    ]
+
+    @Test func scriptDeFermeture() {
+        let script = TabWriter.closeScript(bundleID: "com.operasoftware.Opera", origins: origins)
+        #expect(script.contains("set t to tab id 1934698275 of window id 1934698273"))
+        // L'onglet n'est fermé que s'il affiche encore la même page (URL échappée).
+        #expect(script.contains(#"if (URL of t) is "https://a.fr/?q=\"x\"" then"#))
+        #expect(script.contains("close t"))
+        // Un onglet sans identifiant n'apparaît pas.
+        #expect(!script.contains("b.fr"))
+    }
+
+    @Test func lectureDuResultat() {
+        #expect(TabWriter.parseCloseResult("3,1,2") == CloseSummary(closed: 3, changed: 1, failed: 2))
+        #expect(TabWriter.parseCloseResult("n'importe quoi") == nil)
+        #expect(TabWriter.parseCloseResult(nil) == nil)
+    }
+
+    @Test func seulesLesCopiesRetrouveesSontFermees() {
+        let (confirmed, missing) = TabWriter.confirmed(origins, targetURLs: ["https://b.fr/"])
+        #expect(confirmed.map(\.url) == ["https://b.fr/"])
+        #expect(missing.count == 1)
+    }
+
+    @Test func totaux() {
+        let sum = CloseSummary(closed: 2, changed: 1) + CloseSummary(failed: 1, unconfirmed: 3)
+        #expect(sum == CloseSummary(closed: 2, changed: 1, failed: 1, unconfirmed: 3))
+        #expect(sum.notClosed == 5)
     }
 }

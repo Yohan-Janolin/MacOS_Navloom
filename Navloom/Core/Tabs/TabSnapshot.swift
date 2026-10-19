@@ -14,12 +14,14 @@ nonisolated enum TabSnapshot {
                         modes: [String?]?,
                         urls: [[String?]],
                         titles: [[String?]],
-                        activeIndexes: [Int?]) -> [OpenWindow] {
+                        activeIndexes: [Int?],
+                        tabIDs: [[Int?]] = []) -> [OpenWindow] {
         windowIDs.enumerated().map { offset, windowID in
             let windowKey = "\(browserID)/\(windowID)"
             let windowURLs = urls[safe: offset] ?? []
             let windowTitles = titles[safe: offset] ?? []
             let active = activeIndexes[safe: offset] ?? nil
+            let windowTabIDs = tabIDs[safe: offset] ?? []
 
             let tabs = windowURLs.enumerated().map { tabOffset, url in
                 let index = tabOffset + 1
@@ -27,7 +29,8 @@ nonisolated enum TabSnapshot {
                                index: index,
                                title: (windowTitles[safe: tabOffset] ?? nil) ?? "",
                                url: url ?? "",
-                               isActive: index == active)
+                               isActive: index == active,
+                               tabID: windowTabIDs[safe: tabOffset] ?? nil)
             }
 
             let mode = modes?[safe: offset] ?? nil

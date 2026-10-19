@@ -40,7 +40,11 @@ struct FerryView: View {
         .confirmationDialog(confirmationTitle,
                             isPresented: $model.showTransferConfirmation,
                             titleVisibility: .visible) {
-            Button("Transférer") { model.transfer() }
+            if model.closeOriginals {
+                Button("Transférer et fermer les originaux", role: .destructive) { model.transfer() }
+            } else {
+                Button("Transférer") { model.transfer() }
+            }
         } message: {
             Text(confirmationMessage)
         }
@@ -282,14 +286,23 @@ struct FerryView: View {
                 .labelsHidden()
                 .fixedSize()
 
-                Divider().frame(height: 20)
+                Spacer(minLength: 0)
+            }
 
+            // Options sur une seconde ligne : la fenêtre reste lisible à sa largeur minimale.
+            HStack(spacing: 16) {
                 Toggle("Une seule fenêtre", isOn: $model.singleWindow)
                     .toggleStyle(.checkbox)
                     .help("Regrouper tous les onglets dans une seule fenêtre au lieu de recréer chaque fenêtre")
                 Toggle("Garder la navigation privée", isOn: $model.keepPrivate)
                     .toggleStyle(.checkbox)
                     .help("Rouvrir en navigation privée les onglets qui venaient d'une fenêtre privée")
+                Toggle(isOn: $model.closeOriginals) {
+                    Text("Fermer les onglets d'origine")
+                        .foregroundStyle(model.closeOriginals ? .red : .primary)
+                }
+                .toggleStyle(.checkbox)
+                .help("Une fois leur copie ouverte et retrouvée dans la cible, fermer les onglets d'origine")
 
                 Spacer(minLength: 0)
             }
@@ -345,6 +358,11 @@ struct FerryView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("\(TabSnapshot.plural(summary.openedTabs, "onglet")) ouvert\(summary.openedTabs > 1 ? "s" : "") dans \(summary.browserName) (\(TabSnapshot.plural(summary.openedWindows, "fenêtre")))")
                         .font(.callout.weight(.semibold))
+                    if let closing = summary.closing {
+                        Text(closingText(closing))
+                            .font(.caption)
+                            .foregroundStyle(closing.notClosed > 0 ? .orange : .secondary)
+                    }
                     if summary.skipped > 0 {
                         Text("\(TabSnapshot.plural(summary.skipped, "onglet")) laissé\(summary.skipped > 1 ? "s" : "") de côté (pages internes ou déjà dans \(summary.browserName))")
                             .font(.caption)
@@ -371,6 +389,24 @@ struct FerryView: View {
         }
     }
 
+    private func closingText(_ closing: CloseSummary) -> String {
+        var text = TabSnapshot.plural(closing.closed, "onglet d'origine fermé", "onglets d'origine fermés")
+        var kept: [String] = []
+        if closing.unconfirmed > 0 {
+            kept.append("\(closing.unconfirmed) non retrouvé\(closing.unconfirmed > 1 ? "s" : "") dans la cible")
+        }
+        if closing.changed > 0 {
+            kept.append("\(closing.changed) qui affiche\(closing.changed > 1 ? "nt" : "") une autre page")
+        }
+        if closing.failed > 0 {
+            kept.append("\(closing.failed) introuvable\(closing.failed > 1 ? "s" : "") (par exemple dans un autre espace d'Opera)")
+        }
+        if !kept.isEmpty {
+            text += " · gardés ouverts : " + kept.joined(separator: ", ")
+        }
+        return text
+    }
+
     private var confirmationTitle: String {
         let plan = model.transferPlan
         return "Ouvrir \(TabSnapshot.plural(plan.tabCount, "onglet")) dans \(model.targetBrowser?.name ?? "le navigateur") ?"
@@ -379,7 +415,12 @@ struct FerryView: View {
     private var confirmationMessage: String {
         let plan = model.transferPlan
         var text = TabSnapshot.plural(plan.windows.count, "nouvelle fenêtre sera créée.", "nouvelles fenêtres seront créées.")
-            + " Les onglets d'origine restent ouverts."
+        if model.closeOriginals {
+            let names = model.sourceBrowserNames.joined(separator: ", ")
+            text += " Ensuite, \(TabSnapshot.plural(model.tabsToCloseCount, "onglet sera fermé", "onglets seront fermés")) dans \(names), mais seulement ceux dont la copie est bien retrouvée dans la cible et qui affichent encore la même page. Une fenêtre dont tous les onglets sont fermés se ferme aussi."
+        } else {
+            text += " Les onglets d'origine restent ouverts."
+        }
         if let target = model.targetBrowser, !TabReader.isRunning(target) {
             text += " \(target.name) sera lancé."
         }

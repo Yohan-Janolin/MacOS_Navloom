@@ -1,10 +1,22 @@
 import AppKit
 
+/// Un onglet d'origine, à fermer une fois sa copie ouverte dans la cible.
+nonisolated struct TabOrigin: Hashable, Sendable {
+    let browserID: String
+    let windowID: Int
+    /// Identifiant de l'onglet dans son navigateur (nil s'il n'a pas pu être lu).
+    let tabID: Int?
+    /// URL au moment de la lecture : l'onglet n'est fermé que s'il affiche encore cette page.
+    let url: String
+}
+
 /// Une fenêtre à recréer dans le navigateur cible.
 nonisolated struct TransferWindow: Equatable, Sendable {
     let urls: [String]
     /// Rouvrir en navigation privée (la fenêtre d'origine l'était).
     let isPrivate: Bool
+    /// Onglets d'origine de ces URL (pour les fermer après le transfert).
+    var origins: [TabOrigin] = []
 }
 
 /// Ce qui sera transféré : fenêtres à créer et onglets laissés de côté.
@@ -26,6 +38,28 @@ nonisolated struct TransferSummary: Equatable, Sendable {
     var openedWindows = 0
     var skipped = 0
     var errors: [String] = []
+    /// Fermeture des onglets d'origine (nil si elle n'était pas demandée).
+    var closing: CloseSummary?
+}
+
+/// Bilan de la fermeture des onglets d'origine.
+nonisolated struct CloseSummary: Equatable, Sendable {
+    var closed = 0
+    /// L'onglet affichait une autre page qu'à la lecture : laissé ouvert par prudence.
+    var changed = 0
+    /// Onglet introuvable ou refusé par le navigateur (espace d'Opera non affiché, onglet déjà fermé…).
+    var failed = 0
+    /// La copie n'a pas été retrouvée dans la cible après le transfert : original gardé par sécurité.
+    var unconfirmed = 0
+
+    var notClosed: Int { changed + failed + unconfirmed }
+
+    static func + (lhs: CloseSummary, rhs: CloseSummary) -> CloseSummary {
+        CloseSummary(closed: lhs.closed + rhs.closed,
+                     changed: lhs.changed + rhs.changed,
+                     failed: lhs.failed + rhs.failed,
+                     unconfirmed: lhs.unconfirmed + rhs.unconfirmed)
+    }
 }
 
 /// Prépare le transfert : quelles fenêtres créer, avec quels onglets. Aucun accès aux navigateurs.
@@ -50,26 +84,32 @@ nonisolated enum TransferPlanner {
     static func plan(sources: [Source], targetBrowserID: String,
                      singleWindow: Bool, keepPrivate: Bool) -> TransferPlan {
         var plan = TransferPlan()
-        var windows: [(urls: [String], isPrivate: Bool)] = []
+        var windows: [(urls: [String], isPrivate: Bool, origins: [TabOrigin])] = []
 
         for source in sources where !source.tabs.isEmpty {
             if source.browserID == targetBrowserID {
                 plan.skippedSameBrowser += source.tabs.count
                 continue
             }
-            let urls = source.tabs.map(\.url).filter(isTransferable)
-            plan.skippedInternal += source.tabs.count - urls.count
-            guard !urls.isEmpty else { continue }
+            let tabs = source.tabs.filter { isTransferable($0.url) }
+            plan.skippedInternal += source.tabs.count - tabs.count
+            guard !tabs.isEmpty else { continue }
 
+            let urls = tabs.map(\.url)
+            let origins = tabs.map { tab in
+                TabOrigin(browserID: source.browserID, windowID: source.window.windowID,
+                          tabID: tab.tabID, url: tab.url)
+            }
             let isPrivate = keepPrivate && source.window.isPrivate
             if singleWindow, let index = windows.firstIndex(where: { $0.isPrivate == isPrivate }) {
                 windows[index].urls += urls
+                windows[index].origins += origins
             } else {
-                windows.append((urls, isPrivate))
+                windows.append((urls, isPrivate, origins))
             }
         }
 
-        plan.windows = windows.map { TransferWindow(urls: $0.urls, isPrivate: $0.isPrivate) }
+        plan.windows = windows.map { TransferWindow(urls: $0.urls, isPrivate: $0.isPrivate, origins: $0.origins) }
         return plan
     }
 }
@@ -186,6 +226,75 @@ enum TabWriter {
             return .failure(TabReader.error(code: code, message: message))
         }
         return .success(descriptor)
+    }
+
+    // MARK: - Fermeture des onglets d'origine
+
+    /// Script qui ferme les onglets donnés d'un navigateur, chacun seulement s'il affiche encore
+    /// la même page. Renvoie « fermés,changés,échecs ».
+    static func closeScript(bundleID: String, origins: [TabOrigin]) -> String {
+        var lines = [
+            "tell application id \(quoted(bundleID))",
+            "    set closedCount to 0",
+            "    set changedCount to 0",
+            "    set failedCount to 0",
+        ]
+        for origin in origins {
+            guard let tabID = origin.tabID else { continue }
+            lines += [
+                "    try",
+                "        set t to tab id \(tabID) of window id \(origin.windowID)",
+                "        if (URL of t) is \(quoted(origin.url)) then",
+                "            close t",
+                "            set closedCount to closedCount + 1",
+                "        else",
+                "            set changedCount to changedCount + 1",
+                "        end if",
+                "    on error",
+                "        set failedCount to failedCount + 1",
+                "    end try",
+            ]
+        }
+        lines.append("    return (closedCount as text) & \",\" & (changedCount as text) & \",\" & (failedCount as text)")
+        lines.append("end tell")
+        return lines.joined(separator: "\n")
+    }
+
+    /// Lit « fermés,changés,échecs ».
+    static func parseCloseResult(_ text: String?) -> CloseSummary? {
+        let parts = (text ?? "").split(separator: ",").compactMap { Int($0) }
+        guard parts.count == 3 else { return nil }
+        return CloseSummary(closed: parts[0], changed: parts[1], failed: parts[2])
+    }
+
+    /// Sépare les onglets d'origine dont la copie est bien ouverte dans la cible des autres.
+    static func confirmed(_ origins: [TabOrigin], targetURLs: Set<String>) -> (confirmed: [TabOrigin], missing: [TabOrigin]) {
+        var confirmed: [TabOrigin] = []
+        var missing: [TabOrigin] = []
+        for origin in origins {
+            if targetURLs.contains(origin.url) { confirmed.append(origin) } else { missing.append(origin) }
+        }
+        return (confirmed, missing)
+    }
+
+    /// Ferme les onglets d'origine, navigateur par navigateur.
+    static func close(_ origins: [TabOrigin], browsers: [ChromiumBrowser]) -> CloseSummary {
+        var total = CloseSummary()
+        for (browserID, group) in Dictionary(grouping: origins, by: \.browserID) {
+            let withID = group.filter { $0.tabID != nil }
+            total.failed += group.count - withID.count
+            guard !withID.isEmpty, let browser = browsers.first(where: { $0.id == browserID }) else {
+                total.failed += withID.count
+                continue
+            }
+            switch run(closeScript(bundleID: browser.bundleID, origins: withID)) {
+            case .success(let descriptor):
+                total = total + (parseCloseResult(descriptor.stringValue) ?? CloseSummary(failed: withID.count))
+            case .failure:
+                total.failed += withID.count
+            }
+        }
+        return total
     }
 
     /// Lance le navigateur s'il est fermé et attend qu'il soit prêt (15 secondes au plus).
