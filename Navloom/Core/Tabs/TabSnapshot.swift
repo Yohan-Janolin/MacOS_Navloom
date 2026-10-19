@@ -90,6 +90,11 @@ nonisolated enum TabSnapshot {
     static func plural(_ count: Int, _ word: String) -> String {
         "\(count) \(word)\(count > 1 ? "s" : "")"
     }
+
+    /// Pour les expressions de plusieurs mots : « 1 nouvelle fenêtre », « 2 nouvelles fenêtres ».
+    static func plural(_ count: Int, _ singular: String, _ pluralForm: String) -> String {
+        "\(count) \(count > 1 ? pluralForm : singular)"
+    }
 }
 
 private extension Array {

@@ -28,10 +28,22 @@ struct FerryView: View {
             middle
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
+            if model.phase == .done, !model.browsers.isEmpty {
+                transferStatus
+                transferBanner
+            }
+
             actionBar
         }
         .padding(20)
         .navigationTitle("Navloom")
+        .confirmationDialog(confirmationTitle,
+                            isPresented: $model.showTransferConfirmation,
+                            titleVisibility: .visible) {
+            Button("Transférer") { model.transfer() }
+        } message: {
+            Text(confirmationMessage)
+        }
     }
 
     // MARK: - En-tête
@@ -44,7 +56,7 @@ struct FerryView: View {
                     LinearGradient(colors: Self.gradient,
                                    startPoint: .leading, endPoint: .trailing)
                 )
-            Text("Rassemble les onglets ouverts de tous tes navigateurs")
+            Text("Rassemble les onglets ouverts de tous tes navigateurs et fais-les passer de l'un à l'autre")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -158,13 +170,21 @@ struct FerryView: View {
     private var resultsView: some View {
         VStack(spacing: 10) {
             HStack(spacing: 10) {
+                Button("Tout cocher") { model.selectAllVisible() }
+                Button("Tout décocher") { model.deselectAll() }
+                    .disabled(model.selectedCount == 0)
+                Text("\(model.selectedCount) coché\(model.selectedCount > 1 ? "s" : "")")
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+                Spacer()
                 Button("Tout déplier") { model.setAllExpanded(true) }
                 Button("Tout replier") { model.setAllExpanded(false) }
-                Spacer()
-                Text("Double-clic sur un onglet pour l'ouvrir dans son navigateur")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
+
+            Text("Coche des onglets, un espace ou une fenêtre entière, puis choisis le navigateur cible en bas. Double-clic sur un onglet pour l'ouvrir dans son navigateur.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             List {
                 ForEach(model.visibleBrowsers) { browser in
@@ -185,7 +205,13 @@ struct FerryView: View {
                                 DisclosureGroup(isExpanded: model.isExpanded(window)) {
                                     windowContent(window, browser: browser.browser)
                                 } label: {
-                                    WindowLabel(window: window)
+                                    HStack(spacing: 8) {
+                                        CheckButton(state: model.state(of: window.tabs)) {
+                                            model.toggle(window.tabs)
+                                        }
+                                        .help("Cocher toute la fenêtre")
+                                        WindowLabel(window: window)
+                                    }
                                 }
                             }
                         }
@@ -206,7 +232,10 @@ struct FerryView: View {
             if hasWorkspaces {
                 WorkspaceHeader(workspace: group.workspace ?? TabWorkspace(id: "?", name: "Autres"),
                                 count: group.tabs.count,
-                                isActive: group.isActive)
+                                isActive: group.isActive,
+                                state: model.state(of: group.tabs)) {
+                    model.toggle(group.tabs)
+                }
             }
             ForEach(group.tabs) { tab in
                 tabRow(tab, browser: browser)
@@ -216,13 +245,146 @@ struct FerryView: View {
     }
 
     private func tabRow(_ tab: OpenTab, browser: ChromiumBrowser) -> some View {
-        TabRow(tab: tab, favicon: model.favicons[tab.url])
+        TabRow(tab: tab, favicon: model.favicons[tab.url],
+               isChecked: model.isSelected(tab)) {
+            model.toggle(tab)
+        }
             .contentShape(Rectangle())
             .onTapGesture(count: 2) { model.open(tab, in: browser) }
             .contextMenu {
                 Button("Ouvrir dans \(browser.name)") { model.open(tab, in: browser) }
                 Button("Copier l'URL") { model.copyURL(tab) }
             }
+    }
+
+    // MARK: - Transfert
+
+    /// Dégradé du navigateur cible, le même que dans Echo.
+    private static let targetGradient = [Brand.coral, Brand.gold]
+
+    private var transferBanner: some View {
+        let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
+        let plan = model.transferPlan
+
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                Label("Navigateur cible", systemImage: "arrow.right.circle")
+                    .fontWeight(.semibold)
+                    .lineLimit(1)
+                    .layoutPriority(1)
+
+                Picker("Navigateur cible", selection: $model.targetBrowserID) {
+                    Text("Choisir…").tag(String?.none)
+                    ForEach(model.installedBrowsers) { browser in
+                        Text(browser.name).tag(Optional(browser.id))
+                    }
+                }
+                .labelsHidden()
+                .fixedSize()
+
+                Divider().frame(height: 20)
+
+                Toggle("Une seule fenêtre", isOn: $model.singleWindow)
+                    .toggleStyle(.checkbox)
+                    .help("Regrouper tous les onglets dans une seule fenêtre au lieu de recréer chaque fenêtre")
+                Toggle("Garder la navigation privée", isOn: $model.keepPrivate)
+                    .toggleStyle(.checkbox)
+                    .help("Rouvrir en navigation privée les onglets qui venaient d'une fenêtre privée")
+
+                Spacer(minLength: 0)
+            }
+
+            if model.targetBrowser != nil, model.selectedCount > 0 {
+                Text(planDescription(plan))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .disabled(model.isTransferring)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            LinearGradient(colors: Self.targetGradient.map { $0.opacity(0.18) },
+                           startPoint: .leading, endPoint: .trailing),
+            in: shape
+        )
+        .overlay(shape.strokeBorder(Brand.gold.opacity(0.35), lineWidth: 1))
+    }
+
+    private func planDescription(_ plan: TransferPlan) -> String {
+        var parts: [String] = []
+        if plan.isEmpty {
+            parts.append("Rien à transférer")
+        } else {
+            parts.append("\(TabSnapshot.plural(plan.tabCount, "onglet")) dans \(TabSnapshot.plural(plan.windows.count, "nouvelle fenêtre", "nouvelles fenêtres"))")
+        }
+        if plan.skippedSameBrowser > 0 {
+            parts.append("\(TabSnapshot.plural(plan.skippedSameBrowser, "onglet")) déjà dans ce navigateur")
+        }
+        if plan.skippedInternal > 0 {
+            parts.append(TabSnapshot.plural(plan.skippedInternal, "page interne ignorée", "pages internes ignorées"))
+        }
+        return parts.joined(separator: " · ")
+    }
+
+    /// Progression pendant le transfert, puis bilan.
+    @ViewBuilder
+    private var transferStatus: some View {
+        if let progress = model.transferProgress {
+            VStack(alignment: .leading, spacing: 6) {
+                ThickProgressBar(value: Double(progress.done), total: Double(max(progress.total, 1)), height: 10)
+                Text("Ouverture dans \(model.targetBrowser?.name ?? "le navigateur")… \(progress.done)/\(TabSnapshot.plural(progress.total, "fenêtre"))")
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+        } else if let summary = model.transferSummary {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: summary.errors.isEmpty ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
+                    .foregroundStyle(summary.errors.isEmpty ? .green : .orange)
+                    .font(.title3)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("\(TabSnapshot.plural(summary.openedTabs, "onglet")) ouvert\(summary.openedTabs > 1 ? "s" : "") dans \(summary.browserName) (\(TabSnapshot.plural(summary.openedWindows, "fenêtre")))")
+                        .font(.callout.weight(.semibold))
+                    if summary.skipped > 0 {
+                        Text("\(TabSnapshot.plural(summary.skipped, "onglet")) laissé\(summary.skipped > 1 ? "s" : "") de côté (pages internes ou déjà dans \(summary.browserName))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    ForEach(Array(summary.errors.enumerated()), id: \.offset) { _, error in
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
+                }
+                Spacer()
+                Button {
+                    model.dismissTransferSummary()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(12)
+            .background((summary.errors.isEmpty ? Color.green : Color.orange).opacity(0.10),
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+    }
+
+    private var confirmationTitle: String {
+        let plan = model.transferPlan
+        return "Ouvrir \(TabSnapshot.plural(plan.tabCount, "onglet")) dans \(model.targetBrowser?.name ?? "le navigateur") ?"
+    }
+
+    private var confirmationMessage: String {
+        let plan = model.transferPlan
+        var text = TabSnapshot.plural(plan.windows.count, "nouvelle fenêtre sera créée.", "nouvelles fenêtres seront créées.")
+            + " Les onglets d'origine restent ouverts."
+        if let target = model.targetBrowser, !TabReader.isRunning(target) {
+            text += " \(target.name) sera lancé."
+        }
+        text += " Les espaces de travail ne se transfèrent pas : les onglets arrivent dans l'espace affiché."
+        return text
     }
 
     // MARK: - Barre d'action
@@ -255,9 +417,19 @@ struct FerryView: View {
                 } label: {
                     Label("Actualiser", systemImage: "arrow.clockwise")
                 }
-                .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .keyboardShortcut("r", modifiers: .command)
+                .disabled(model.isTransferring)
+
+                Button {
+                    model.showTransferConfirmation = true
+                } label: {
+                    Label("Transférer \(TabSnapshot.plural(model.transferPlan.tabCount, "onglet"))",
+                          systemImage: "ferry.fill")
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(!model.canTransfer)
             }
         }
     }
@@ -367,9 +539,13 @@ private struct WorkspaceHeader: View {
     let workspace: TabWorkspace
     let count: Int
     let isActive: Bool
+    let state: FerryViewModel.CheckState
+    let onToggle: () -> Void
 
     var body: some View {
         HStack(spacing: 8) {
+            CheckButton(state: state, action: onToggle)
+                .help("Cocher tout l'espace")
             Group {
                 if let emoji = workspace.emoji {
                     Text(emoji)
@@ -413,9 +589,12 @@ private struct WorkspaceHeader: View {
 private struct TabRow: View {
     let tab: OpenTab
     let favicon: NSImage?
+    let isChecked: Bool
+    let onToggle: () -> Void
 
     var body: some View {
         HStack(spacing: 10) {
+            CheckButton(state: isChecked ? .all : .none, action: onToggle)
             Group {
                 if let favicon {
                     Image(nsImage: favicon)
@@ -454,6 +633,24 @@ private struct TabRow: View {
             }
         }
         .padding(.vertical, 2)
+    }
+}
+
+// MARK: - Case à cocher
+
+/// Case à trois états (aucun, certains, tous), utilisée pour les onglets, les espaces et les fenêtres.
+private struct CheckButton: View {
+    let state: FerryViewModel.CheckState
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: state.symbol)
+                .font(.system(size: 15))
+                .foregroundStyle(state == .none ? AnyShapeStyle(.secondary) : AnyShapeStyle(Brand.indigo))
+                .contentTransition(.symbolEffect(.replace))
+        }
+        .buttonStyle(.plain)
     }
 }
 

@@ -523,3 +523,88 @@ struct TabMergerTests {
         #expect(text.contains("Espace « A étudier » (1 onglet)"))
     }
 }
+
+// MARK: - Transfert
+
+struct TransferPlannerTests {
+
+    private func window(_ id: Int, isPrivate: Bool = false) -> OpenWindow {
+        OpenWindow(id: "w\(id)", windowID: id, position: id, isPrivate: isPrivate, tabs: [])
+    }
+
+    private func tabs(_ urls: String...) -> [OpenTab] {
+        urls.enumerated().map { OpenTab(id: "t\($0.offset)", index: $0.offset + 1, title: "", url: $0.element, isActive: false) }
+    }
+
+    @Test func uneFenetreParFenetreDOrigine() {
+        let plan = TransferPlanner.plan(sources: [
+            .init(browserID: "vivaldi", window: window(1), tabs: tabs("https://a.fr/", "https://b.fr/")),
+            .init(browserID: "opera", window: window(2), tabs: tabs("https://c.fr/")),
+        ], targetBrowserID: "brave", singleWindow: false, keepPrivate: true)
+        #expect(plan.windows.map(\.urls) == [["https://a.fr/", "https://b.fr/"], ["https://c.fr/"]])
+        #expect(plan.tabCount == 3)
+    }
+
+    @Test func toutDansUneSeuleFenetre() {
+        let plan = TransferPlanner.plan(sources: [
+            .init(browserID: "vivaldi", window: window(1), tabs: tabs("https://a.fr/")),
+            .init(browserID: "opera", window: window(2), tabs: tabs("https://c.fr/")),
+            .init(browserID: "opera", window: window(3, isPrivate: true), tabs: tabs("https://secret.fr/")),
+        ], targetBrowserID: "brave", singleWindow: true, keepPrivate: true)
+        // La fenêtre privée reste à part, même en mode « une seule fenêtre ».
+        #expect(plan.windows == [TransferWindow(urls: ["https://a.fr/", "https://c.fr/"], isPrivate: false),
+                                 TransferWindow(urls: ["https://secret.fr/"], isPrivate: true)])
+    }
+
+    @Test func navigationPriveeNonConservee() {
+        let plan = TransferPlanner.plan(sources: [
+            .init(browserID: "vivaldi", window: window(1, isPrivate: true), tabs: tabs("https://secret.fr/")),
+        ], targetBrowserID: "brave", singleWindow: false, keepPrivate: false)
+        #expect(plan.windows.first?.isPrivate == false)
+    }
+
+    @Test func pagesInternesEtMemeNavigateurIgnores() {
+        let plan = TransferPlanner.plan(sources: [
+            .init(browserID: "vivaldi", window: window(1), tabs: tabs("https://a.fr/", "vivaldi://settings", "chrome://newtab/")),
+            .init(browserID: "brave", window: window(2), tabs: tabs("https://b.fr/")),
+            .init(browserID: "opera", window: window(3), tabs: []),
+        ], targetBrowserID: "brave", singleWindow: false, keepPrivate: true)
+        #expect(plan.windows.map(\.urls) == [["https://a.fr/"]])
+        #expect(plan.skippedInternal == 2)
+        #expect(plan.skippedSameBrowser == 1)
+    }
+
+    @Test func seulesLesPagesWebSeTransferent() {
+        #expect(TransferPlanner.isTransferable("https://a.fr/"))
+        #expect(TransferPlanner.isTransferable("http://192.168.1.45:3456/containers"))
+        #expect(!TransferPlanner.isTransferable("opera://startpage"))
+        #expect(!TransferPlanner.isTransferable("about:blank"))
+        #expect(!TransferPlanner.isTransferable(""))
+    }
+}
+
+@MainActor
+struct TabWriterTests {
+
+    @Test func guillemetsNeutralises() {
+        #expect(TabWriter.quoted(#"https://a.fr/?q="x"\y"#) == #""https://a.fr/?q=\"x\"\\y""#)
+    }
+
+    @Test func scriptDUneFenetre() {
+        let script = TabWriter.script(bundleID: "com.brave.Browser",
+                                      window: TransferWindow(urls: ["https://a.fr/", "https://b.fr/"], isPrivate: false))
+        #expect(script.contains(#"tell application id "com.brave.Browser""#))
+        #expect(script.contains("set w to make new window\n"))
+        #expect(script.contains(#"set URL of active tab of w to "https://a.fr/""#))
+        #expect(script.contains(#"make new tab at end of tabs of w with properties {URL:"https://b.fr/"}"#))
+    }
+
+    @Test func fenetrePrivee() {
+        let script = TabWriter.script(bundleID: "x", window: TransferWindow(urls: ["https://a.fr/"], isPrivate: true))
+        #expect(script.contains(#"make new window with properties {mode:"incognito"}"#))
+    }
+
+    @Test func fenetreVide() {
+        #expect(TabWriter.script(bundleID: "x", window: TransferWindow(urls: [], isPrivate: false)).isEmpty)
+    }
+}

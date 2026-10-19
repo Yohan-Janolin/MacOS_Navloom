@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 import UniformTypeIdentifiers
 
-/// Ferry, lot 1 : lecture seule des onglets ouverts de tous les navigateurs.
+/// Ferry : lit les onglets ouverts de tous les navigateurs et fait passer ceux qu'on coche dans un autre.
 @MainActor
 @Observable
 final class FerryViewModel {
@@ -31,6 +31,24 @@ final class FerryViewModel {
 
     private var faviconTask: Task<Void, Never>?
 
+    // MARK: État du transfert
+
+    /// Onglets cochés (identifiants `OpenTab.id`).
+    private(set) var selection: Set<String> = []
+    var targetBrowserID: String?
+    /// Tout regrouper dans une seule fenêtre au lieu de recréer chaque fenêtre.
+    var singleWindow = false
+    /// Rouvrir en navigation privée les onglets qui l'étaient.
+    var keepPrivate = true
+    var showTransferConfirmation = false
+    private(set) var transferProgress: (done: Int, total: Int)?
+    private(set) var transferSummary: TransferSummary?
+
+    /// Navigateurs installés, cibles possibles d'un transfert (lancés au besoin).
+    let installedBrowsers: [ChromiumBrowser] = ChromiumBrowser.known.filter {
+        NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.bundleID) != nil
+    }
+
     // MARK: - Lecture
 
     func read() {
@@ -52,6 +70,9 @@ final class FerryViewModel {
                 results.append(BrowserTabs(browser: browser, result: result))
             }
             browsers = results
+            // Les coches survivent à l'actualisation tant que l'onglet existe encore.
+            let ids = Set(results.flatMap { $0.windows.flatMap { $0.tabs.map(\.id) } })
+            selection.formIntersection(ids)
             lastRead = .now
             currentBrowserName = ""
             phase = .done
@@ -139,6 +160,131 @@ final class FerryViewModel {
     }
     var hasPermissionProblem: Bool {
         browsers.contains { $0.error == .permissionDenied }
+    }
+
+    // MARK: - Sélection
+
+    enum CheckState {
+        case none, some, all
+
+        var symbol: String {
+            switch self {
+            case .none: "square"
+            case .some: "minus.square.fill"
+            case .all: "checkmark.square.fill"
+            }
+        }
+    }
+
+    func isSelected(_ tab: OpenTab) -> Bool {
+        selection.contains(tab.id)
+    }
+
+    func toggle(_ tab: OpenTab) {
+        if selection.contains(tab.id) {
+            selection.remove(tab.id)
+        } else {
+            selection.insert(tab.id)
+        }
+    }
+
+    /// État d'un ensemble d'onglets (fenêtre ou espace) : aucun, certains ou tous cochés.
+    func state(of tabs: [OpenTab]) -> CheckState {
+        let checked = tabs.filter { selection.contains($0.id) }.count
+        if checked == 0 { return .none }
+        return checked == tabs.count ? .all : .some
+    }
+
+    /// Coche tout l'ensemble, ou le décoche s'il l'était déjà entièrement.
+    func toggle(_ tabs: [OpenTab]) {
+        let ids = tabs.map(\.id)
+        if state(of: tabs) == .all {
+            selection.subtract(ids)
+        } else {
+            selection.formUnion(ids)
+        }
+    }
+
+    /// Coche tous les onglets affichés (recherche et navigation privée prises en compte).
+    func selectAllVisible() {
+        for browser in visibleBrowsers {
+            for window in visibleWindows(of: browser) {
+                selection.formUnion(window.tabs.map(\.id))
+            }
+        }
+    }
+
+    func deselectAll() {
+        selection.removeAll()
+    }
+
+    var selectedCount: Int { selection.count }
+
+    // MARK: - Transfert
+
+    var targetBrowser: ChromiumBrowser? {
+        installedBrowsers.first { $0.id == targetBrowserID }
+    }
+
+    /// Ce que le transfert ferait avec les réglages actuels (sert aussi d'aperçu).
+    var transferPlan: TransferPlan {
+        guard let targetBrowserID else { return TransferPlan() }
+        let sources = browsers.flatMap { browser in
+            browser.windows.map { window in
+                TransferPlanner.Source(browserID: browser.browser.id,
+                                       window: window,
+                                       tabs: window.tabs.filter { selection.contains($0.id) })
+            }
+        }
+        return TransferPlanner.plan(sources: sources, targetBrowserID: targetBrowserID,
+                                    singleWindow: singleWindow, keepPrivate: keepPrivate)
+    }
+
+    var isTransferring: Bool { transferProgress != nil }
+
+    var canTransfer: Bool {
+        phase == .done && !isTransferring && targetBrowser != nil && !transferPlan.isEmpty
+    }
+
+    func dismissTransferSummary() {
+        transferSummary = nil
+    }
+
+    func transfer() {
+        guard canTransfer, let target = targetBrowser else { return }
+        let plan = transferPlan
+        transferSummary = nil
+        transferProgress = (0, plan.windows.count)
+
+        Task {
+            var summary = TransferSummary(browserName: target.name,
+                                          skipped: plan.skippedInternal + plan.skippedSameBrowser)
+
+            if await TabWriter.launchIfNeeded(target) {
+                windows: for (offset, window) in plan.windows.enumerated() {
+                    await Task.yield()
+                    switch TabWriter.open(window, in: target) {
+                    case .success:
+                        summary.openedWindows += 1
+                        summary.openedTabs += window.urls.count
+                    case .failure(let error):
+                        summary.errors.append(error.message)
+                        // Sans autorisation, inutile d'insister fenêtre après fenêtre.
+                        if error == .permissionDenied { break windows }
+                    }
+                    transferProgress = (offset + 1, plan.windows.count)
+                }
+            } else {
+                summary.errors.append("\(target.name) n'a pas pu être lancé.")
+            }
+
+            transferProgress = nil
+            transferSummary = summary
+            if summary.openedTabs > 0 {
+                selection.removeAll()
+                read()
+            }
+        }
     }
 
     // MARK: - Actions
