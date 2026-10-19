@@ -123,6 +123,64 @@ actor FaviconDatabase {
         return result
     }
 
+    // MARK: - Icônes des onglets ouverts (Ferry)
+
+    /// Une icône pour chaque préfixe d'URL (« https://github.com/ ») : celle de n'importe quelle
+    /// page qui commence ainsi. Sert de repli quand l'URL exacte d'un onglet n'est pas dans la base.
+    /// Retourne le plus grand bitmap ne dépassant pas 64 pixels (sinon le plus petit disponible).
+    func anyFavicon(forPrefixes prefixes: [String]) throws -> [String: Data] {
+        let stmt = try prepare("""
+            SELECT b.width, b.image_data
+            FROM icon_mapping m
+            JOIN favicons f ON f.id = m.icon_id
+            JOIN favicon_bitmaps b ON b.icon_id = f.id
+            WHERE m.page_url LIKE ? ESCAPE '\\' AND f.icon_type = 1
+              AND b.image_data IS NOT NULL AND LENGTH(b.image_data) > 0
+            ORDER BY m.icon_id, b.width
+            LIMIT 8
+            """)
+        defer { sqlite3_finalize(stmt) }
+
+        var result: [String: Data] = [:]
+        for prefix in prefixes where result[prefix] == nil {
+            sqlite3_reset(stmt)
+            sqlite3_clear_bindings(stmt)
+            let pattern = Self.escapedForLike(prefix) + "%"
+            sqlite3_bind_text(stmt, 1, pattern, -1, sqliteTransient)
+
+            var bitmaps: [FaviconBitmap] = []
+            var status = sqlite3_step(stmt)
+            while status == SQLITE_ROW {
+                let width = Int(sqlite3_column_int(stmt, 0))
+                let count = Int(sqlite3_column_bytes(stmt, 1))
+                if count > 0, let bytes = sqlite3_column_blob(stmt, 1) {
+                    bitmaps.append(FaviconBitmap(size: width, png: Data(bytes: bytes, count: count)))
+                }
+                status = sqlite3_step(stmt)
+            }
+            guard status == SQLITE_ROW || status == SQLITE_DONE else { throw lastError }
+
+            if let best = Self.bestBitmap(bitmaps) {
+                result[prefix] = best.png
+            }
+        }
+        return result
+    }
+
+    /// Le plus grand bitmap ne dépassant pas `maxSize` pixels, sinon le plus petit de tous.
+    nonisolated static func bestBitmap(_ bitmaps: [FaviconBitmap], maxSize: Int = 64) -> FaviconBitmap? {
+        let small = bitmaps.filter { $0.size <= maxSize }
+        if let best = small.max(by: { $0.size < $1.size }) { return best }
+        return bitmaps.min(by: { $0.size < $1.size })
+    }
+
+    /// Neutralise les jokers de LIKE (`%` et `_`) présents dans une URL.
+    nonisolated static func escapedForLike(_ text: String) -> String {
+        text.replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "%", with: "\\%")
+            .replacingOccurrences(of: "_", with: "\\_")
+    }
+
     /// Identifiant d'une icône déjà présente (même URL d'image, avec au moins un bitmap), pour la
     /// réutiliser au lieu d'en créer une seconde.
     func iconID(forIconURL iconURL: String) throws -> Int64? {

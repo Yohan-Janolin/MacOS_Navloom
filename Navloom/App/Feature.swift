@@ -8,6 +8,7 @@ enum Feature: String, CaseIterable, Identifiable {
     case twins
     case ghosts
     case echo
+    case ferry
     case backups
     case settings
     case about
@@ -15,7 +16,7 @@ enum Feature: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     /// Accueil et outils, en haut de la barre latérale.
-    static let tools: [Feature] = [.home, .faviconSync, .twins, .ghosts, .echo]
+    static let tools: [Feature] = [.home, .faviconSync, .twins, .ghosts, .echo, .ferry]
 
     /// Entrées fixées en bas, sous un séparateur.
     static let footer: [Feature] = [.backups, .settings, .about]
@@ -27,6 +28,7 @@ enum Feature: String, CaseIterable, Identifiable {
         case .twins: "Twins"
         case .ghosts: "Ghosts"
         case .echo: "Echo"
+        case .ferry: "Ferry"
         case .backups: "Sauvegardes"
         case .settings: "Paramètres"
         case .about: "À propos"
@@ -41,6 +43,7 @@ enum Feature: String, CaseIterable, Identifiable {
         case .twins: "square.on.square"
         case .ghosts: "eye.slash.fill"
         case .echo: "dot.radiowaves.left.and.right"
+        case .ferry: "ferry.fill"
         case .backups: "clock.arrow.circlepath"
         case .settings: "gearshape.fill"
         case .about: "info.circle.fill"
@@ -54,6 +57,7 @@ enum Feature: String, CaseIterable, Identifiable {
         case .twins: Brand.sky
         case .ghosts: Brand.green
         case .echo: Brand.pink
+        case .ferry: Brand.indigo
         case .backups: Brand.teal
         case .settings: Brand.violet
         case .about: Brand.pink

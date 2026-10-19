@@ -46,6 +46,7 @@ enum Brand {
     static let violet = Color(hex: 0xA78BFA)
     static let lime = Color(hex: 0xA3E635)
     static let green = Color(hex: 0x22C55E)
+    static let indigo = Color(hex: 0x818CF8)
 }
 
 /// Pastille colorée façon Réglages Système : symbole blanc sur carré arrondi dégradé.

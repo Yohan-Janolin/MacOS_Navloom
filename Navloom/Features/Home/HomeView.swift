@@ -15,6 +15,8 @@ struct HomeView: View {
                              text: "Ouvre chaque favori pour repérer ceux dont la page n'existe plus (page introuvable, domaine disparu, redirection vers l'accueil) et supprime ceux que tu coches. La recherche peut se faire navigateur ouvert ; pour supprimer, il doit être fermé et la synchro des favoris désactivée (voir plus bas). Double-clic sur un résultat pour le tester dans ton navigateur.")
                     ToolCard(feature: .echo,
                              text: "Réplique les favoris d'un navigateur (la source) vers un autre (la cible), avec leurs icônes, que les navigateurs importent mal. Deux modes : ajouter les favoris manquants, ou copie complète, qui rend la cible identique à la source (ce qui n'y est pas est supprimé). La comparaison se fait navigateurs ouverts ; pour écrire, la cible doit être fermée et sa synchro des favoris désactivée (voir plus bas). Des sauvegardes sont créées avant.")
+                    ToolCard(feature: .ferry,
+                             text: "Rassemble en une seule liste les onglets ouverts de tous tes navigateurs, regroupés par fenêtre, avec une recherche et un export texte. Lecture seule : rien n'est fermé ni modifié. La première fois, macOS te demande d'autoriser Navloom à contrôler chaque navigateur. Les fenêtres de navigation privée sont masquées par défaut.")
                     ToolCard(feature: .backups,
                              text: "Liste les sauvegardes créées avant chaque écriture, par outil (FaviconSync, Twins, Ghosts, Echo), et permet de restaurer l'une d'elles.")
                 }

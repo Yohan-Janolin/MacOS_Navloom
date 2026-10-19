@@ -9,6 +9,7 @@ struct MainView: View {
     @State private var twins = TwinsViewModel()
     @State private var ghosts = GhostsViewModel()
     @State private var echo = EchoViewModel()
+    @State private var ferry = FerryViewModel()
     @State private var backups = BackupsViewModel()
 
     var body: some View {
@@ -64,6 +65,8 @@ struct MainView: View {
             GhostsView(model: ghosts)
         case .echo:
             EchoView(model: echo)
+        case .ferry:
+            FerryView(model: ferry)
         case .backups:
             BackupsView(model: backups)
         case .settings:

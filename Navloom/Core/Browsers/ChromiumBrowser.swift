@@ -157,6 +157,19 @@ nonisolated struct ChromiumBrowser: Identifiable, Hashable, Sendable {
         }
     }
 
+    /// Bases `Favicons` de tous les profils, y compris ceux sans favoris.
+    /// Ferry s'en sert pour les icônes des onglets : AppleScript ne dit pas à quel profil
+    /// appartient une fenêtre, donc on cherche l'icône dans chacun.
+    func faviconDatabaseURLs() -> [URL] {
+        let fm = FileManager.default
+        guard let names = try? fm.contentsOfDirectory(atPath: root.path) else { return [] }
+        return names
+            .filter { $0 == "Default" || $0.hasPrefix("Profile ") }
+            .sorted()
+            .map { root.appending(path: $0).appending(path: "Favicons") }
+            .filter { fm.fileExists(atPath: $0.path) }
+    }
+
     /// Navigateurs connus ayant au moins un profil exploitable.
     static func installed() -> [ChromiumBrowser] {
         return known.filter { !$0.profiles().isEmpty }
