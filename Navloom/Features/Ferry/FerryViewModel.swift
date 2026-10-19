@@ -45,7 +45,11 @@ final class FerryViewModel {
                 currentBrowserName = browser.name
                 // Laisse SwiftUI afficher le nom avant l'appel AppleScript (qui bloque le temps de la réponse).
                 await Task.yield()
-                results.append(BrowserTabs(browser: browser, result: TabReader.read(browser)))
+                // Lecture en direct, puis profils et espaces (Opera) tirés des fichiers de session.
+                let result = TabReader.read(browser).map { live in
+                    TabMerger.merge(live: live, sessions: TabSessions.load(for: browser))
+                }
+                results.append(BrowserTabs(browser: browser, result: result))
             }
             browsers = results
             lastRead = .now
@@ -86,8 +90,9 @@ final class FerryViewModel {
             guard isSearching else { return window }
             let tabs = window.tabs.filter { $0.matches(searchText) }
             guard !tabs.isEmpty else { return nil }
-            return OpenWindow(id: window.id, windowID: window.windowID, position: window.position,
-                              isPrivate: window.isPrivate, tabs: tabs)
+            var filtered = window
+            filtered.tabs = tabs
+            return filtered
         }
     }
 

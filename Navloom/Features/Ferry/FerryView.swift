@@ -183,17 +183,7 @@ struct FerryView: View {
                             }
                             ForEach(windows) { window in
                                 DisclosureGroup(isExpanded: model.isExpanded(window)) {
-                                    ForEach(window.tabs) { tab in
-                                        TabRow(tab: tab, favicon: model.favicons[tab.url])
-                                            .contentShape(Rectangle())
-                                            .onTapGesture(count: 2) { model.open(tab, in: browser.browser) }
-                                            .contextMenu {
-                                                Button("Ouvrir dans \(browser.browser.name)") {
-                                                    model.open(tab, in: browser.browser)
-                                                }
-                                                Button("Copier l'URL") { model.copyURL(tab) }
-                                            }
-                                    }
+                                    windowContent(window, browser: browser.browser)
                                 } label: {
                                     WindowLabel(window: window)
                                 }
@@ -206,6 +196,33 @@ struct FerryView: View {
             }
             .listStyle(.inset(alternatesRowBackgrounds: true))
         }
+    }
+
+    /// Onglets d'une fenêtre, sous un intertitre par espace de travail (Opera).
+    @ViewBuilder
+    private func windowContent(_ window: OpenWindow, browser: ChromiumBrowser) -> some View {
+        let hasWorkspaces = !window.workspaces.isEmpty
+        ForEach(window.tabGroups) { group in
+            if hasWorkspaces {
+                WorkspaceHeader(workspace: group.workspace ?? TabWorkspace(id: "?", name: "Autres"),
+                                count: group.tabs.count,
+                                isActive: group.isActive)
+            }
+            ForEach(group.tabs) { tab in
+                tabRow(tab, browser: browser)
+                    .padding(.leading, hasWorkspaces ? 14 : 0)
+            }
+        }
+    }
+
+    private func tabRow(_ tab: OpenTab, browser: ChromiumBrowser) -> some View {
+        TabRow(tab: tab, favicon: model.favicons[tab.url])
+            .contentShape(Rectangle())
+            .onTapGesture(count: 2) { model.open(tab, in: browser) }
+            .contextMenu {
+                Button("Ouvrir dans \(browser.name)") { model.open(tab, in: browser) }
+                Button("Copier l'URL") { model.copyURL(tab) }
+            }
     }
 
     // MARK: - Barre d'action
@@ -295,6 +312,12 @@ private struct AppIcon: View {
 private struct WindowLabel: View {
     let window: OpenWindow
 
+    private var countText: String {
+        let tabs = TabSnapshot.plural(window.tabs.count, "onglet")
+        let spaces = Set(window.tabs.compactMap(\.workspaceID)).count
+        return window.workspaces.isEmpty ? tabs : "\(tabs) · \(TabSnapshot.plural(spaces, "espace"))"
+    }
+
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: window.isPrivate ? "eye.slash.fill" : "macwindow")
@@ -312,7 +335,17 @@ private struct WindowLabel: View {
                     .background(.quaternary, in: Capsule())
             }
 
-            Text(TabSnapshot.plural(window.tabs.count, "onglet"))
+            if let profile = window.profileName {
+                Label(profile, systemImage: "person.crop.circle")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(Brand.indigo)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 1)
+                    .background(Brand.indigo.opacity(0.15), in: Capsule())
+                    .lineLimit(1)
+            }
+
+            Text(countText)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
@@ -325,6 +358,53 @@ private struct WindowLabel: View {
                     .truncationMode(.tail)
             }
         }
+    }
+}
+
+// MARK: - Espace de travail
+
+private struct WorkspaceHeader: View {
+    let workspace: TabWorkspace
+    let count: Int
+    let isActive: Bool
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Group {
+                if let emoji = workspace.emoji {
+                    Text(emoji)
+                        .font(.system(size: 12))
+                } else {
+                    Image(systemName: BrowserWorkspaces.symbol(for: workspace.icon))
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+            }
+            .frame(width: 20, height: 20)
+            .background((isActive ? Brand.indigo : Color.gray).gradient,
+                        in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+
+            Text(workspace.name)
+                .font(.callout.weight(.bold))
+
+            Text(TabSnapshot.plural(count, "onglet"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+
+            if isActive {
+                Text("Affiché")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(Brand.indigo)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 1)
+                    .background(Brand.indigo.opacity(0.15), in: Capsule())
+                    .help("Espace affiché dans cette fenêtre")
+            }
+            Spacer()
+        }
+        .padding(.top, 6)
+        .padding(.bottom, 2)
     }
 }
 

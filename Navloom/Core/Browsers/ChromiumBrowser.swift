@@ -129,16 +129,26 @@ nonisolated struct ChromiumBrowser: Identifiable, Hashable, Sendable {
     /// Profils trouvés sur le disque : "Default" et "Profile 1", "Profile 2"…
     /// Seuls ceux qui contiennent un fichier Bookmarks (ou AccountBookmarks, pour Chrome) sont retournés.
     func profiles() -> [ChromiumProfile] {
+        profiles(requiringBookmarks: true)
+    }
+
+    /// Tous les profils, même sans favoris : Ferry s'en sert pour lire les fichiers de session.
+    func allProfiles() -> [ChromiumProfile] {
+        profiles(requiringBookmarks: false)
+    }
+
+    private func profiles(requiringBookmarks: Bool) -> [ChromiumProfile] {
         let fm = FileManager.default
         guard let names = try? fm.contentsOfDirectory(atPath: root.path) else { return [] }
 
         let cache = infoCache()
 
-        // Seuls les profils qui ont des favoris sont gardés.
         let folders = names
             .filter { $0 == "Default" || $0.hasPrefix("Profile ") }
             .sorted()
             .filter { folder in
+                // Pour les outils de favoris, seuls les profils qui ont des favoris sont gardés.
+                guard requiringBookmarks else { return true }
                 let directory = root.appending(path: folder)
                 return fm.fileExists(atPath: directory.appending(path: "Bookmarks").path)
                     || fm.fileExists(atPath: directory.appending(path: "AccountBookmarks").path)

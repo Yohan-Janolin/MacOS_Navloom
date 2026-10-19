@@ -63,11 +63,23 @@ nonisolated enum TabSnapshot {
 
             for window in windows {
                 let privateMark = window.isPrivate ? " · privée" : ""
+                let profileMark = window.profileName.map { " · profil \($0)" } ?? ""
                 lines.append("")
-                lines.append("  Fenêtre \(window.position)\(privateMark) (\(plural(window.tabs.count, "onglet")))")
-                for tab in window.tabs {
-                    lines.append("    • \(tab.displayTitle)")
-                    lines.append("      \(tab.url)")
+                lines.append("  Fenêtre \(window.position)\(privateMark)\(profileMark) (\(plural(window.tabs.count, "onglet")))")
+                for group in window.tabGroups {
+                    let indent: String
+                    if window.workspaces.isEmpty {
+                        indent = "    "
+                    } else {
+                        let name = group.workspace?.name ?? "Autres"
+                        let shown = group.isActive ? ", affiché" : ""
+                        lines.append("    Espace « \(name) » (\(plural(group.tabs.count, "onglet"))\(shown))")
+                        indent = "      "
+                    }
+                    for tab in group.tabs {
+                        lines.append("\(indent)• \(tab.displayTitle)")
+                        lines.append("\(indent)  \(tab.url)")
+                    }
                 }
             }
         }

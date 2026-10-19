@@ -9,7 +9,9 @@ nonisolated struct OpenTab: Identifiable, Hashable, Sendable {
     let title: String
     let url: String
     /// Onglet affiché au premier plan dans sa fenêtre.
-    let isActive: Bool
+    var isActive: Bool
+    /// Espace (Opera) auquel appartient l'onglet ; nil si le navigateur n'en a pas.
+    var workspaceID: String? = nil
 
     var host: String? {
         URL(string: url)?.host()
@@ -41,11 +43,59 @@ nonisolated struct OpenWindow: Identifiable, Hashable, Sendable {
     let position: Int
     /// Navigation privée (« incognito » pour les navigateurs Chromium).
     let isPrivate: Bool
-    let tabs: [OpenTab]
+    var tabs: [OpenTab]
+    /// Profil du navigateur, retrouvé grâce au fichier de session (AppleScript ne le donne pas).
+    var profileName: String? = nil
+    /// Espaces de la fenêtre, dans l'ordre du navigateur (vide si le navigateur n'en a pas).
+    var workspaces: [TabWorkspace] = []
+    /// Espace affiché dans la fenêtre.
+    var activeWorkspaceID: String? = nil
 
     var activeTab: OpenTab? {
         tabs.first(where: \.isActive)
     }
+
+    /// Onglets regroupés par espace, dans l'ordre des espaces (un seul groupe sans espace sinon).
+    /// Les espaces vides sont omis ; un onglet d'un espace inconnu va dans un groupe à part.
+    var tabGroups: [TabGroup] {
+        guard !workspaces.isEmpty else {
+            return [TabGroup(id: "\(id)/-", workspace: nil, isActive: false, tabs: tabs)]
+        }
+        var groups = workspaces.compactMap { workspace -> TabGroup? in
+            let members = tabs.filter { $0.workspaceID == workspace.id }
+            guard !members.isEmpty else { return nil }
+            return TabGroup(id: "\(id)/\(workspace.id)", workspace: workspace,
+                            isActive: workspace.id == activeWorkspaceID, tabs: members)
+        }
+        let known = Set(workspaces.map(\.id))
+        let others = tabs.filter { tab in
+            guard let workspaceID = tab.workspaceID else { return true }
+            return !known.contains(workspaceID)
+        }
+        if !others.isEmpty {
+            groups.append(TabGroup(id: "\(id)/?", workspace: nil, isActive: false, tabs: others))
+        }
+        return groups
+    }
+}
+
+/// Un espace de travail (Opera) : identifiant, nom et icône définis par l'utilisateur.
+nonisolated struct TabWorkspace: Identifiable, Hashable, Sendable {
+    let id: String
+    let name: String
+    /// Nom d'icône propre au navigateur (« home-icon »…).
+    var icon: String? = nil
+    /// Émoji choisi à la place de l'icône, s'il y en a un.
+    var emoji: String? = nil
+}
+
+/// Onglets d'une fenêtre appartenant au même espace.
+nonisolated struct TabGroup: Identifiable, Sendable {
+    let id: String
+    let workspace: TabWorkspace?
+    /// Espace actuellement affiché dans la fenêtre.
+    let isActive: Bool
+    let tabs: [OpenTab]
 }
 
 /// Pourquoi les onglets d'un navigateur n'ont pas pu être lus.
