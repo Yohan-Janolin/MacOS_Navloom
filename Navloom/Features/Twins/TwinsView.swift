@@ -9,15 +9,15 @@ struct TwinsView: View {
                 ProgressView()
             } else if model.browsers.isEmpty {
                 ContentUnavailableView(
-                    "Aucun navigateur détecté",
+                    "No browser detected",
                     systemImage: "globe",
-                    description: Text("Navloom cherche Vivaldi, Chrome, Brave et Edge dans ~/Library/Application Support.")
+                    description: Text("Navloom looks for Vivaldi, Chrome, Brave and Edge in ~/Library/Application Support.")
                 )
             } else {
                 content
             }
         }
-        .navigationTitle("Navloom")
+        .navigationTitle(Text(verbatim: "Navloom"))
         .task { model.loadBrowsersIfNeeded() }
         .onChange(of: model.selectedBrowserID) { model.browserChanged() }
         .onChange(of: model.selectedProfileID) { model.reset() }
@@ -30,18 +30,18 @@ struct TwinsView: View {
             }
         }
         .confirmationDialog(
-            "Supprimer \(model.selection.count) favori\(model.selection.count > 1 ? "s" : "") ?",
+            "Delete \(model.selection.count) bookmarks?",
             isPresented: $model.showConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Supprimer", role: .destructive) { model.removeSelected() }
+            Button("Delete", role: .destructive) { model.removeSelected() }
         } message: {
-            Text("Les favoris cochés seront retirés de \(browserName). Une sauvegarde du fichier Bookmarks est créée avant.")
+            Text("The checked bookmarks will be removed from \(browserName). A backup of the Bookmarks file is created beforehand.")
         }
     }
 
     private var browserName: String {
-        model.selectedBrowser?.name ?? "le navigateur"
+        model.selectedBrowser?.name ?? String(localized: "the browser")
     }
 
     // MARK: - Structure
@@ -76,13 +76,13 @@ struct TwinsView: View {
 
     private var titleHeader: some View {
         VStack(spacing: 4) {
-            Text("Twins")
+            Text(verbatim: "Twins")
                 .font(.largeTitle.bold())
                 .foregroundStyle(
                     LinearGradient(colors: Self.gradient,
                                    startPoint: .leading, endPoint: .trailing)
                 )
-            Text("Retrouve les favoris qui pointent sur la même URL")
+            Text("Finds bookmarks pointing to the same URL")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -94,10 +94,10 @@ struct TwinsView: View {
 
     private var stats: some View {
         HStack(spacing: 12) {
-            StatCard(title: "Favoris", value: model.totalBookmarks, systemImage: "bookmark")
-            StatCard(title: "URLs en double", value: model.groups.count,
+            StatCard(title: "Bookmarks", value: model.totalBookmarks, systemImage: "bookmark")
+            StatCard(title: "Duplicate URLs", value: model.groups.count,
                      systemImage: "square.on.square", tint: Brand.sky)
-            StatCard(title: "Favoris en trop", value: model.extraCopies,
+            StatCard(title: "Extra bookmarks", value: model.extraCopies,
                      systemImage: "minus.circle", tint: .orange)
         }
     }
@@ -109,29 +109,29 @@ struct TwinsView: View {
         switch model.phase {
         case .idle:
             ContentUnavailableView(
-                "Prêt à chercher les doublons",
+                "Ready to find duplicates",
                 systemImage: "square.on.square",
-                description: Text("Navloom regroupe les favoris qui pointent exactement sur la même URL. L'analyse ne modifie rien.")
+                description: Text("Navloom groups the bookmarks pointing to exactly the same URL. The analysis doesn't change anything.")
             )
         case .analyzing:
-            ProgressView("Lecture des favoris…")
+            ProgressView("Reading bookmarks…")
         case .done:
             if model.groups.isEmpty {
-                ContentUnavailableView("Aucun doublon", systemImage: "checkmark.seal",
-                                       description: Text("Aucune URL n'apparaît deux fois dans tes favoris."))
+                ContentUnavailableView("No duplicates", systemImage: "checkmark.seal",
+                                       description: Text("No URL appears twice in your bookmarks."))
             } else {
                 VStack(spacing: 12) {
                     SyncNotice(browserName: browserName,
                                isBrowserRunning: model.isBrowserRunning,
                                syncStatus: model.syncStatus,
-                               operation: .removal(items: "les doublons"))
+                               operation: .removal(items: String(localized: "the duplicates")))
                     selectionToolbar
                     accountNote
                     groupsList
                 }
             }
         case .removing:
-            ProgressView("Suppression des doublons…")
+            ProgressView("Deleting duplicates…")
         case .removed:
             removedView
         }
@@ -141,7 +141,7 @@ struct TwinsView: View {
     @ViewBuilder
     private var accountNote: some View {
         if model.accountBookmarkCount > 0 {
-            Label("\(model.accountBookmarkCount) favori\(model.accountBookmarkCount > 1 ? "s" : "") du compte Google (icône nuage) : ils ne sont pas cochables, supprime-les à la main dans \(browserName). Une copie du compte protège son groupe : les copies locales peuvent toutes être cochées.",
+            Label("\(model.accountBookmarkCount) Google Account bookmarks (cloud icon): they can't be checked, delete them by hand in \(browserName). An account copy protects its group: the local copies can all be checked.",
                   systemImage: "icloud")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -152,11 +152,11 @@ struct TwinsView: View {
     /// Ligne d'outils au-dessus de la liste : raccourcis de sélection à gauche, compteur à droite.
     private var selectionToolbar: some View {
         HStack(spacing: 10) {
-            Button("Garder le premier de chaque groupe") { model.selectAllButFirst() }
-            Button("Tout décocher") { model.clearSelection() }
+            Button("Keep the First of Each Group") { model.selectAllButFirst() }
+            Button("Uncheck All") { model.clearSelection() }
                 .disabled(model.selection.isEmpty)
             Spacer()
-            Text("\(model.selection.count) coché\(model.selection.count > 1 ? "s" : "")")
+            Text("\(model.selection.count) checked")
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
         }
@@ -169,11 +169,11 @@ struct TwinsView: View {
                 .foregroundStyle(.green)
 
             if let summary = model.summary {
-                Text("\(summary.removed) favori\(summary.removed > 1 ? "s" : "") supprimé\(summary.removed > 1 ? "s" : "")")
+                Text("\(summary.removed) bookmarks deleted")
                     .font(.title2.bold())
-                Button("Afficher la sauvegarde dans le Finder") { model.revealBackup() }
+                Button("Show Backup in Finder") { model.revealBackup() }
             }
-            Text("Relance \(browserName) pour voir le résultat.")
+            Text("Relaunch \(browserName) to see the result.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
         }
@@ -196,13 +196,13 @@ struct TwinsView: View {
                     }
                 } header: {
                     HStack {
-                        Text(group.url)
+                        Text(verbatim: group.url)
                             .font(.headline)
                             .foregroundStyle(.primary)
                             .lineLimit(1)
                             .truncationMode(.middle)
                         Spacer()
-                        Text("\(group.bookmarks.count) favoris")
+                        Text("\(group.bookmarks.count) bookmarks")
                             .font(.callout)
                             .foregroundStyle(.secondary)
                     }
@@ -226,7 +226,7 @@ struct TwinsView: View {
     private var actionBar: some View {
         HStack {
             if model.phase == .done {
-                Button("Annuler") { model.reset() }
+                Button("Cancel") { model.reset() }
             }
 
             Spacer()
@@ -239,9 +239,9 @@ struct TwinsView: View {
     private var primaryActions: some View {
         switch model.phase {
         case .done where !model.groups.isEmpty:
-            Button("Nouvelle analyse") { model.analyze() }
+            Button("New Analysis") { model.analyze() }
                 .controlSize(.large)
-            Button("Supprimer \(model.selection.count) favori\(model.selection.count > 1 ? "s" : "")") {
+            Button("Delete \(model.selection.count) bookmarks") {
                 model.showConfirmation = true
             }
             .buttonStyle(.borderedProminent)
@@ -249,16 +249,16 @@ struct TwinsView: View {
             .controlSize(.large)
             .disabled(!model.canRemove)
         case .done, .removed:
-            Button("Nouvelle analyse") { model.analyze() }
+            Button("New Analysis") { model.analyze() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
         case .removing:
-            Button("Suppression en cours…") {}
+            Button("Deleting…") {}
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(true)
         case .idle, .analyzing:
-            Button("Chercher les doublons") { model.analyze() }
+            Button("Find Duplicates") { model.analyze() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(model.selectedProfile == nil || model.isBusy)
@@ -273,14 +273,14 @@ private struct TwinRow: View {
     @Binding var isChecked: Bool
 
     private var folderLabel: String {
-        let folder = bookmark.folder.isEmpty ? "Racine" : bookmark.folder
-        return bookmark.source == .account ? "Compte Google · \(folder)" : folder
+        let folder = bookmark.folder.isEmpty ? String(localized: "Root") : bookmark.folder
+        return bookmark.source == .account ? String(localized: "Google Account · \(folder)") : folder
     }
 
     private var details: some View {
         VStack(alignment: .leading, spacing: 1) {
-            Text(bookmark.name).lineLimit(1)
-            Label(folderLabel, systemImage: "folder")
+            Text(verbatim: bookmark.name).lineLimit(1)
+            Label { Text(verbatim: folderLabel) } icon: { Image(systemName: "folder") }
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
@@ -302,7 +302,7 @@ private struct TwinRow: View {
                 details
             }
             .padding(.vertical, 2)
-            .help("Favori du compte Google : à supprimer à la main dans le navigateur")
+            .help("Google Account bookmark: delete it by hand in the browser")
         }
     }
 }

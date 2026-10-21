@@ -11,10 +11,16 @@ final class GhostsViewModel {
     }
 
     enum Category: String, CaseIterable, Identifiable {
-        case dead = "Morts"
-        case uncertain = "À vérifier"
-        case moved = "Redirigés"
+        case dead, uncertain, moved
         var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .dead: String(localized: "Dead")
+            case .uncertain: String(localized: "To check")
+            case .moved: String(localized: "Redirected")
+            }
+        }
     }
 
     struct Row: Identifiable {
@@ -172,7 +178,7 @@ final class GhostsViewModel {
             progressPass = 2
             progressDone = 0
             progressTotal = count
-            currentURL = "Pause avant le second passage…"
+            currentURL = String(localized: "Pausing before the second pass…")
         }
     }
 
@@ -181,7 +187,7 @@ final class GhostsViewModel {
             issues.map {
                 Row(nodeID: $0.bookmark.nodeID,
                     name: $0.bookmark.name, url: $0.bookmark.url, detail: $0.reason,
-                    folder: $0.bookmark.folder.isEmpty ? "Racine" : $0.bookmark.folder,
+                    folder: $0.bookmark.folder.isEmpty ? String(localized: "Root") : $0.bookmark.folder,
                     isLocal: $0.bookmark.source == .local)
             }
         }
@@ -287,14 +293,14 @@ final class GhostsViewModel {
 
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.plainText]
-        panel.nameFieldStringValue = "ghosts-rapport.txt"
+        panel.nameFieldStringValue = String(localized: "ghosts-report.txt")
         panel.canCreateDirectories = true
         guard panel.runModal() == .OK, let url = panel.url else { return }
 
         do {
             try text.write(to: url, atomically: true, encoding: .utf8)
         } catch {
-            errorMessage = "Impossible d'écrire le rapport : \(error.localizedDescription)"
+            errorMessage = String(localized: "Couldn't write the report: \(error.localizedDescription)")
         }
     }
 }
