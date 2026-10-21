@@ -28,3 +28,10 @@ Pods/
 # Fichiers de travail personnels (backups, bases de test)
 *.backup
 *.test
+
+# Distribution (DMG fabriqués par scripts/make-dmg.sh)
+dist/
+
+# Certificat de signature : jamais dans le dépôt
+*.p12
+*.cer

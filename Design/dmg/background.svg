@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="400" viewBox="0 0 660 400">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FBFAFF"/>
+      <stop offset="1" stop-color="#F1EEFB"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0.08" cy="0.95" r="0.55">
+      <stop offset="0" stop-color="#FF7A59" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#FF7A59" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0.95" cy="0.05" r="0.55">
+      <stop offset="0" stop-color="#A78BFA" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#A78BFA" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="arrow" gradientUnits="userSpaceOnUse" x1="262" y1="0" x2="398" y2="0">
+      <stop offset="0" stop-color="#FF7A59"/>
+      <stop offset="0.5" stop-color="#FF5C8A"/>
+      <stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+    <!-- Motif de l'icône : trame 3x3 tournée à 45° -->
+    <g id="weave">
+      <g transform="rotate(45 67.5 67.5)">
+        <rect x="29.5" y="29.5" width="25" height="20" rx="5" fill="#FF7A59"/>
+        <rect x="80.5" y="29.5" width="25" height="20" rx="5" fill="#FF7A59"/>
+        <rect x="52.5" y="57.5" width="30" height="20" rx="5" fill="#FFC94D"/>
+        <rect x="29.5" y="85.5" width="25" height="20" rx="5" fill="#FF5C8A"/>
+        <rect x="80.5" y="85.5" width="25" height="20" rx="5" fill="#FF5C8A"/>
+        <rect x="29.5" y="52.5" width="20" height="30" rx="5" fill="#2DD4BF"/>
+        <rect x="57.5" y="29.5" width="20" height="25" rx="5" fill="#60A5FA"/>
+        <rect x="57.5" y="80.5" width="20" height="25" rx="5" fill="#60A5FA"/>
+        <rect x="85.5" y="52.5" width="20" height="30" rx="5" fill="#A78BFA"/>
+      </g>
+    </g>
+  </defs>
+
+  <rect width="660" height="400" fill="url(#bg)"/>
+  <rect width="660" height="400" fill="url(#glowA)"/>
+  <rect width="660" height="400" fill="url(#glowB)"/>
+
+  <!-- Trames décoratives, très discrètes, dans deux coins -->
+  <g opacity="0.12"><use href="#weave" transform="translate(560 -40) scale(1.25)"/></g>
+  <g opacity="0.10"><use href="#weave" transform="translate(-60 300) scale(1.1)"/></g>
+
+  <!-- Nom, en haut -->
+  <text x="330" y="58" text-anchor="middle" font-family="SF Pro Display, Helvetica Neue, Helvetica, Arial, sans-serif"
+        font-size="30" font-weight="700" fill="#1C1B33" letter-spacing="0.5">Navloom</text>
+
+  <!-- Flèche de l'app vers Applications (icônes centrées en x=180 et x=480, y=200) -->
+  <g fill="none" stroke="url(#arrow)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M262 200 Q 330 172 398 200" stroke-width="6"/>
+    <path d="M385.8 184.2 L 398 200 L 378.2 202.7" stroke-width="6"/>
+  </g>
+</svg>
