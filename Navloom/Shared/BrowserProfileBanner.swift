@@ -58,5 +58,8 @@ struct BrowserProfileBanner: View {
             in: shape
         )
         .overlay(shape.strokeBorder((colors.last ?? Brand.violet).opacity(0.3), lineWidth: 1))
+        // Bandeau compact (Sauvegardes) : il prend toujours sa largeur idéale. Sans cela, le Spacer voisin
+        // lui en grignote une partie et les libellés longs (« Navigateur ») sont tronqués.
+        .fixedSize(horizontal: !expands, vertical: false)
     }
 }
