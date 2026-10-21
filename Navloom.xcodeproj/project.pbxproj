@@ -178,6 +178,7 @@
 			knownRegions = (
 				en,
 				Base,
+				fr,
 			);
 			mainGroup = 15EC89E7306C471600875C4A;
 			minimizedProjectReferenceProxies = 1;
@@ -380,7 +381,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Navloom accède aux onglets ouverts de tes navigateurs pour les afficher et les transférer avec Ferry.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Navloom accesses the open tabs of your browsers to display them and transfer them with Ferry.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -416,7 +417,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Navloom accède aux onglets ouverts de tes navigateurs pour les afficher et les transférer avec Ferry.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Navloom accesses the open tabs of your browsers to display them and transfer them with Ferry.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -1,0 +1,24 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSAppleEventsUsageDescription" : {
+      "comment" : "Privacy - AppleEvents Sending Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Navloom accesses the open tabs of your browsers to display them and transfer them with Ferry."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom accède aux onglets ouverts de tes navigateurs pour les afficher et les transférer avec Ferry."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
