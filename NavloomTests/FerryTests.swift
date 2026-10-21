@@ -113,13 +113,8 @@ struct TabReportTests {
     @Test func uneErreurApparaitDansLeRapport() {
         let failed = BrowserTabs(browser: browser, result: .failure(.permissionDenied))
         let text = TabSnapshot.report([failed], includePrivate: false)
-        #expect(text.contains("Vivaldi — non lu"))
-    }
-
-    @Test func pluriel() {
-        #expect(TabSnapshot.plural(0, "onglet") == "0 onglet")
-        #expect(TabSnapshot.plural(1, "onglet") == "1 onglet")
-        #expect(TabSnapshot.plural(3, "onglet") == "3 onglets")
+        #expect(text.contains("Vivaldi — "))
+        #expect(text.contains(TabReadError.permissionDenied.message))
     }
 }
 
@@ -378,7 +373,7 @@ struct BrowserWorkspacesTests {
         #expect(parsed?.style == .vivaldi)
         let spaces = parsed?.list ?? []
         #expect(spaces.map(\.id) == [BrowserWorkspaces.vivaldiDefaultID, "1791027980791", "1791027999000"])
-        #expect(spaces.map(\.name) == ["Espace par défaut", "Network-901", "Sans nom de clé name"])
+        #expect(spaces.map(\.name) == [BrowserWorkspaces.vivaldiDefaultName, "Network-901", "Sans nom de clé name"])
         #expect(spaces[2].emoji == "🚀")
     }
 
@@ -519,8 +514,8 @@ struct TabMergerTests {
         let browser = ChromiumBrowser.known.first { $0.id == "opera" }!
         let merged = TabMerger.merge(live: live(), sessions: [session])
         let text = TabSnapshot.report([BrowserTabs(browser: browser, result: .success(merged))], includePrivate: false)
-        #expect(text.contains("Espace « Network-901 » (1 onglet, affiché)"))
-        #expect(text.contains("Espace « A étudier » (1 onglet)"))
+        #expect(text.contains(TabSnapshot.workspaceLine(name: "Network-901", tabCount: 1, isShown: true)))
+        #expect(text.contains(TabSnapshot.workspaceLine(name: "A étudier", tabCount: 1, isShown: false)))
     }
 }
 

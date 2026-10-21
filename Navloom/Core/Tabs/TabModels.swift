@@ -116,11 +116,11 @@ nonisolated enum TabReadError: Error, Equatable, Sendable {
     var message: String {
         switch self {
         case .permissionDenied:
-            "Navloom n'a pas l'autorisation de lire les onglets de ce navigateur."
+            String(localized: "Navloom isn't allowed to read this browser's tabs.")
         case .notRunning:
-            "Le navigateur s'est fermé pendant la lecture."
+            String(localized: "The browser quit during the read.")
         case .script(let code, let message):
-            "Erreur AppleScript \(code) : \(message)"
+            String(localized: "AppleScript error \(code): \(message)")
         }
     }
 }

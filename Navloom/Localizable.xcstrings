@@ -21,6 +21,16 @@
         }
       }
     },
+    "%@ (internal pages or already in %@)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (pages internes ou déjà dans %2$@)"
+          }
+        }
+      }
+    },
     "%@ already contains all the source's web bookmarks." : {
       "localizations" : {
         "fr" : {
@@ -37,6 +47,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ a déjà exactement les favoris de la source."
+          }
+        }
+      }
+    },
+    "%@ already in this browser" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ déjà dans ce navigateur"
+          }
+        }
+      }
+    },
+    "%@ couldn't be launched." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ n'a pas pu être lancé."
+          }
+        }
+      }
+    },
+    "%@ in %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ dans %2$@"
+          }
+        }
+      }
+    },
+    "%@ in %@ (%@)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ dans %2$@ (%3$@)"
           }
         }
       }
@@ -107,6 +157,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir écrire."
+          }
+        }
+      }
+    },
+    "%@ will be launched." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ sera lancé."
           }
         }
       }
@@ -931,6 +991,176 @@
         }
       }
     },
+    "%lld in another Opera workspace (close by hand)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld dans un autre espace d'Opera (à fermer à la main)"
+          }
+        }
+      }
+    },
+    "%lld internal pages skipped" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld internal page skipped"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld internal pages skipped"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld page interne ignorée"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld pages internes ignorées"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld missing" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld missing"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld missing"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld introuvable"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld introuvables"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld new windows" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new window"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new windows"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nouvelle fenêtre"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nouvelles fenêtres"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld new windows will be created." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new window will be created."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld new windows will be created."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nouvelle fenêtre sera créée."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld nouvelles fenêtres seront créées."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld non-web bookmarks" : {
       "localizations" : {
         "en" : {
@@ -1011,6 +1241,126 @@
         }
       }
     },
+    "%lld not found in the target" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld not found in the target"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld not found in the target"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld non retrouvé dans la cible"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld non retrouvés dans la cible"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld original tabs closed" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld original tab closed"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld original tabs closed"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglet d'origine fermé"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglets d'origine fermés"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld showing another page" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld showing another page"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld showing another page"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld qui affiche une autre page"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld qui affichent une autre page"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld source duplicates skipped" : {
       "localizations" : {
         "en" : {
@@ -1051,6 +1401,206 @@
         }
       }
     },
+    "%lld tabs" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tab"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tabs"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglet"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglets"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld tabs from other Opera workspaces will be copied but stay open: Opera refuses to close them, close them by hand." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tab from another Opera workspace will be copied but stay open: Opera refuses to close it, close it by hand."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tabs from other Opera workspaces will be copied but stay open: Opera refuses to close them, close them by hand."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglet d'un autre espace d'Opera sera copié mais restera ouvert : Opera refuse de le fermer, ferme-le à la main."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglets d'autres espaces d'Opera seront copiés mais resteront ouverts : Opera refuse de les fermer, ferme-les à la main."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld tabs left aside" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tab left aside"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tabs left aside"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglet laissé de côté"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglets laissés de côté"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld tabs opened" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tab opened"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tabs opened"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglet ouvert"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglets ouverts"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld tabs will be closed" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tab will be closed"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld tabs will be closed"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglet sera fermé"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld onglets seront fermés"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld to delete" : {
       "localizations" : {
         "fr" : {
@@ -1067,6 +1617,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld icônes uniques · %2$lld échec(s)"
+          }
+        }
+      }
+    },
+    "%lld windows" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld window"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld windows"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld fenêtre"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld fenêtres"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld workspaces" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld workspace"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld workspaces"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld espace"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld espaces"
+                }
+              }
+            }
           }
         }
       }
@@ -1461,6 +2091,16 @@
         }
       }
     },
+    "AppleScript error %lld: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur AppleScript %1$lld : %2$@"
+          }
+        }
+      }
+    },
     "Apply to %@" : {
       "localizations" : {
         "fr" : {
@@ -1671,6 +2311,16 @@
         }
       }
     },
+    "Browsers" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigateurs"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
         "fr" : {
@@ -1687,6 +2337,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tout cocher"
+          }
+        }
+      }
+    },
+    "Check tabs, a workspace or a whole window, then choose the target browser at the bottom. Double-click a tab to open it in its browser." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coche des onglets, un espace ou une fenêtre entière, puis choisis le navigateur cible en bas. Double-clic sur un onglet pour l'ouvrir dans son navigateur."
+          }
+        }
+      }
+    },
+    "Check the whole window" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cocher toute la fenêtre"
+          }
+        }
+      }
+    },
+    "Check the whole workspace" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cocher tout l'espace"
           }
         }
       }
@@ -1747,6 +2427,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nettoyer maintenant"
+          }
+        }
+      }
+    },
+    "Close the original tabs" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer les onglets d'origine"
+          }
+        }
+      }
+    },
+    "Collapse All" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout replier"
           }
         }
       }
@@ -1821,6 +2521,16 @@
         }
       }
     },
+    "Couldn't launch: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lancement impossible : %@"
+          }
+        }
+      }
+    },
     "Couldn't move them: %@" : {
       "localizations" : {
         "fr" : {
@@ -1877,6 +2587,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Par défaut"
+          }
+        }
+      }
+    },
+    "Default workspace" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espace par défaut"
           }
         }
       }
@@ -2031,6 +2751,16 @@
         }
       }
     },
+    "Each workspace arrives in its own window, in the target's shown workspace: move them afterwards into the workspace you want." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque espace arrive dans sa propre fenêtre, dans l'espace affiché de la cible : range-les ensuite dans l'espace voulu."
+          }
+        }
+      }
+    },
     "Echo compares the source bookmarks with the target's and shows what would be added (and, in full copy, deleted). The comparison doesn't change anything: the browsers can stay open." : {
       "localizations" : {
         "fr" : {
@@ -2047,6 +2777,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tout est en ordre"
+          }
+        }
+      }
+    },
+    "Expand All" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout déplier"
+          }
+        }
+      }
+    },
+    "Export" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter"
           }
         }
       }
@@ -2241,6 +2991,16 @@
         }
       }
     },
+    "Gathers the open tabs of all your browsers and moves them from one to another" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rassemble les onglets ouverts de tous tes navigateurs et fais-les passer de l'un à l'autre"
+          }
+        }
+      }
+    },
     "Gathers the open tabs of all your browsers in a single list, grouped by window (with the profile when there are several, and the Opera and Vivaldi workspaces), with search and a text export. Check tabs, workspaces or windows to reopen them in another browser, keeping the window layout (and one window per workspace, since workspaces can't be recreated). Optionally, the original tabs are closed afterwards, only if their copy is found in the target; Opera refuses to close those in its other workspaces. The first time, macOS asks you to allow Navloom to control each browser. Private windows are hidden by default." : {
       "localizations" : {
         "fr" : {
@@ -2301,6 +3061,16 @@
         }
       }
     },
+    "Group all tabs in a single window instead of recreating each window" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regrouper tous les onglets dans une seule fenêtre au lieu de recréer chaque fenêtre"
+          }
+        }
+      }
+    },
     "Home" : {
       "localizations" : {
         "fr" : {
@@ -2321,6 +3091,16 @@
         }
       }
     },
+    "If macOS asks for permission, answer it to continue." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si macOS demande une autorisation, réponds-y pour continuer."
+          }
+        }
+      }
+    },
     "In %@: %lld to add" : {
       "localizations" : {
         "fr" : {
@@ -2337,6 +3117,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dans Vivaldi, ouvre Réglages › Synchronisation et décoche « Signets »."
+          }
+        }
+      }
+    },
+    "In front" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Au premier plan"
+          }
+        }
+      }
+    },
+    "Invalid AppleScript script" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Script AppleScript invalide"
           }
         }
       }
@@ -2417,6 +3217,16 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Keep private browsing" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder la navigation privée"
           }
         }
       }
@@ -2631,6 +3441,16 @@
         }
       }
     },
+    "Navloom isn't allowed to read this browser's tabs." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom n'a pas l'autorisation de lire les onglets de ce navigateur."
+          }
+        }
+      }
+    },
     "Navloom looks for Vivaldi, Chrome, Brave and Edge in ~/Library/Application Support." : {
       "localizations" : {
         "fr" : {
@@ -2667,6 +3487,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Navloom lit l'état de la synchro dans tous les navigateurs pris en charge. Pour Chrome, les favoris du compte Google sont dans un fichier séparé : la synchro complète est la seule à bloquer la suppression (voir « Limites »)."
+          }
+        }
+      }
+    },
+    "Navloom reads the windows and tabs of the open browsers (closed browsers are ignored). Reading doesn't close or change anything. The first time, macOS asks you to allow Navloom to control each browser: accept so that its tabs appear." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom lit les fenêtres et les onglets des navigateurs ouverts (les navigateurs fermés sont ignorés). La lecture ne ferme ni ne modifie rien. La première fois, macOS te demande d'autoriser Navloom à contrôler chaque navigateur : accepte pour que ses onglets apparaissent."
+          }
+        }
+      }
+    },
+    "Navloom · Ferry — open tabs" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom · Ferry — onglets ouverts"
           }
         }
       }
@@ -2731,6 +3571,16 @@
         }
       }
     },
+    "No browser open" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun navigateur ouvert"
+          }
+        }
+      }
+    },
     "No duplicates" : {
       "localizations" : {
         "fr" : {
@@ -2781,6 +3631,16 @@
         }
       }
     },
+    "No open windows" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune fenêtre ouverte"
+          }
+        }
+      }
+    },
     "Nothing to add" : {
       "localizations" : {
         "fr" : {
@@ -2797,6 +3657,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rien à nettoyer."
+          }
+        }
+      }
+    },
+    "Nothing to transfer" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien à transférer"
           }
         }
       }
@@ -2821,6 +3691,56 @@
         }
       }
     },
+    "Once their copy is open and found in the target, close the original tabs" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une fois leur copie ouverte et retrouvée dans la cible, fermer les onglets d'origine"
+          }
+        }
+      }
+    },
+    "One window per workspace" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une fenêtre par espace"
+          }
+        }
+      }
+    },
+    "Only private browsing windows" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seulement des fenêtres de navigation privée"
+          }
+        }
+      }
+    },
+    "Open %@ in %@?" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir %1$@ dans %2$@ ?"
+          }
+        }
+      }
+    },
+    "Open Automation Settings" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les réglages d'Automatisation"
+          }
+        }
+      }
+    },
     "Open Folder" : {
       "localizations" : {
         "fr" : {
@@ -2841,12 +3761,42 @@
         }
       }
     },
+    "Open System Settings › Privacy & Security › Automation, expand Navloom and turn on %@, then click Refresh." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre Réglages Système › Confidentialité et sécurité › Automatisation, déplie Navloom et active %@, puis clique sur Actualiser."
+          }
+        }
+      }
+    },
+    "Open Vivaldi, Chrome, Brave, Edge or Opera, then read again." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre Vivaldi, Chrome, Brave, Edge ou Opera, puis relance la lecture."
+          }
+        }
+      }
+    },
     "Open an issue" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir une issue"
+          }
+        }
+      }
+    },
+    "Open in %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir dans %@"
           }
         }
       }
@@ -2861,6 +3811,16 @@
         }
       }
     },
+    "Opening in %@… %lld/%@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouverture dans %1$@… %2$lld/%3$@"
+          }
+        }
+      }
+    },
     "Opens each bookmark to spot the ones whose page no longer exists (page not found, domain gone, redirect to the home page) and deletes the ones you check. The scan can run with the browser open; to delete, it must be closed and bookmark sync turned off (see below). Double-click a result to test it in your browser." : {
       "localizations" : {
         "fr" : {
@@ -2871,12 +3831,32 @@
         }
       }
     },
+    "Opera doesn't allow closing the tabs of this workspace: it will be copied but stay open" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opera ne laisse pas fermer les onglets de cet espace : il sera copié mais restera ouvert"
+          }
+        }
+      }
+    },
     "Other bookmarks" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autres favoris"
+          }
+        }
+      }
+    },
+    "Others" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres"
           }
         }
       }
@@ -2911,6 +3891,46 @@
         }
       }
     },
+    "Private" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privée"
+          }
+        }
+      }
+    },
+    "Private browsing" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigation privée"
+          }
+        }
+      }
+    },
+    "Private browsing windows not included." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenêtres de navigation privée non incluses."
+          }
+        }
+      }
+    },
+    "Private hidden" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privées masquées"
+          }
+        }
+      }
+    },
     "Profile" : {
       "localizations" : {
         "fr" : {
@@ -2941,12 +3961,52 @@
         }
       }
     },
+    "Read Open Tabs" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lire les onglets ouverts"
+          }
+        }
+      }
+    },
+    "Reading %@…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture de %@…"
+          }
+        }
+      }
+    },
     "Reading bookmarks…" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lecture des favoris…"
+          }
+        }
+      }
+    },
+    "Reading tabs…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture des onglets…"
+          }
+        }
+      }
+    },
+    "Reading…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture en cours…"
           }
         }
       }
@@ -2991,12 +4051,32 @@
         }
       }
     },
+    "Ready to ship your tabs" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prêt à embarquer tes onglets"
+          }
+        }
+      }
+    },
     "Redirected" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Redirigés"
+          }
+        }
+      }
+    },
+    "Refresh" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser"
           }
         }
       }
@@ -3037,6 +4117,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Date de release"
+          }
+        }
+      }
+    },
+    "Reopen in private browsing the tabs that came from a private window" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rouvrir en navigation privée les onglets qui venaient d'une fenêtre privée"
           }
         }
       }
@@ -3121,6 +4211,16 @@
         }
       }
     },
+    "Search a title or URL" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher un titre ou une URL"
+          }
+        }
+      }
+    },
     "Searching…" : {
       "localizations" : {
         "fr" : {
@@ -3181,12 +4281,32 @@
         }
       }
     },
+    "Shown" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affiché"
+          }
+        }
+      }
+    },
     "Sign back in, set your encryption password again (you can reuse the same one), then check “Bookmarks” again." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reconnecte-toi, redéfinis ton mot de passe de chiffrement (tu peux reprendre le même), puis recoche « Signets »."
+          }
+        }
+      }
+    },
+    "Single window" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une seule fenêtre"
           }
         }
       }
@@ -3261,6 +4381,26 @@
         }
       }
     },
+    "Tab shown in this window" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onglet affiché dans cette fenêtre"
+          }
+        }
+      }
+    },
+    "Tabs" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onglets"
+          }
+        }
+      }
+    },
     "Target browser" : {
       "localizations" : {
         "fr" : {
@@ -3311,6 +4451,16 @@
         }
       }
     },
+    "The browser quit during the read." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le navigateur s'est fermé pendant la lecture."
+          }
+        }
+      }
+    },
     "The checked bookmarks will be removed from %@. A backup of the Bookmarks file is created beforehand." : {
       "localizations" : {
         "fr" : {
@@ -3347,6 +4497,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les icônes n'ont pas pu être écrites (%@) : la base Favicons n'a pas été modifiée. Les favoris sont ajoutés sans icône."
+          }
+        }
+      }
+    },
+    "The original tabs stay open." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les onglets d'origine restent ouverts."
           }
         }
       }
@@ -3491,6 +4651,16 @@
         }
       }
     },
+    "Then, %@ in %@, but only those whose copy is found in the target and that still show the same page. A window whose tabs are all closed closes too." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ensuite, %1$@ dans %2$@, mais seulement ceux dont la copie est bien retrouvée dans la cible et qui affichent encore la même page. Une fenêtre dont tous les onglets sont fermés se ferme aussi."
+          }
+        }
+      }
+    },
     "This %@ profile has no local Bookmarks file (bookmarks saved only in the account?)." : {
       "localizations" : {
         "fr" : {
@@ -3507,6 +4677,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cette sauvegarde est illisible : elle n'a pas été appliquée."
+          }
+        }
+      }
+    },
+    "Time of the last read" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heure de la dernière lecture"
           }
         }
       }
@@ -3591,6 +4771,66 @@
         }
       }
     },
+    "Transfer" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transférer"
+          }
+        }
+      }
+    },
+    "Transfer %lld tabs" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Transfer %lld tab"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Transfer %lld tabs"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Transférer %lld onglet"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Transférer %lld onglets"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Transfer and Close the Originals" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transférer et fermer les originaux"
+          }
+        }
+      }
+    },
     "Twins / Ghosts / Echo - Trouble with sync" : {
       "localizations" : {
         "fr" : {
@@ -3637,6 +4877,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tout décocher"
+          }
+        }
+      }
+    },
+    "Unreadable window identifier" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifiant de fenêtre illisible"
           }
         }
       }
@@ -3701,6 +4951,26 @@
         }
       }
     },
+    "Window %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenêtre %lld"
+          }
+        }
+      }
+    },
+    "Windows" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenêtres"
+          }
+        }
+      }
+    },
     "With Vivaldi" : {
       "localizations" : {
         "fr" : {
@@ -3731,6 +5001,66 @@
         }
       }
     },
+    "Workspace %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espace %lld"
+          }
+        }
+      }
+    },
+    "Workspace shown in this window" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espace affiché dans cette fenêtre"
+          }
+        }
+      }
+    },
+    "Workspace “%@” (%@)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espace « %1$@ » (%2$@)"
+          }
+        }
+      }
+    },
+    "Workspace “%@” (%@, shown)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espace « %1$@ » (%2$@, affiché)"
+          }
+        }
+      }
+    },
+    "Workspaces aren't recreated in the target: each source workspace arrives in its own window, to be moved afterwards into the workspace you want" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les espaces ne se recréent pas dans la cible : chaque espace de la source arrive dans sa propre fenêtre, à ranger ensuite dans l'espace voulu"
+          }
+        }
+      }
+    },
+    "Workspaces aren't recreated: the tabs arrive in the target's shown workspace." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les espaces de travail ne se recréent pas : les onglets arrivent dans l'espace affiché de la cible."
+          }
+        }
+      }
+    },
     "Writing…" : {
       "localizations" : {
         "fr" : {
@@ -3751,6 +5081,16 @@
         }
       }
     },
+    "ferry-tabs.txt" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ferry-onglets.txt"
+          }
+        }
+      }
+    },
     "ghosts-report.txt" : {
       "localizations" : {
         "fr" : {
@@ -3761,12 +5101,32 @@
         }
       }
     },
+    "kept open: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gardés ouverts : %@"
+          }
+        }
+      }
+    },
     "macOS blocks access to the data of %@, so they don't appear in the list of browsers.\n\nTo use them, open System Settings › Privacy & Security › Full Disk Access, add Navloom with the “+” button if it isn't there, turn it on, then relaunch Navloom." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "macOS bloque l'accès aux données de %@ : ils n'apparaissent donc pas dans la liste des navigateurs.\n\nPour les utiliser, ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + » s'il n'y est pas, active-le, puis relance Navloom."
+          }
+        }
+      }
+    },
+    "not read: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "non lu : %@"
           }
         }
       }
@@ -3787,6 +5147,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "paramètres ?…"
+          }
+        }
+      }
+    },
+    "private" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "privée"
+          }
+        }
+      }
+    },
+    "profile %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "profil %@"
           }
         }
       }

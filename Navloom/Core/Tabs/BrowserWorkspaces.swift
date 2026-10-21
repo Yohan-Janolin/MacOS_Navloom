@@ -71,7 +71,7 @@ nonisolated enum BrowserWorkspaces {
 
         return (ordered + remaining).map { id in
             TabWorkspace(id: id,
-                         name: nonEmpty(names[id]) ?? "Espace \((Int(id) ?? 0) + 1)",
+                         name: nonEmpty(names[id]) ?? defaultName(position: (Int(id) ?? 0) + 1),
                          icon: icons[id],
                          emoji: nonEmpty(emojis[id]))
         }
@@ -85,12 +85,20 @@ nonisolated enum BrowserWorkspaces {
         let spaces = list.enumerated().compactMap { offset, item -> TabWorkspace? in
             guard let id = workspaceKey(item["id"]) else { return nil }
             return TabWorkspace(id: id,
-                                name: nonEmpty(item["name"]) ?? nonEmpty(item["title"]) ?? "Espace \(offset + 1)",
+                                name: nonEmpty(item["name"]) ?? nonEmpty(item["title"]) ?? defaultName(position: offset + 1),
                                 icon: nil,
                                 emoji: nonEmpty(item["emoji"]))
         }
         guard !spaces.isEmpty else { return [] }
-        return [TabWorkspace(id: vivaldiDefaultID, name: "Espace par défaut")] + spaces
+        return [TabWorkspace(id: vivaldiDefaultID, name: vivaldiDefaultName)] + spaces
+    }
+
+    /// Nom de l'espace qui regroupe les onglets hors espace dans Vivaldi.
+    static var vivaldiDefaultName: String { String(localized: "Default workspace") }
+
+    /// Nom donné à un espace sans nom : « Espace 2 ».
+    static func defaultName(position: Int) -> String {
+        String(localized: "Workspace \(position)")
     }
 
     /// Identifiant numérique (écrit « 1791027980791 » ou « 1.791027980791e+12 ») → texte entier.

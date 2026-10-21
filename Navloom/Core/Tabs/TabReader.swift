@@ -60,7 +60,7 @@ enum TabReader {
 
     private static func run(_ source: String) -> Result<NSAppleEventDescriptor, TabReadError> {
         guard let script = NSAppleScript(source: source) else {
-            return .failure(.script(code: 0, message: "Script AppleScript invalide"))
+            return .failure(.script(code: 0, message: String(localized: "Invalid AppleScript script")))
         }
         var errorInfo: NSDictionary?
         let descriptor = script.executeAndReturnError(&errorInfo)

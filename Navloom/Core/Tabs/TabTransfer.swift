@@ -204,7 +204,7 @@ enum TabWriter {
             case .success(let descriptor):
                 // Renvoyé en texte : les identifiants Chromium dépassent souvent la taille d'un entier AppleScript.
                 guard let windowID = descriptor.stringValue.flatMap({ Int($0) }) else {
-                    return .failure(.script(code: 0, message: "Identifiant de fenêtre illisible"))
+                    return .failure(.script(code: 0, message: String(localized: "Unreadable window identifier")))
                 }
                 return run(fillWindowScript(bundleID: browser.bundleID, windowID: windowID, urls: window.urls))
                     .map { _ in .appleScript }
@@ -234,13 +234,13 @@ enum TabWriter {
             try? await Task.sleep(for: .seconds(1))
             return .success(.commandLine)
         } catch {
-            return .failure(.script(code: 0, message: "Lancement impossible : \(error.localizedDescription)"))
+            return .failure(.script(code: 0, message: String(localized: "Couldn't launch: \(error.localizedDescription)")))
         }
     }
 
     private static func run(_ source: String) -> Result<NSAppleEventDescriptor, TabReadError> {
         guard let script = NSAppleScript(source: source) else {
-            return .failure(.script(code: 0, message: "Script AppleScript invalide"))
+            return .failure(.script(code: 0, message: String(localized: "Invalid AppleScript script")))
         }
         var errorInfo: NSDictionary?
         let descriptor = script.executeAndReturnError(&errorInfo)

@@ -283,7 +283,7 @@ final class FerryViewModel {
                     transferProgress = (offset + 1, plan.windows.count)
                 }
             } else {
-                summary.errors.append("\(target.name) n'a pas pu être lancé.")
+                summary.errors.append(String(localized: "\(target.name) couldn't be launched."))
             }
 
             if closeOriginals, !transferred.isEmpty {
@@ -367,14 +367,14 @@ final class FerryViewModel {
 
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.plainText]
-        panel.nameFieldStringValue = "ferry-onglets.txt"
+        panel.nameFieldStringValue = String(localized: "ferry-tabs.txt")
         panel.canCreateDirectories = true
         guard panel.runModal() == .OK, let url = panel.url else { return }
 
         do {
             try text.write(to: url, atomically: true, encoding: .utf8)
         } catch {
-            errorMessage = "Impossible d'écrire le rapport : \(error.localizedDescription)"
+            errorMessage = String(localized: "Couldn't write the report: \(error.localizedDescription)")
         }
     }
 }

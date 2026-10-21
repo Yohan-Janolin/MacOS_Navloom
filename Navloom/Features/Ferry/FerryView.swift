@@ -36,14 +36,14 @@ struct FerryView: View {
             actionBar
         }
         .padding(20)
-        .navigationTitle("Navloom")
+        .navigationTitle(Text(verbatim: "Navloom"))
         .confirmationDialog(confirmationTitle,
                             isPresented: $model.showTransferConfirmation,
                             titleVisibility: .visible) {
             if model.closeOriginals {
-                Button("Transférer et fermer les originaux", role: .destructive) { model.transfer() }
+                Button("Transfer and Close the Originals", role: .destructive) { model.transfer() }
             } else {
-                Button("Transférer") { model.transfer() }
+                Button("Transfer") { model.transfer() }
             }
         } message: {
             Text(confirmationMessage)
@@ -54,13 +54,13 @@ struct FerryView: View {
 
     private var titleHeader: some View {
         VStack(spacing: 4) {
-            Text("Ferry")
+            Text(verbatim: "Ferry")
                 .font(.largeTitle.bold())
                 .foregroundStyle(
                     LinearGradient(colors: Self.gradient,
                                    startPoint: .leading, endPoint: .trailing)
                 )
-            Text("Rassemble les onglets ouverts de tous tes navigateurs et fais-les passer de l'un à l'autre")
+            Text("Gathers the open tabs of all your browsers and moves them from one to another")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -75,7 +75,7 @@ struct FerryView: View {
             HStack(spacing: 6) {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.secondary)
-                TextField("Rechercher un titre ou une URL", text: $model.searchText)
+                TextField("Search a title or URL", text: $model.searchText)
                     .textFieldStyle(.plain)
                 if !model.searchText.isEmpty {
                     Button {
@@ -95,7 +95,7 @@ struct FerryView: View {
             Divider().frame(height: 20)
 
             Toggle(isOn: $model.showPrivate) {
-                Label("Navigation privée", systemImage: "eye.slash")
+                Label("Private browsing", systemImage: "eye.slash")
                     .fontWeight(.semibold)
             }
             .toggleStyle(.switch)
@@ -104,9 +104,9 @@ struct FerryView: View {
 
             if let date = model.lastRead {
                 Divider().frame(height: 20)
-                Label(date.formatted(date: .omitted, time: .shortened), systemImage: "clock")
+                Label { Text(verbatim: date.formatted(date: .omitted, time: .shortened)) } icon: { Image(systemName: "clock") }
                     .foregroundStyle(.secondary)
-                    .help("Heure de la dernière lecture")
+                    .help("Time of the last read")
                     .fixedSize()
             }
         }
@@ -122,13 +122,13 @@ struct FerryView: View {
 
     private var stats: some View {
         HStack(spacing: 12) {
-            StatCard(title: "Navigateurs", value: model.browserCount,
+            StatCard(title: "Browsers", value: model.browserCount,
                      systemImage: "globe", tint: Brand.indigo)
-            StatCard(title: "Fenêtres", value: model.windowCount,
+            StatCard(title: "Windows", value: model.windowCount,
                      systemImage: "macwindow", tint: Brand.violet)
-            StatCard(title: "Onglets", value: model.tabCount,
+            StatCard(title: "Tabs", value: model.tabCount,
                      systemImage: "square.on.square", tint: Brand.sky)
-            StatCard(title: "Privées masquées", value: model.hiddenPrivateCount,
+            StatCard(title: "Private hidden", value: model.hiddenPrivateCount,
                      systemImage: "eye.slash", tint: .gray)
         }
     }
@@ -140,28 +140,28 @@ struct FerryView: View {
         switch model.phase {
         case .idle:
             ContentUnavailableView {
-                Label("Prêt à embarquer tes onglets", systemImage: "ferry")
+                Label("Ready to ship your tabs", systemImage: "ferry")
             } description: {
-                Text("Navloom lit les fenêtres et les onglets des navigateurs ouverts (les navigateurs fermés sont ignorés). La lecture ne ferme ni ne modifie rien. La première fois, macOS te demande d'autoriser Navloom à contrôler chaque navigateur : accepte pour que ses onglets apparaissent.")
+                Text("Navloom reads the windows and tabs of the open browsers (closed browsers are ignored). Reading doesn't close or change anything. The first time, macOS asks you to allow Navloom to control each browser: accept so that its tabs appear.")
             }
         case .reading:
             VStack(spacing: 12) {
                 ProgressView()
                 Text(model.currentBrowserName.isEmpty
-                     ? "Lecture des onglets…"
-                     : "Lecture de \(model.currentBrowserName)…")
+                     ? String(localized: "Reading tabs…")
+                     : String(localized: "Reading \(model.currentBrowserName)…"))
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(.secondary)
-                Text("Si macOS demande une autorisation, réponds-y pour continuer.")
+                Text("If macOS asks for permission, answer it to continue.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         case .done:
             if model.browsers.isEmpty {
                 ContentUnavailableView(
-                    "Aucun navigateur ouvert",
+                    "No browser open",
                     systemImage: "globe",
-                    description: Text("Ouvre Vivaldi, Chrome, Brave, Edge ou Opera, puis relance la lecture.")
+                    description: Text("Open Vivaldi, Chrome, Brave, Edge or Opera, then read again.")
                 )
             } else if model.visibleBrowsers.isEmpty {
                 ContentUnavailableView.search(text: model.searchText)
@@ -174,18 +174,18 @@ struct FerryView: View {
     private var resultsView: some View {
         VStack(spacing: 10) {
             HStack(spacing: 10) {
-                Button("Tout cocher") { model.selectAllVisible() }
-                Button("Tout décocher") { model.deselectAll() }
+                Button("Check All") { model.selectAllVisible() }
+                Button("Uncheck All") { model.deselectAll() }
                     .disabled(model.selectedCount == 0)
-                Text("\(model.selectedCount) coché\(model.selectedCount > 1 ? "s" : "")")
+                Text("\(model.selectedCount) checked")
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
                 Spacer()
-                Button("Tout déplier") { model.setAllExpanded(true) }
-                Button("Tout replier") { model.setAllExpanded(false) }
+                Button("Expand All") { model.setAllExpanded(true) }
+                Button("Collapse All") { model.setAllExpanded(false) }
             }
 
-            Text("Coche des onglets, un espace ou une fenêtre entière, puis choisis le navigateur cible en bas. Double-clic sur un onglet pour l'ouvrir dans son navigateur.")
+            Text("Check tabs, a workspace or a whole window, then choose the target browser at the bottom. Double-click a tab to open it in its browser.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -201,8 +201,8 @@ struct FerryView: View {
                             let windows = model.visibleWindows(of: browser)
                             if windows.isEmpty {
                                 Text(browser.windows.isEmpty
-                                     ? "Aucune fenêtre ouverte"
-                                     : "Seulement des fenêtres de navigation privée")
+                                     ? String(localized: "No open windows")
+                                     : String(localized: "Only private browsing windows"))
                                     .foregroundStyle(.secondary)
                             }
                             ForEach(windows) { window in
@@ -213,7 +213,7 @@ struct FerryView: View {
                                         CheckButton(state: model.state(of: window.tabs)) {
                                             model.toggle(window.tabs)
                                         }
-                                        .help("Cocher toute la fenêtre")
+                                        .help("Check the whole window")
                                         WindowLabel(window: window)
                                     }
                                 }
@@ -234,7 +234,7 @@ struct FerryView: View {
         let hasWorkspaces = !window.workspaces.isEmpty
         ForEach(window.tabGroups) { group in
             if hasWorkspaces {
-                WorkspaceHeader(workspace: group.workspace ?? TabWorkspace(id: "?", name: "Autres"),
+                WorkspaceHeader(workspace: group.workspace ?? TabWorkspace(id: "?", name: String(localized: "Others")),
                                 count: group.tabs.count,
                                 isActive: group.isActive,
                                 state: model.state(of: group.tabs)) {
@@ -257,8 +257,8 @@ struct FerryView: View {
             .contentShape(Rectangle())
             .onTapGesture(count: 2) { model.open(tab, in: browser) }
             .contextMenu {
-                Button("Ouvrir dans \(browser.name)") { model.open(tab, in: browser) }
-                Button("Copier l'URL") { model.copyURL(tab) }
+                Button("Open in \(browser.name)") { model.open(tab, in: browser) }
+                Button("Copy URL") { model.copyURL(tab) }
             }
     }
 
@@ -273,15 +273,15 @@ struct FerryView: View {
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
-                Label("Navigateur cible", systemImage: "arrow.right.circle")
+                Label("Target browser", systemImage: "arrow.right.circle")
                     .fontWeight(.semibold)
                     .lineLimit(1)
                     .layoutPriority(1)
 
-                Picker("Navigateur cible", selection: $model.targetBrowserID) {
-                    Text("Choisir…").tag(String?.none)
+                Picker("Target browser", selection: $model.targetBrowserID) {
+                    Text("Choose…").tag(String?.none)
                     ForEach(model.installedBrowsers) { browser in
-                        Text(browser.name).tag(Optional(browser.id))
+                        Text(verbatim: browser.name).tag(Optional(browser.id))
                     }
                 }
                 .labelsHidden()
@@ -292,28 +292,28 @@ struct FerryView: View {
 
             // Options sur une seconde ligne : la fenêtre reste lisible à sa largeur minimale.
             HStack(spacing: 16) {
-                Toggle("Une seule fenêtre", isOn: $model.singleWindow)
+                Toggle("Single window", isOn: $model.singleWindow)
                     .toggleStyle(.checkbox)
-                    .help("Regrouper tous les onglets dans une seule fenêtre au lieu de recréer chaque fenêtre")
-                Toggle("Une fenêtre par espace", isOn: $model.windowPerWorkspace)
+                    .help("Group all tabs in a single window instead of recreating each window")
+                Toggle("One window per workspace", isOn: $model.windowPerWorkspace)
                     .toggleStyle(.checkbox)
                     .disabled(model.singleWindow)
-                    .help("Les espaces ne se recréent pas dans la cible : chaque espace de la source arrive dans sa propre fenêtre, à ranger ensuite dans l'espace voulu")
-                Toggle("Garder la navigation privée", isOn: $model.keepPrivate)
+                    .help("Workspaces aren't recreated in the target: each source workspace arrives in its own window, to be moved afterwards into the workspace you want")
+                Toggle("Keep private browsing", isOn: $model.keepPrivate)
                     .toggleStyle(.checkbox)
-                    .help("Rouvrir en navigation privée les onglets qui venaient d'une fenêtre privée")
+                    .help("Reopen in private browsing the tabs that came from a private window")
                 Toggle(isOn: $model.closeOriginals) {
-                    Text("Fermer les onglets d'origine")
+                    Text("Close the original tabs")
                         .foregroundStyle(model.closeOriginals ? .red : .primary)
                 }
                 .toggleStyle(.checkbox)
-                .help("Une fois leur copie ouverte et retrouvée dans la cible, fermer les onglets d'origine")
+                .help("Once their copy is open and found in the target, close the original tabs")
 
                 Spacer(minLength: 0)
             }
 
             if model.targetBrowser != nil, model.selectedCount > 0 {
-                Text(planDescription(plan))
+                Text(verbatim: planDescription(plan))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -332,15 +332,18 @@ struct FerryView: View {
     private func planDescription(_ plan: TransferPlan) -> String {
         var parts: [String] = []
         if plan.isEmpty {
-            parts.append("Rien à transférer")
+            parts.append(String(localized: "Nothing to transfer"))
         } else {
-            parts.append("\(TabSnapshot.plural(plan.tabCount, "onglet")) dans \(TabSnapshot.plural(plan.windows.count, "nouvelle fenêtre", "nouvelles fenêtres"))")
+            let tabs = String(localized: "\(plan.tabCount) tabs")
+            let windows = String(localized: "\(plan.windows.count) new windows")
+            parts.append(String(localized: "\(tabs) in \(windows)"))
         }
         if plan.skippedSameBrowser > 0 {
-            parts.append("\(TabSnapshot.plural(plan.skippedSameBrowser, "onglet")) déjà dans ce navigateur")
+            let tabs = String(localized: "\(plan.skippedSameBrowser) tabs")
+            parts.append(String(localized: "\(tabs) already in this browser"))
         }
         if plan.skippedInternal > 0 {
-            parts.append(TabSnapshot.plural(plan.skippedInternal, "page interne ignorée", "pages internes ignorées"))
+            parts.append(String(localized: "\(plan.skippedInternal) internal pages skipped"))
         }
         return parts.joined(separator: " · ")
     }
@@ -351,7 +354,9 @@ struct FerryView: View {
         if let progress = model.transferProgress {
             VStack(alignment: .leading, spacing: 6) {
                 ThickProgressBar(value: Double(progress.done), total: Double(max(progress.total, 1)), height: 10)
-                Text("Ouverture dans \(model.targetBrowser?.name ?? "le navigateur")… \(progress.done)/\(TabSnapshot.plural(progress.total, "fenêtre"))")
+                let target = model.targetBrowser?.name ?? String(localized: "the browser")
+                let windows = String(localized: "\(progress.total) windows")
+                Text("Opening in \(target)… \(progress.done)/\(windows)")
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(.secondary)
             }
@@ -361,20 +366,23 @@ struct FerryView: View {
                     .foregroundStyle(summary.errors.isEmpty ? .green : .orange)
                     .font(.title3)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("\(TabSnapshot.plural(summary.openedTabs, "onglet")) ouvert\(summary.openedTabs > 1 ? "s" : "") dans \(summary.browserName) (\(TabSnapshot.plural(summary.openedWindows, "fenêtre")))")
+                    let opened = String(localized: "\(summary.openedTabs) tabs opened")
+                    let windows = String(localized: "\(summary.openedWindows) windows")
+                    Text("\(opened) in \(summary.browserName) (\(windows))")
                         .font(.callout.weight(.semibold))
                     if let closing = summary.closing {
-                        Text(closingText(closing))
+                        Text(verbatim: closingText(closing))
                             .font(.caption)
                             .foregroundStyle(closing.notClosed > 0 ? .orange : .secondary)
                     }
                     if summary.skipped > 0 {
-                        Text("\(TabSnapshot.plural(summary.skipped, "onglet")) laissé\(summary.skipped > 1 ? "s" : "") de côté (pages internes ou déjà dans \(summary.browserName))")
+                        let skipped = String(localized: "\(summary.skipped) tabs left aside")
+                        Text("\(skipped) (internal pages or already in \(summary.browserName))")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     ForEach(Array(summary.errors.enumerated()), id: \.offset) { _, error in
-                        Text(error)
+                        Text(verbatim: error)
                             .font(.caption)
                             .foregroundStyle(.orange)
                     }
@@ -395,52 +403,56 @@ struct FerryView: View {
     }
 
     private func closingText(_ closing: CloseSummary) -> String {
-        var text = TabSnapshot.plural(closing.closed, "onglet d'origine fermé", "onglets d'origine fermés")
+        var text = String(localized: "\(closing.closed) original tabs closed")
         var kept: [String] = []
         if closing.unconfirmed > 0 {
-            kept.append("\(closing.unconfirmed) non retrouvé\(closing.unconfirmed > 1 ? "s" : "") dans la cible")
+            kept.append(String(localized: "\(closing.unconfirmed) not found in the target"))
         }
         if closing.changed > 0 {
-            kept.append("\(closing.changed) qui affiche\(closing.changed > 1 ? "nt" : "") une autre page")
+            kept.append(String(localized: "\(closing.changed) showing another page"))
         }
         if closing.otherSpace > 0 {
-            kept.append("\(closing.otherSpace) dans un autre espace d'Opera (à fermer à la main)")
+            kept.append(String(localized: "\(closing.otherSpace) in another Opera workspace (close by hand)"))
         }
         if closing.failed > 0 {
-            kept.append("\(closing.failed) introuvable\(closing.failed > 1 ? "s" : "")")
+            kept.append(String(localized: "\(closing.failed) missing"))
         }
         if !kept.isEmpty {
-            text += " · gardés ouverts : " + kept.joined(separator: ", ")
+            let list = kept.joined(separator: ", ")
+            text += " · " + String(localized: "kept open: \(list)")
         }
         return text
     }
 
     private var confirmationTitle: String {
         let plan = model.transferPlan
-        return "Ouvrir \(TabSnapshot.plural(plan.tabCount, "onglet")) dans \(model.targetBrowser?.name ?? "le navigateur") ?"
+        let tabs = String(localized: "\(plan.tabCount) tabs")
+        let target = model.targetBrowser?.name ?? String(localized: "the browser")
+        return String(localized: "Open \(tabs) in \(target)?")
     }
 
     private var confirmationMessage: String {
         let plan = model.transferPlan
-        var text = TabSnapshot.plural(plan.windows.count, "nouvelle fenêtre sera créée.", "nouvelles fenêtres seront créées.")
+        var sentences = [String(localized: "\(plan.windows.count) new windows will be created.")]
         if model.closeOriginals {
-            let names = model.sourceBrowserNames.joined(separator: ", ")
-            text += " Ensuite, \(TabSnapshot.plural(model.tabsToCloseCount, "onglet sera fermé", "onglets seront fermés")) dans \(names), mais seulement ceux dont la copie est bien retrouvée dans la cible et qui affichent encore la même page. Une fenêtre dont tous les onglets sont fermés se ferme aussi."
+            let names = DiskAccess.joinedNames(model.sourceBrowserNames)
+            let closing = String(localized: "\(model.tabsToCloseCount) tabs will be closed")
+            sentences.append(String(localized: "Then, \(closing) in \(names), but only those whose copy is found in the target and that still show the same page. A window whose tabs are all closed closes too."))
             if model.unclosableCount > 0 {
-                text += " \(TabSnapshot.plural(model.unclosableCount, "onglet d'un autre espace d'Opera sera copié mais restera ouvert", "onglets d'autres espaces d'Opera seront copiés mais resteront ouverts")) : Opera refuse de les fermer, ferme-les à la main."
+                sentences.append(String(localized: "\(model.unclosableCount) tabs from other Opera workspaces will be copied but stay open: Opera refuses to close them, close them by hand."))
             }
         } else {
-            text += " Les onglets d'origine restent ouverts."
+            sentences.append(String(localized: "The original tabs stay open."))
         }
         if let target = model.targetBrowser, !TabReader.isRunning(target) {
-            text += " \(target.name) sera lancé."
+            sentences.append(String(localized: "\(target.name) will be launched."))
         }
         if model.selectionHasWorkspaces {
-            text += model.windowPerWorkspace && !model.singleWindow
-                ? " Chaque espace arrive dans sa propre fenêtre, dans l'espace affiché de la cible : range-les ensuite dans l'espace voulu."
-                : " Les espaces de travail ne se recréent pas : les onglets arrivent dans l'espace affiché de la cible."
+            sentences.append(model.windowPerWorkspace && !model.singleWindow
+                ? String(localized: "Each workspace arrives in its own window, in the target's shown workspace: move them afterwards into the workspace you want.")
+                : String(localized: "Workspaces aren't recreated: the tabs arrive in the target's shown workspace."))
         }
-        return text
+        return sentences.joined(separator: " ")
     }
 
     // MARK: - Barre d'action
@@ -451,7 +463,7 @@ struct FerryView: View {
                 Button {
                     model.exportReport()
                 } label: {
-                    Label("Exporter", systemImage: "square.and.arrow.up")
+                    Label("Export", systemImage: "square.and.arrow.up")
                 }
             }
 
@@ -459,11 +471,11 @@ struct FerryView: View {
 
             switch model.phase {
             case .idle:
-                Button("Lire les onglets ouverts") { model.read() }
+                Button("Read Open Tabs") { model.read() }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
             case .reading:
-                Button("Lecture en cours…") {}
+                Button("Reading…") {}
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
                     .disabled(true)
@@ -471,7 +483,7 @@ struct FerryView: View {
                 Button {
                     model.read()
                 } label: {
-                    Label("Actualiser", systemImage: "arrow.clockwise")
+                    Label("Refresh", systemImage: "arrow.clockwise")
                 }
                 .controlSize(.large)
                 .keyboardShortcut("r", modifiers: .command)
@@ -480,8 +492,7 @@ struct FerryView: View {
                 Button {
                     model.showTransferConfirmation = true
                 } label: {
-                    Label("Transférer \(TabSnapshot.plural(model.transferPlan.tabCount, "onglet"))",
-                          systemImage: "ferry.fill")
+                    Label("Transfer \(model.transferPlan.tabCount) tabs", systemImage: "ferry.fill")
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
@@ -501,13 +512,13 @@ private struct BrowserHeader: View {
         HStack(spacing: 8) {
             AppIcon(bundleID: browser.browser.bundleID)
                 .frame(width: 20, height: 20)
-            Text(browser.browser.name)
+            Text(verbatim: browser.browser.name)
                 .font(.headline)
                 .foregroundStyle(.primary)
             Spacer()
             if browser.error == nil {
                 let tabs = windows.reduce(0) { $0 + $1.tabs.count }
-                Text("\(TabSnapshot.plural(windows.count, "fenêtre")) · \(TabSnapshot.plural(tabs, "onglet"))")
+                Text(verbatim: String(localized: "\(windows.count) windows") + " · " + String(localized: "\(tabs) tabs"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
@@ -541,9 +552,9 @@ private struct WindowLabel: View {
     let window: OpenWindow
 
     private var countText: String {
-        let tabs = TabSnapshot.plural(window.tabs.count, "onglet")
+        let tabs = String(localized: "\(window.tabs.count) tabs")
         let spaces = Set(window.tabs.compactMap(\.workspaceID)).count
-        return window.workspaces.isEmpty ? tabs : "\(tabs) · \(TabSnapshot.plural(spaces, "espace"))"
+        return window.workspaces.isEmpty ? tabs : tabs + " · " + String(localized: "\(spaces) workspaces")
     }
 
     var body: some View {
@@ -552,11 +563,11 @@ private struct WindowLabel: View {
                 .foregroundStyle(window.isPrivate ? AnyShapeStyle(.secondary) : AnyShapeStyle(Brand.violet))
                 .frame(width: 18)
 
-            Text("Fenêtre \(window.position)")
+            Text("Window \(window.position)")
                 .font(.callout.weight(.semibold))
 
             if window.isPrivate {
-                Text("Privée")
+                Text("Private")
                     .font(.caption2.weight(.semibold))
                     .padding(.horizontal, 6)
                     .padding(.vertical, 1)
@@ -564,7 +575,7 @@ private struct WindowLabel: View {
             }
 
             if let profile = window.profileName {
-                Label(profile, systemImage: "person.crop.circle")
+                Label { Text(verbatim: profile) } icon: { Image(systemName: "person.crop.circle") }
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(Brand.indigo)
                     .padding(.horizontal, 6)
@@ -573,13 +584,13 @@ private struct WindowLabel: View {
                     .lineLimit(1)
             }
 
-            Text(countText)
+            Text(verbatim: countText)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
 
             if let active = window.activeTab {
-                Text("· \(active.displayTitle)")
+                Text(verbatim: "· \(active.displayTitle)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -601,10 +612,10 @@ private struct WorkspaceHeader: View {
     var body: some View {
         HStack(spacing: 8) {
             CheckButton(state: state, action: onToggle)
-                .help("Cocher tout l'espace")
+                .help("Check the whole workspace")
             Group {
                 if let emoji = workspace.emoji {
-                    Text(emoji)
+                    Text(verbatim: emoji)
                         .font(.system(size: 12))
                 } else {
                     Image(systemName: BrowserWorkspaces.symbol(for: workspace.icon))
@@ -616,22 +627,22 @@ private struct WorkspaceHeader: View {
             .background((isActive ? Brand.indigo : Color.gray).gradient,
                         in: RoundedRectangle(cornerRadius: 5, style: .continuous))
 
-            Text(workspace.name)
+            Text(verbatim: workspace.name)
                 .font(.callout.weight(.bold))
 
-            Text(TabSnapshot.plural(count, "onglet"))
+            Text("\(count) tabs")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
 
             if isActive {
-                Text("Affiché")
+                Text("Shown")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(Brand.indigo)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 1)
                     .background(Brand.indigo.opacity(0.15), in: Capsule())
-                    .help("Espace affiché dans cette fenêtre")
+                    .help("Workspace shown in this window")
             }
             Spacer()
         }
@@ -668,10 +679,10 @@ private struct TabRow: View {
             .frame(width: 16, height: 16)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(tab.displayTitle)
+                Text(verbatim: tab.displayTitle)
                     .font(.callout.weight(.semibold))
                     .lineLimit(1)
-                Text(tab.url)
+                Text(verbatim: tab.url)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -684,17 +695,17 @@ private struct TabRow: View {
                 Image(systemName: "lock.fill")
                     .font(.caption)
                     .foregroundStyle(.orange)
-                    .help("Opera ne laisse pas fermer les onglets de cet espace : il sera copié mais restera ouvert")
+                    .help("Opera doesn't allow closing the tabs of this workspace: it will be copied but stay open")
             }
 
             if tab.isActive {
-                Text("Au premier plan")
+                Text("In front")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(Brand.indigo)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
                     .background(Brand.indigo.opacity(0.15), in: Capsule())
-                    .help("Onglet affiché dans cette fenêtre")
+                    .help("Tab shown in this window")
             }
         }
         .padding(.vertical, 2)
@@ -732,14 +743,14 @@ private struct ErrorRow: View {
                 .foregroundStyle(.orange)
                 .frame(width: 18)
             VStack(alignment: .leading, spacing: 6) {
-                Text(error.message)
+                Text(verbatim: error.message)
                     .font(.callout.weight(.semibold))
                 if error == .permissionDenied {
-                    Text("Ouvre Réglages Système › Confidentialité et sécurité › Automatisation, déplie Navloom et active \(browserName), puis clique sur Actualiser.")
+                    Text("Open System Settings › Privacy & Security › Automation, expand Navloom and turn on \(browserName), then click Refresh.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
-                    Button("Ouvrir les réglages d'Automatisation", action: openSettings)
+                    Button("Open Automation Settings", action: openSettings)
                         .controlSize(.small)
                 }
             }

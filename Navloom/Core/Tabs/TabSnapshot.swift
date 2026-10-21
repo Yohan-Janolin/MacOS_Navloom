@@ -47,36 +47,36 @@ nonisolated enum TabSnapshot {
     /// Rapport texte, navigateur par navigateur puis fenêtre par fenêtre.
     static func report(_ browsers: [BrowserTabs], includePrivate: Bool, date: Date = .now) -> String {
         var lines: [String] = []
-        lines.append("Navloom · Ferry — onglets ouverts")
+        lines.append(String(localized: "Navloom · Ferry — open tabs"))
         lines.append(date.formatted(date: .long, time: .shortened))
         if !includePrivate {
-            lines.append("Fenêtres de navigation privée non incluses.")
+            lines.append(String(localized: "Private browsing windows not included."))
         }
 
         for browser in browsers {
             lines.append("")
             if let error = browser.error {
-                lines.append("\(browser.browser.name) — non lu : \(error.message)")
+                lines.append(browser.browser.name + " — " + String(localized: "not read: \(error.message)"))
                 continue
             }
 
             let windows = browser.windows.filter { includePrivate || !$0.isPrivate }
             let tabCount = windows.reduce(0) { $0 + $1.tabs.count }
-            lines.append("\(browser.browser.name) — \(plural(windows.count, "fenêtre")), \(plural(tabCount, "onglet"))")
+            lines.append(browser.browser.name + " — " + String(localized: "\(windows.count) windows") + ", " + String(localized: "\(tabCount) tabs"))
 
             for window in windows {
-                let privateMark = window.isPrivate ? " · privée" : ""
-                let profileMark = window.profileName.map { " · profil \($0)" } ?? ""
+                var title = String(localized: "Window \(window.position)")
+                if window.isPrivate { title += " · " + String(localized: "private") }
+                if let profile = window.profileName { title += " · " + String(localized: "profile \(profile)") }
                 lines.append("")
-                lines.append("  Fenêtre \(window.position)\(privateMark)\(profileMark) (\(plural(window.tabs.count, "onglet")))")
+                lines.append("  \(title) (" + String(localized: "\(window.tabs.count) tabs") + ")")
                 for group in window.tabGroups {
                     let indent: String
                     if window.workspaces.isEmpty {
                         indent = "    "
                     } else {
-                        let name = group.workspace?.name ?? "Autres"
-                        let shown = group.isActive ? ", affiché" : ""
-                        lines.append("    Espace « \(name) » (\(plural(group.tabs.count, "onglet"))\(shown))")
+                        let name = group.workspace?.name ?? String(localized: "Others")
+                        lines.append("    " + workspaceLine(name: name, tabCount: group.tabs.count, isShown: group.isActive))
                         indent = "      "
                     }
                     for tab in group.tabs {
@@ -89,14 +89,12 @@ nonisolated enum TabSnapshot {
         return lines.joined(separator: "\n") + "\n"
     }
 
-    /// « 1 onglet », « 3 onglets », « 0 fenêtre »
-    static func plural(_ count: Int, _ word: String) -> String {
-        "\(count) \(word)\(count > 1 ? "s" : "")"
-    }
-
-    /// Pour les expressions de plusieurs mots : « 1 nouvelle fenêtre », « 2 nouvelles fenêtres ».
-    static func plural(_ count: Int, _ singular: String, _ pluralForm: String) -> String {
-        "\(count) \(count > 1 ? pluralForm : singular)"
+    /// Ligne d'un espace dans le rapport : « Espace « Dev » (3 onglets, affiché) ».
+    static func workspaceLine(name: String, tabCount: Int, isShown: Bool) -> String {
+        let tabs = String(localized: "\(tabCount) tabs")
+        return isShown
+            ? String(localized: "Workspace “\(name)” (\(tabs), shown)")
+            : String(localized: "Workspace “\(name)” (\(tabs))")
     }
 }
 
