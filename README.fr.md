@@ -26,14 +26,14 @@ Navloom fonctionne avec les navigateurs basés sur Chromium (Chrome, Edge, Brave
 ## 📸 Captures d'écran
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="800" alt="Écran d'accueil de Navloom" />
+  <img src="docs/screenshots/home_fr.png" width="800" alt="Écran d'accueil de Navloom" />
 </p>
 
 | FaviconSync | Twins | Ghosts |
 |:---:|:---:|:---:|
-| <img src="docs/screenshots/faviconsync.png" width="260" alt="FaviconSync" /> | <img src="docs/screenshots/twins.png" width="260" alt="Twins" /> | <img src="docs/screenshots/ghosts.png" width="260" alt="Ghosts" /> |
+| <img src="docs/screenshots/faviconsync_fr.png" width="260" alt="FaviconSync" /> | <img src="docs/screenshots/twins_fr.png" width="260" alt="Twins" /> | <img src="docs/screenshots/ghosts_fr.png" width="260" alt="Ghosts" /> |
 | **Echo** | **Ferry** | **Sauvegardes** |
-| <img src="docs/screenshots/echo.png" width="260" alt="Echo" /> | <img src="docs/screenshots/ferry.png" width="260" alt="Ferry" /> | <img src="docs/screenshots/backups.png" width="260" alt="Sauvegardes" /> |
+| <img src="docs/screenshots/echo_fr.png" width="260" alt="Echo" /> | <img src="docs/screenshots/ferry_fr.png" width="260" alt="Ferry" /> | <img src="docs/screenshots/backups_fr.png" width="260" alt="Sauvegardes" /> |
 
 ## ✨ Fonctionnalités
 
