@@ -684,3 +684,86 @@ struct TabCloserTests {
         #expect(sum.notClosed == 5)
     }
 }
+
+// MARK: - Une fenêtre par espace, onglets non fermables
+
+struct WorkspaceTransferTests {
+
+    private let spaces = [TabWorkspace(id: "0", name: "Home"), TabWorkspace(id: "1", name: "Network-901")]
+
+    private func tab(_ url: String, space: String?, canClose: Bool = true) -> OpenTab {
+        OpenTab(id: url, index: 1, title: "", url: url, isActive: false,
+                workspaceID: space, tabID: 1, canClose: canClose)
+    }
+
+    private var window: OpenWindow {
+        var window = OpenWindow(id: "w", windowID: 9, position: 1, isPrivate: false, tabs: [])
+        window.workspaces = spaces
+        return window
+    }
+
+    private var tabs: [OpenTab] {
+        [tab("https://b.fr/", space: "1", canClose: false),
+         tab("https://a.fr/", space: "0"),
+         tab("https://c.fr/", space: "1", canClose: false),
+         tab("https://x.fr/", space: "9")]
+    }
+
+    @Test func unGroupeParEspaceDansLOrdreDesEspaces() {
+        let groups = TransferPlanner.groups(of: tabs, in: window, splitByWorkspace: true)
+        #expect(groups.map { $0.map(\.url) } == [["https://a.fr/"], ["https://b.fr/", "https://c.fr/"], ["https://x.fr/"]])
+    }
+
+    @Test func sansDecoupageUnSeulGroupe() {
+        #expect(TransferPlanner.groups(of: tabs, in: window, splitByWorkspace: false).count == 1)
+        let plain = OpenWindow(id: "p", windowID: 1, position: 1, isPrivate: false, tabs: [])
+        #expect(TransferPlanner.groups(of: tabs, in: plain, splitByWorkspace: true).count == 1)
+    }
+
+    @Test func planAvecUneFenetreParEspace() {
+        let source = TransferPlanner.Source(browserID: "opera", window: window, tabs: tabs)
+        let perSpace = TransferPlanner.plan(sources: [source], targetBrowserID: "vivaldi",
+                                            singleWindow: false, windowPerWorkspace: true, keepPrivate: true)
+        #expect(perSpace.windows.count == 3)
+        // « Une seule fenêtre » l'emporte.
+        let single = TransferPlanner.plan(sources: [source], targetBrowserID: "vivaldi",
+                                          singleWindow: true, windowPerWorkspace: true, keepPrivate: true)
+        #expect(single.windows.count == 1)
+        #expect(single.tabCount == 4)
+    }
+
+    @Test func lesOngletsNonFermablesSontSignales() {
+        let source = TransferPlanner.Source(browserID: "opera", window: window, tabs: tabs)
+        let plan = TransferPlanner.plan(sources: [source], targetBrowserID: "vivaldi",
+                                        singleWindow: true, keepPrivate: true)
+        let origins = plan.windows.flatMap(\.origins)
+        #expect(origins.filter { !$0.canClose }.map(\.url) == ["https://b.fr/", "https://c.fr/"])
+    }
+
+    @MainActor
+    @Test func seulsLesFermablesPartentALaFermeture() {
+        let origins = [TabOrigin(browserID: "opera", windowID: 1, tabID: 1, url: "https://a.fr/"),
+                       TabOrigin(browserID: "opera", windowID: 1, tabID: 2, url: "https://b.fr/", canClose: false)]
+        let (closable, otherSpace) = TabWriter.closable(origins)
+        #expect(closable.map(\.url) == ["https://a.fr/"])
+        #expect(otherSpace == 1)
+    }
+
+    @Test func operaMarqueLesOngletsDesAutresEspaces() throws {
+        func sessionTab(_ id: Int, _ index: Int, _ url: String, _ space: String) -> SessionTab {
+            SessionTab(id: id, windowID: 100, index: index, url: url, title: url,
+                       extraData: ["workspaces_state": Data(space.utf8)])
+        }
+        let session = SessionWindow(id: 100, selectedTabIndex: 0, extraData: [:],
+                                    tabs: [sessionTab(10, 0, "https://reddit.com/", "0"),
+                                           sessionTab(20, 0, "https://selfh.st/", "1")])
+        let live = TabSnapshot.windows(browserID: "opera", windowIDs: [100], modes: ["normal"],
+                                       urls: [["https://reddit.com/"]], titles: [["Reddit"]], activeIndexes: [1])
+        let merged = try #require(TabMerger.merge(live: live, sessions: [
+            ProfileSession(profileName: "Default", windows: [session],
+                           workspaces: ProfileWorkspaces(style: .opera, list: spaces)),
+        ]).first)
+        #expect(merged.tabs.first { $0.url == "https://reddit.com/" }?.canClose == true)
+        #expect(merged.tabs.first { $0.url == "https://selfh.st/" }?.canClose == false)
+    }
+}

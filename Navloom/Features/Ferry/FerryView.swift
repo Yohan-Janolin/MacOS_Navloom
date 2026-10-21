@@ -250,7 +250,8 @@ struct FerryView: View {
 
     private func tabRow(_ tab: OpenTab, browser: ChromiumBrowser) -> some View {
         TabRow(tab: tab, favicon: model.favicons[tab.url],
-               isChecked: model.isSelected(tab)) {
+               isChecked: model.isSelected(tab),
+               showsUnclosable: model.closeOriginals && !tab.canClose) {
             model.toggle(tab)
         }
             .contentShape(Rectangle())
@@ -294,6 +295,10 @@ struct FerryView: View {
                 Toggle("Une seule fenêtre", isOn: $model.singleWindow)
                     .toggleStyle(.checkbox)
                     .help("Regrouper tous les onglets dans une seule fenêtre au lieu de recréer chaque fenêtre")
+                Toggle("Une fenêtre par espace", isOn: $model.windowPerWorkspace)
+                    .toggleStyle(.checkbox)
+                    .disabled(model.singleWindow)
+                    .help("Les espaces ne se recréent pas dans la cible : chaque espace de la source arrive dans sa propre fenêtre, à ranger ensuite dans l'espace voulu")
                 Toggle("Garder la navigation privée", isOn: $model.keepPrivate)
                     .toggleStyle(.checkbox)
                     .help("Rouvrir en navigation privée les onglets qui venaient d'une fenêtre privée")
@@ -398,8 +403,11 @@ struct FerryView: View {
         if closing.changed > 0 {
             kept.append("\(closing.changed) qui affiche\(closing.changed > 1 ? "nt" : "") une autre page")
         }
+        if closing.otherSpace > 0 {
+            kept.append("\(closing.otherSpace) dans un autre espace d'Opera (à fermer à la main)")
+        }
         if closing.failed > 0 {
-            kept.append("\(closing.failed) introuvable\(closing.failed > 1 ? "s" : "") (par exemple dans un autre espace d'Opera)")
+            kept.append("\(closing.failed) introuvable\(closing.failed > 1 ? "s" : "")")
         }
         if !kept.isEmpty {
             text += " · gardés ouverts : " + kept.joined(separator: ", ")
@@ -418,13 +426,20 @@ struct FerryView: View {
         if model.closeOriginals {
             let names = model.sourceBrowserNames.joined(separator: ", ")
             text += " Ensuite, \(TabSnapshot.plural(model.tabsToCloseCount, "onglet sera fermé", "onglets seront fermés")) dans \(names), mais seulement ceux dont la copie est bien retrouvée dans la cible et qui affichent encore la même page. Une fenêtre dont tous les onglets sont fermés se ferme aussi."
+            if model.unclosableCount > 0 {
+                text += " \(TabSnapshot.plural(model.unclosableCount, "onglet d'un autre espace d'Opera sera copié mais restera ouvert", "onglets d'autres espaces d'Opera seront copiés mais resteront ouverts")) : Opera refuse de les fermer, ferme-les à la main."
+            }
         } else {
             text += " Les onglets d'origine restent ouverts."
         }
         if let target = model.targetBrowser, !TabReader.isRunning(target) {
             text += " \(target.name) sera lancé."
         }
-        text += " Les espaces de travail ne se transfèrent pas : les onglets arrivent dans l'espace affiché."
+        if model.selectionHasWorkspaces {
+            text += model.windowPerWorkspace && !model.singleWindow
+                ? " Chaque espace arrive dans sa propre fenêtre, dans l'espace affiché de la cible : range-les ensuite dans l'espace voulu."
+                : " Les espaces de travail ne se recréent pas : les onglets arrivent dans l'espace affiché de la cible."
+        }
         return text
     }
 
@@ -631,6 +646,8 @@ private struct TabRow: View {
     let tab: OpenTab
     let favicon: NSImage?
     let isChecked: Bool
+    /// Signale un onglet qu'Opera refusera de fermer (autre espace), quand la fermeture est demandée.
+    var showsUnclosable = false
     let onToggle: () -> Void
 
     var body: some View {
@@ -662,6 +679,13 @@ private struct TabRow: View {
             }
 
             Spacer(minLength: 8)
+
+            if showsUnclosable {
+                Image(systemName: "lock.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .help("Opera ne laisse pas fermer les onglets de cet espace : il sera copié mais restera ouvert")
+            }
 
             if tab.isActive {
                 Text("Au premier plan")

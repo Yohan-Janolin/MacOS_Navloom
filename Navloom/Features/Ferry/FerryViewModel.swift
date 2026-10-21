@@ -42,6 +42,8 @@ final class FerryViewModel {
     var keepPrivate = true
     /// Fermer les onglets d'origine une fois leur copie ouverte (décoché par défaut : c'est destructif).
     var closeOriginals = false
+    /// Recréer chaque espace de travail de la source dans sa propre fenêtre.
+    var windowPerWorkspace = true
     var showTransferConfirmation = false
     private(set) var transferProgress: (done: Int, total: Int)?
     private(set) var transferSummary: TransferSummary?
@@ -239,7 +241,8 @@ final class FerryViewModel {
             }
         }
         return TransferPlanner.plan(sources: sources, targetBrowserID: targetBrowserID,
-                                    singleWindow: singleWindow, keepPrivate: keepPrivate)
+                                    singleWindow: singleWindow, windowPerWorkspace: windowPerWorkspace,
+                                    keepPrivate: keepPrivate)
     }
 
     var isTransferring: Bool { transferProgress != nil }
@@ -304,15 +307,29 @@ final class FerryViewModel {
         } else {
             targetURLs = []
         }
-        let (confirmed, missing) = TabWriter.confirmed(origins, targetURLs: targetURLs)
+        let (closable, otherSpace) = TabWriter.closable(origins)
+        let (confirmed, missing) = TabWriter.confirmed(closable, targetURLs: targetURLs)
         var closing = TabWriter.close(confirmed, browsers: browsers.map(\.browser))
         closing.unconfirmed += missing.count
+        closing.otherSpace += otherSpace
         return closing
     }
 
     /// Onglets que la fermeture concernerait (pour la confirmation).
     var tabsToCloseCount: Int {
-        transferPlan.windows.reduce(0) { $0 + $1.origins.count }
+        transferPlan.windows.reduce(0) { $0 + $1.origins.filter(\.canClose).count }
+    }
+
+    /// Onglets copiés qui resteront ouverts (autres espaces d'Opera).
+    var unclosableCount: Int {
+        transferPlan.windows.reduce(0) { $0 + $1.origins.filter { !$0.canClose }.count }
+    }
+
+    /// Vrai si au moins une fenêtre cochée a des espaces de travail.
+    var selectionHasWorkspaces: Bool {
+        browsers.flatMap(\.windows).contains { window in
+            !window.workspaces.isEmpty && window.tabs.contains { selection.contains($0.id) }
+        }
     }
 
     /// Navigateurs d'où partiraient les onglets (pour la confirmation).

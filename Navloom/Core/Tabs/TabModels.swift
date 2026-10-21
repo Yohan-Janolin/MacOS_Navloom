@@ -15,6 +15,9 @@ nonisolated struct OpenTab: Identifiable, Hashable, Sendable {
     /// Identifiant donné par le navigateur (AppleScript, ou fichier de session pour les espaces
     /// qu'AppleScript ne voit pas). Sert à fermer l'onglet après un transfert.
     var tabID: Int? = nil
+    /// Faux pour un onglet qu'AppleScript ne voit pas (autres espaces d'Opera) : il peut être copié,
+    /// mais le navigateur refuse de le fermer.
+    var canClose = true
 
     var host: String? {
         URL(string: url)?.host()

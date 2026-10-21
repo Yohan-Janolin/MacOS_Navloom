@@ -73,6 +73,9 @@ nonisolated enum TabMerger {
             BrowserWorkspaces.workspaceID(of: tab, style: .opera)
         }
 
+        // Onglets qu'AppleScript voit (premier espace) : les seuls qu'Opera accepte de fermer.
+        let liveURLs = Set(live.tabs.map(\.url))
+
         var tabs = session.tabs.map { tab in
             let workspaceID = workspace(of: tab)
             return OpenTab(id: "\(live.id)#s\(tab.id)",
@@ -82,7 +85,8 @@ nonisolated enum TabMerger {
                            isActive: workspaceID == activeWorkspaceID && tab.index == session.selectedTabIndex,
                            workspaceID: workspaceID,
                            // Les identifiants du fichier de session sont ceux du navigateur (comme pour les fenêtres).
-                           tabID: tab.id)
+                           tabID: tab.id,
+                           canClose: liveURLs.contains(tab.url))
         }
 
         // L'espace qu'AppleScript lit : celui où se trouvent la plupart des onglets reconnus.

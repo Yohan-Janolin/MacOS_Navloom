@@ -8,6 +8,8 @@ nonisolated struct TabOrigin: Hashable, Sendable {
     let tabID: Int?
     /// URL au moment de la lecture : l'onglet n'est fermé que s'il affiche encore cette page.
     let url: String
+    /// Faux pour un onglet d'un autre espace d'Opera : copié, mais impossible à fermer.
+    var canClose = true
 }
 
 /// Une fenêtre à recréer dans le navigateur cible.
@@ -51,14 +53,17 @@ nonisolated struct CloseSummary: Equatable, Sendable {
     var failed = 0
     /// La copie n'a pas été retrouvée dans la cible après le transfert : original gardé par sécurité.
     var unconfirmed = 0
+    /// Onglets d'un autre espace d'Opera : le navigateur refuse de les fermer, à faire à la main.
+    var otherSpace = 0
 
-    var notClosed: Int { changed + failed + unconfirmed }
+    var notClosed: Int { changed + failed + unconfirmed + otherSpace }
 
     static func + (lhs: CloseSummary, rhs: CloseSummary) -> CloseSummary {
         CloseSummary(closed: lhs.closed + rhs.closed,
                      changed: lhs.changed + rhs.changed,
                      failed: lhs.failed + rhs.failed,
-                     unconfirmed: lhs.unconfirmed + rhs.unconfirmed)
+                     unconfirmed: lhs.unconfirmed + rhs.unconfirmed,
+                     otherSpace: lhs.otherSpace + rhs.otherSpace)
     }
 }
 
@@ -80,9 +85,11 @@ nonisolated enum TransferPlanner {
 
     /// - Parameters:
     ///   - singleWindow: tout regrouper dans une seule fenêtre (une seconde, privée, si besoin).
+    ///   - windowPerWorkspace: une fenêtre par espace de travail de la source (ignoré avec `singleWindow`).
     ///   - keepPrivate: rouvrir en navigation privée les onglets qui l'étaient.
     static func plan(sources: [Source], targetBrowserID: String,
-                     singleWindow: Bool, keepPrivate: Bool) -> TransferPlan {
+                     singleWindow: Bool, windowPerWorkspace: Bool = false,
+                     keepPrivate: Bool) -> TransferPlan {
         var plan = TransferPlan()
         var windows: [(urls: [String], isPrivate: Bool, origins: [TabOrigin])] = []
 
@@ -95,22 +102,39 @@ nonisolated enum TransferPlanner {
             plan.skippedInternal += source.tabs.count - tabs.count
             guard !tabs.isEmpty else { continue }
 
-            let urls = tabs.map(\.url)
-            let origins = tabs.map { tab in
-                TabOrigin(browserID: source.browserID, windowID: source.window.windowID,
-                          tabID: tab.tabID, url: tab.url)
-            }
             let isPrivate = keepPrivate && source.window.isPrivate
-            if singleWindow, let index = windows.firstIndex(where: { $0.isPrivate == isPrivate }) {
-                windows[index].urls += urls
-                windows[index].origins += origins
-            } else {
-                windows.append((urls, isPrivate, origins))
+            for group in groups(of: tabs, in: source.window, splitByWorkspace: windowPerWorkspace && !singleWindow) {
+                let urls = group.map(\.url)
+                let origins = group.map { tab in
+                    TabOrigin(browserID: source.browserID, windowID: source.window.windowID,
+                              tabID: tab.tabID, url: tab.url, canClose: tab.canClose)
+                }
+                if singleWindow, let index = windows.firstIndex(where: { $0.isPrivate == isPrivate }) {
+                    windows[index].urls += urls
+                    windows[index].origins += origins
+                } else {
+                    windows.append((urls, isPrivate, origins))
+                }
             }
         }
 
         plan.windows = windows.map { TransferWindow(urls: $0.urls, isPrivate: $0.isPrivate, origins: $0.origins) }
         return plan
+    }
+
+    /// Les onglets d'une fenêtre, en un seul groupe, ou en un groupe par espace (dans l'ordre des espaces,
+    /// les onglets sans espace connu à la fin).
+    static func groups(of tabs: [OpenTab], in window: OpenWindow, splitByWorkspace: Bool) -> [[OpenTab]] {
+        guard splitByWorkspace, !window.workspaces.isEmpty else { return [tabs] }
+        var groups: [[OpenTab]] = window.workspaces.map { workspace in
+            tabs.filter { $0.workspaceID == workspace.id }
+        }
+        let known = Set(window.workspaces.map(\.id))
+        groups.append(tabs.filter { tab in
+            guard let id = tab.workspaceID else { return true }
+            return !known.contains(id)
+        })
+        return groups.filter { !$0.isEmpty }
     }
 }
 
@@ -265,6 +289,12 @@ enum TabWriter {
         let parts = (text ?? "").split(separator: ",").compactMap { Int($0) }
         guard parts.count == 3 else { return nil }
         return CloseSummary(closed: parts[0], changed: parts[1], failed: parts[2])
+    }
+
+    /// Sépare les onglets d'origine fermables de ceux d'un autre espace d'Opera.
+    static func closable(_ origins: [TabOrigin]) -> (closable: [TabOrigin], otherSpace: Int) {
+        let closable = origins.filter(\.canClose)
+        return (closable, origins.count - closable.count)
     }
 
     /// Sépare les onglets d'origine dont la copie est bien ouverte dans la cible des autres.
