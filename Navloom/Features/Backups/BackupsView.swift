@@ -112,7 +112,7 @@ struct BackupsView: View {
 
     /// Un filtre par outil : chaque sauvegarde est rangée sous l'outil qui l'a créée.
     private var filterPicker: some View {
-        Picker("", selection: $model.selectedFilter) {
+        Picker("Tool", selection: $model.selectedFilter) {
             ForEach(model.filters) { filter in
                 Text(verbatim: "\(filter.title) (\(model.count(in: filter)))").tag(filter)
             }

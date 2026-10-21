@@ -4371,6 +4371,16 @@
         }
       }
     },
+    "Results" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Résultats"
+          }
+        }
+      }
+    },
     "Root" : {
       "localizations" : {
         "fr" : {
@@ -4407,6 +4417,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recherche en cours…"
+          }
+        }
+      }
+    },
+    "Select" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner"
           }
         }
       }
@@ -4967,6 +4987,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pour réactiver la synchro des favoris sans faire revenir les favoris supprimés : retourne dans Réglages › Synchronisation et clique sur « Réinitialiser les données distantes ». Cela efface les données stockées chez Vivaldi, ton mot de passe de chiffrement et te déconnecte."
+          }
+        }
+      }
+    },
+    "Tool" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outil"
           }
         }
       }

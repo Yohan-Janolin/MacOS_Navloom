@@ -173,7 +173,7 @@ struct GhostsView: View {
                        syncStatus: model.syncStatus,
                        operation: .removal(items: String(localized: "the dead links")))
 
-            Picker("", selection: $model.selectedCategory) {
+            Picker("Results", selection: $model.selectedCategory) {
                 ForEach(GhostsViewModel.Category.allCases) { category in
                     Text(verbatim: "\(category.title) (\(model.rows[category]?.count ?? 0))").tag(category)
                 }
@@ -327,7 +327,7 @@ private struct GhostRowView: View {
             // La case est séparée du texte : un double-clic sur la ligne ouvre le lien sans cocher.
             // Un favori du compte Google n'a pas de case : Chrome le remettrait depuis le serveur.
             if row.isLocal {
-                Toggle("", isOn: $isChecked)
+                Toggle("Select", isOn: $isChecked)
                     .labelsHidden()
                     .toggleStyle(.checkbox)
             } else {

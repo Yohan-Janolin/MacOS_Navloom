@@ -135,7 +135,7 @@ struct FaviconSyncView: View {
         VStack(spacing: 12) {
             if model.phase == .fetched { writeNotice }
 
-            Picker("", selection: $model.selectedCategory) {
+            Picker("Results", selection: $model.selectedCategory) {
                 ForEach(FaviconSyncViewModel.ResultCategory.allCases) { category in
                     Text(verbatim: "\(category.title) (\(model.rows[category]?.count ?? 0))").tag(category)
                 }
