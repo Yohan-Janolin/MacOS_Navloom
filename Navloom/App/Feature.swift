@@ -21,17 +21,18 @@ enum Feature: String, CaseIterable, Identifiable {
     /// Entrées fixées en bas, sous un séparateur.
     static let footer: [Feature] = [.backups, .settings, .about]
 
+    /// Les noms des outils (FaviconSync, Twins…) sont des noms propres : ils ne se traduisent pas.
     var title: String {
         switch self {
-        case .home: "Accueil"
+        case .home: String(localized: "Home")
         case .faviconSync: "FaviconSync"
         case .twins: "Twins"
         case .ghosts: "Ghosts"
         case .echo: "Echo"
         case .ferry: "Ferry"
-        case .backups: "Sauvegardes"
-        case .settings: "Paramètres"
-        case .about: "À propos"
+        case .backups: String(localized: "Backups")
+        case .settings: String(localized: "Settings")
+        case .about: String(localized: "About")
         }
     }
 

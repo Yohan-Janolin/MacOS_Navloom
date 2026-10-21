@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Carte de statistique partagée par FaviconSync, Twins et Ghosts : fond et contour teintés.
 struct StatCard: View {
-    let title: String
+    let title: LocalizedStringKey
     let value: Int
     let systemImage: String
     var tint: Color = .accentColor

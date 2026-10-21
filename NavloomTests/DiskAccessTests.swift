@@ -86,9 +86,12 @@ struct DiskAccessTests {
     // MARK: Texte du bandeau
 
     @Test func laListeDeNomsSeFormuleEnFrancais() {
-        #expect(DiskAccess.joinedNames([]) == "")
-        #expect(DiskAccess.joinedNames(["Chrome"]) == "Chrome")
-        #expect(DiskAccess.joinedNames(["Chrome", "Brave"]) == "Chrome et Brave")
-        #expect(DiskAccess.joinedNames(["Chrome", "Brave", "Edge"]) == "Chrome, Brave et Edge")
+        let fr = Locale(identifier: "fr_FR")
+        #expect(DiskAccess.joinedNames([], locale: fr) == "")
+        #expect(DiskAccess.joinedNames(["Chrome"], locale: fr) == "Chrome")
+        #expect(DiskAccess.joinedNames(["Chrome", "Brave"], locale: fr) == "Chrome et Brave")
+        #expect(DiskAccess.joinedNames(["Chrome", "Brave", "Edge"], locale: fr) == "Chrome, Brave et Edge")
+        let en = Locale(identifier: "en_US")
+        #expect(DiskAccess.joinedNames(["Chrome", "Brave", "Edge"], locale: en) == "Chrome, Brave, and Edge")
     }
 }

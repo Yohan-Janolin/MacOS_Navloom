@@ -9,7 +9,7 @@ struct BrowserProfileBanner: View {
     /// Vrai : le bandeau occupe toute la largeur. Faux : il s'adapte à son contenu.
     var expands = true
     /// Titre du choix de navigateur (« Navigateur source », « Navigateur cible »…).
-    var browserTitle = "Navigateur"
+    var browserTitle: LocalizedStringKey = "Browser"
     /// Couleurs du dégradé de fond (de gauche à droite) ; la dernière colore aussi le contour.
     var colors: [Color] = [Brand.coral, Brand.violet]
 
@@ -22,9 +22,9 @@ struct BrowserProfileBanner: View {
                 .lineLimit(1)
                 .layoutPriority(1)
 
-            Picker("Navigateur", selection: $browserID) {
+            Picker("Browser", selection: $browserID) {
                 ForEach(browsers) { browser in
-                    Text(browser.name).tag(Optional(browser.id))
+                    Text(verbatim: browser.name).tag(Optional(browser.id))
                 }
             }
             .labelsHidden()
@@ -33,14 +33,14 @@ struct BrowserProfileBanner: View {
             if !profiles.isEmpty {
                 Divider().frame(height: 20)
 
-                Label("Profil", systemImage: "person.crop.circle")
+                Label("Profile", systemImage: "person.crop.circle")
                     .fontWeight(.semibold)
                     .lineLimit(1)
                     .layoutPriority(1)
 
-                Picker("Profil", selection: $profileID) {
+                Picker("Profile", selection: $profileID) {
                     ForEach(profiles) { profile in
-                        Text(profile.name).tag(Optional(profile.id))
+                        Text(verbatim: profile.name).tag(Optional(profile.id))
                     }
                 }
                 .labelsHidden()

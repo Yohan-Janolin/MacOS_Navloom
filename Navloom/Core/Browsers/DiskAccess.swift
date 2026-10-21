@@ -39,10 +39,9 @@ nonisolated enum DiskAccess {
     }
 
     /// « Chrome », « Chrome et Brave », « Chrome, Brave et Edge ».
-    static func joinedNames(_ names: [String]) -> String {
-        guard let last = names.last else { return "" }
-        guard names.count > 1 else { return last }
-        return names.dropLast().joined(separator: ", ") + " et " + last
+    /// « Chrome, Brave et Edge » / "Chrome, Brave, and Edge", selon la langue de l'app.
+    static func joinedNames(_ names: [String], locale: Locale = .current) -> String {
+        names.formatted(.list(type: .and).locale(locale))
     }
 }
 

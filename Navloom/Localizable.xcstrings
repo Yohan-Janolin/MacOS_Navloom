@@ -1,0 +1,676 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ (build %@)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (build %2$@)"
+          }
+        }
+      }
+    },
+    "%@ is open. Quit it completely (Cmd + Q) to be able to add." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir ajouter."
+          }
+        }
+      }
+    },
+    "%@ is open. Quit it completely (Cmd + Q) to be able to copy." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir copier."
+          }
+        }
+      }
+    },
+    "%@ is open. Quit it completely (Cmd + Q) to be able to delete." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir supprimer."
+          }
+        }
+      }
+    },
+    "%@ is open. Quit it completely (Cmd + Q) to be able to restore." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir restaurer."
+          }
+        }
+      }
+    },
+    "%@. Arc isn't supported, nor are Safari or Firefox, which don't use the same bookmark format." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Arc n'est pas supporté, pas plus que Safari ou Firefox, qui n'utilisent pas le même format de favoris."
+          }
+        }
+      }
+    },
+    "A backup of the Bookmarks file (and of the Favicons database, if icons are copied) will be created automatically before adding." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une sauvegarde du fichier Bookmarks (et de la base Favicons, si les icônes sont copiées) sera créée automatiquement avant l'ajout."
+          }
+        }
+      }
+    },
+    "A backup of the Bookmarks file will be created automatically before deleting." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une sauvegarde du fichier Bookmarks sera créée automatiquement avant la suppression."
+          }
+        }
+      }
+    },
+    "About" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À propos"
+          }
+        }
+      }
+    },
+    "Author" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auteur"
+          }
+        }
+      }
+    },
+    "Backups" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegardes"
+          }
+        }
+      }
+    },
+    "Backups of the Bookmarks file (and of the Favicons database, if icons are copied) will be created automatically before the copy: you'll be able to roll back from the Backups screen." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des sauvegardes du fichier Bookmarks (et de la base Favicons, si les icônes sont copiées) seront créées automatiquement avant la copie : tu pourras revenir en arrière depuis l'écran Sauvegardes."
+          }
+        }
+      }
+    },
+    "Bookmark sync is on in %@: the next time it starts, it may mix the added bookmarks with the ones in your account (duplicates, or a return to the account's state). Turn it off in the browser's sync settings (the steps are on the Home screen) before adding." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchro des favoris est activée dans %@ : à son prochain lancement, elle peut mélanger les favoris ajoutés avec ceux de ton compte (doublons, ou retour à l'état du compte). Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil) avant d'ajouter."
+          }
+        }
+      }
+    },
+    "Bookmark sync is on in %@: the next time it starts, it may replace the restored bookmarks with the ones in your account. Turn it off in the browser's sync settings (the steps are on the Home screen) before restoring." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchro des favoris est activée dans %@ : à son prochain lancement, elle peut remplacer les favoris restaurés par ceux de ton compte. Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil) avant de restaurer."
+          }
+        }
+      }
+    },
+    "Bookmark sync is on in %@: the next time it starts, it would bring back the deleted bookmarks and mix the copy with the ones in your account. Turn it off in the browser's sync settings (the steps are on the Home screen) before the full copy." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchro des favoris est activée dans %@ : à son prochain lancement, elle remettrait les favoris supprimés et mélangerait la copie avec ceux de ton compte. Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil) avant la copie complète."
+          }
+        }
+      }
+    },
+    "Bookmark sync is on in %@: the next time it starts, it would bring back the deleted bookmarks. Turn it off in the browser's sync settings (the steps are on the Home screen), or delete %@ directly in its bookmark manager." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchro des favoris est activée dans %1$@ : à son prochain lancement, elle remettrait les favoris supprimés. Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil), ou supprime %2$@ directement dans son gestionnaire de favoris."
+          }
+        }
+      }
+    },
+    "Browser" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigateur"
+          }
+        }
+      }
+    },
+    "Browser closed" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigateur fermé"
+          }
+        }
+      }
+    },
+    "Choose a tool" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis un outil"
+          }
+        }
+      }
+    },
+    "Chrome and Google Account bookmarks" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chrome et les favoris du compte Google"
+          }
+        }
+      }
+    },
+    "Dark" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sombre"
+          }
+        }
+      }
+    },
+    "Disclaimer" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avertissement"
+          }
+        }
+      }
+    },
+    "Fetches the missing icons (favicons) of your bookmarks and writes them into the browser. The browser must be closed when writing." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récupère les icônes (favicons) manquantes de tes favoris et les écrit dans le navigateur. Le navigateur doit être fermé au moment d'écrire."
+          }
+        }
+      }
+    },
+    "Finds bookmarks pointing to exactly the same URL and deletes the ones you check. The browser must be closed, and bookmark sync turned off (see below)." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retrouve les favoris qui pointent sur exactement la même URL et supprime ceux que tu coches. Le navigateur doit être fermé, et la synchro des favoris désactivée (voir plus bas)."
+          }
+        }
+      }
+    },
+    "Full Disk Access" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accès complet au disque"
+          }
+        }
+      }
+    },
+    "Full Disk Access required" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accès complet au disque requis"
+          }
+        }
+      }
+    },
+    "Gathers the open tabs of all your browsers in a single list, grouped by window (with the profile when there are several, and the Opera and Vivaldi workspaces), with search and a text export. Check tabs, workspaces or windows to reopen them in another browser, keeping the window layout (and one window per workspace, since workspaces can't be recreated). Optionally, the original tabs are closed afterwards, only if their copy is found in the target; Opera refuses to close those in its other workspaces. The first time, macOS asks you to allow Navloom to control each browser. Private windows are hidden by default." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rassemble en une seule liste les onglets ouverts de tous tes navigateurs, regroupés par fenêtre (avec le profil quand il y en a plusieurs, et les espaces d'Opera et de Vivaldi), avec une recherche et un export texte. Coche des onglets, des espaces ou des fenêtres pour les rouvrir dans un autre navigateur, en gardant le découpage par fenêtre (et une fenêtre par espace, les espaces ne pouvant pas être recréés). En option, les onglets d'origine sont fermés ensuite, seulement si leur copie est bien retrouvée dans la cible ; Opera refuse de fermer ceux de ses autres espaces. La première fois, macOS te demande d'autoriser Navloom à contrôler chaque navigateur. Les fenêtres de navigation privée sont masquées par défaut."
+          }
+        }
+      }
+    },
+    "GitHub repository" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dépôt GitHub"
+          }
+        }
+      }
+    },
+    "Home" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accueil"
+          }
+        }
+      }
+    },
+    "In Vivaldi, open Settings › Sync and uncheck “Bookmarks”." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans Vivaldi, ouvre Réglages › Synchronisation et décoche « Signets »."
+          }
+        }
+      }
+    },
+    "Later" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus tard"
+          }
+        }
+      }
+    },
+    "Light" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clair"
+          }
+        }
+      }
+    },
+    "Limitations" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limites"
+          }
+        }
+      }
+    },
+    "Lists the backups created before each write, by tool (FaviconSync, Twins, Ghosts, Echo), and lets you restore one of them." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste les sauvegardes créées avant chaque écriture, par outil (FaviconSync, Twins, Ghosts, Echo), et permet de restaurer l'une d'elles."
+          }
+        }
+      }
+    },
+    "Navloom can't read the sync status of %@. If sync is on, it may bring back the deleted bookmarks. A backup of the Bookmarks file will be created before deleting." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom ne sait pas lire l'état de la synchro de %@. Si elle est activée, elle peut remettre les favoris supprimés. Une sauvegarde du fichier Bookmarks sera créée avant la suppression."
+          }
+        }
+      }
+    },
+    "Navloom can't read the sync status of %@. If sync is on, it may undo the addition. A backup is created automatically before writing." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom ne sait pas lire l'état de la synchro de %@. Si elle est activée, elle peut défaire l'ajout. Une sauvegarde est créée automatiquement avant l'écriture."
+          }
+        }
+      }
+    },
+    "Navloom can't read the sync status of %@. If sync is on, it may undo the copy. Backups are created automatically before writing." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom ne sait pas lire l'état de la synchro de %@. Si elle est activée, elle peut défaire la copie. Des sauvegardes sont créées automatiquement avant l'écriture."
+          }
+        }
+      }
+    },
+    "Navloom can't read the sync status of %@. If sync is on, it may undo the restore. The current state is backed up automatically beforehand." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom ne sait pas lire l'état de la synchro de %@. Si elle est activée, elle peut défaire la restauration. L'état actuel est sauvegardé automatiquement avant."
+          }
+        }
+      }
+    },
+    "Navloom is provided “as is”, without any warranty. It modifies your browser's files. A backup is created before every write, but the author can't be held responsible for any data loss or other damage. You use it at your own risk." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom est fourni « tel quel », sans aucune garantie. Il modifie des fichiers de ton navigateur. Une sauvegarde est créée avant chaque écriture, mais l'auteur ne peut pas être tenu responsable d'une perte de données ou de tout autre dégât. Tu l'utilises à tes risques."
+          }
+        }
+      }
+    },
+    "Navloom modifies the browser's files, which the browser would overwrite when it quits. Quit it completely (Cmd + Q) before writing. Every write is preceded by a backup." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom modifie les fichiers du navigateur, qui les réécrirait à sa fermeture. Quitte-le complètement (Cmd + Q) avant d'écrire. Chaque écriture est précédée d'une sauvegarde."
+          }
+        }
+      }
+    },
+    "Navloom reads the sync status in every supported browser. For Chrome, Google Account bookmarks are in a separate file: only full sync blocks deletion (see “Limitations”)." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom lit l'état de la synchro dans tous les navigateurs pris en charge. Pour Chrome, les favoris du compte Google sont dans un fichier séparé : la synchro complète est la seule à bloquer la suppression (voir « Limites »)."
+          }
+        }
+      }
+    },
+    "On macOS 27, Chrome, Edge and Brave (stable versions) protect their data: until Navloom has Full Disk Access, they don't appear in the list of browsers. Open System Settings › Privacy & Security › Full Disk Access, add Navloom with the “+” button, turn it on, then relaunch Navloom. The other browsers don't need it. Navloom only reads bookmarks, icons and a few settings (profile names, sync status)." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sur macOS 27, Chrome, Edge et Brave (versions stables) protègent leurs données : tant que Navloom n'a pas l'accès complet au disque, ils n'apparaissent pas dans la liste des navigateurs. Ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + », active-le, puis relance Navloom. Les autres navigateurs n'en ont pas besoin. Navloom ne lit que les favoris, les icônes et quelques réglages (noms de profils, état de la synchro)."
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les réglages"
+          }
+        }
+      }
+    },
+    "Open an issue" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir une issue"
+          }
+        }
+      }
+    },
+    "Opens each bookmark to spot the ones whose page no longer exists (page not found, domain gone, redirect to the home page) and deletes the ones you check. The scan can run with the browser open; to delete, it must be closed and bookmark sync turned off (see below). Double-click a result to test it in your browser." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre chaque favori pour repérer ceux dont la page n'existe plus (page introuvable, domaine disparu, redirection vers l'accueil) et supprime ceux que tu coches. La recherche peut se faire navigateur ouvert ; pour supprimer, il doit être fermé et la synchro des favoris désactivée (voir plus bas). Double-clic sur un résultat pour le tester dans ton navigateur."
+          }
+        }
+      }
+    },
+    "Profile" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil"
+          }
+        }
+      }
+    },
+    "Quit Vivaldi (Cmd + Q), then delete your duplicates or dead links with Navloom." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitte Vivaldi (Cmd + Q), puis supprime tes doublons ou tes liens morts avec Navloom."
+          }
+        }
+      }
+    },
+    "Relaunch Navloom" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relancer Navloom"
+          }
+        }
+      }
+    },
+    "Release date" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date de release"
+          }
+        }
+      }
+    },
+    "Replicates the bookmarks of one browser (the source) to another (the target), with their icons, which browsers import poorly. Two modes: add the missing bookmarks, or full copy, which makes the target identical to the source (anything not in the source is deleted). The comparison runs with the browsers open; to write, the target must be closed and its bookmark sync turned off (see below). Backups are created beforehand." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réplique les favoris d'un navigateur (la source) vers un autre (la cible), avec leurs icônes, que les navigateurs importent mal. Deux modes : ajouter les favoris manquants, ou copie complète, qui rend la cible identique à la source (ce qui n'y est pas est supprimé). La comparaison se fait navigateurs ouverts ; pour écrire, la cible doit être fermée et sa synchro des favoris désactivée (voir plus bas). Des sauvegardes sont créées avant."
+          }
+        }
+      }
+    },
+    "Report a problem" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signaler un problème"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paramètres"
+          }
+        }
+      }
+    },
+    "Sign back in, set your encryption password again (you can reuse the same one), then check “Bookmarks” again." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnecte-toi, redéfinis ton mot de passe de chiffrement (tu peux reprendre le même), puis recoche « Signets »."
+          }
+        }
+      }
+    },
+    "Supported browsers" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigateurs pris en charge"
+          }
+        }
+      }
+    },
+    "System" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Système"
+          }
+        }
+      }
+    },
+    "The current state is backed up automatically before restoring." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'état actuel est sauvegardé automatiquement avant la restauration."
+          }
+        }
+      }
+    },
+    "To turn bookmark sync back on without bringing back the deleted bookmarks: go back to Settings › Sync and click “Reset Remote Data”. This erases the data stored by Vivaldi and your encryption password, and signs you out." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour réactiver la synchro des favoris sans faire revenir les favoris supprimés : retourne dans Réglages › Synchronisation et clique sur « Réinitialiser les données distantes ». Cela efface les données stockées chez Vivaldi, ton mot de passe de chiffrement et te déconnecte."
+          }
+        }
+      }
+    },
+    "Tools" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les outils"
+          }
+        }
+      }
+    },
+    "Tools to keep your bookmarks in shape" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des outils pour entretenir tes favoris"
+          }
+        }
+      }
+    },
+    "Tools to keep your browser bookmarks in shape" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des outils pour entretenir les favoris de ton navigateur"
+          }
+        }
+      }
+    },
+    "Twins / Ghosts / Echo - Trouble with sync" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twins / Ghosts / Echo - Problème avec la synchronisation"
+          }
+        }
+      }
+    },
+    "Version" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        }
+      }
+    },
+    "When Chrome saves bookmarks “in your Google Account” (Settings › In your Google Account › Bookmarks), it stores them in a separate file. Navloom reads them: FaviconSync, Twins and Ghosts take them into account, with a cloud icon. But they can never be checked, because Chrome would restore them from the server: delete them by hand in Chrome. Only your local bookmarks can be deleted from Navloom. If you turn off the Bookmarks option in Chrome, it hides the account bookmarks and Navloom ignores them too (based on the setting Chrome writes in its preferences)." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand Chrome enregistre les favoris « dans ton compte Google » (Réglages › Dans votre compte Google › Favoris), il les range dans un fichier à part. Navloom les lit : FaviconSync, Twins et Ghosts les prennent en compte, avec une icône nuage. Mais ils ne sont jamais cochables, car Chrome les remettrait depuis le serveur : supprime-les à la main dans Chrome. Seuls tes favoris locaux se suppriment depuis Navloom. Si tu désactives l'option Favoris dans Chrome, il masque ceux du compte et Navloom les ignore aussi (d'après le réglage que Chrome écrit dans ses préférences)."
+          }
+        }
+      }
+    },
+    "When bookmark sync is on, the browser brings back at launch the bookmarks Navloom deleted. So Twins and Ghosts refuse to delete, and Echo refuses to write to the target, while it's on. Navloom can't turn it off for you: it's set in the browser, with your account." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand la synchro des favoris est active, le navigateur remet au lancement les favoris que Navloom a supprimés. Twins et Ghosts refusent donc de supprimer, et Echo d’écrire dans la cible, tant qu’elle est active. Navloom ne peut pas la couper à ta place : elle se règle dans le navigateur, avec ton compte."
+          }
+        }
+      }
+    },
+    "Why sync gets in the way" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pourquoi la synchro gêne"
+          }
+        }
+      }
+    },
+    "With Vivaldi" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avec Vivaldi"
+          }
+        }
+      }
+    },
+    "macOS blocks access to the data of %@, so they don't appear in the list of browsers.\n\nTo use them, open System Settings › Privacy & Security › Full Disk Access, add Navloom with the “+” button if it isn't there, turn it on, then relaunch Navloom." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS bloque l'accès aux données de %@ : ils n'apparaissent donc pas dans la liste des navigateurs.\n\nPour les utiliser, ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + » s'il n'y est pas, active-le, puis relance Navloom."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

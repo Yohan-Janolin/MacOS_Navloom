@@ -4,7 +4,7 @@ import SwiftUI
 /// favoris active) ou, sinon, le rappel qu'une sauvegarde est créée avant l'écriture.
 struct SyncNotice: View {
     enum Operation {
-        /// `items` : ce qu'on supprime, avec son article (« les doublons », « les liens morts »).
+        /// `items` : ce qu'on supprime, avec son article, déjà traduit (« les doublons » / "the duplicates").
         case removal(items: String)
         case restoration
         /// Echo : ajout de favoris dans le navigateur de destination.
@@ -28,55 +28,55 @@ struct SyncNotice: View {
     }
 
     private var message: (text: String, systemImage: String, tint: Color) {
-        let verb: String
-        switch operation {
-        case .removal: verb = "supprimer"
-        case .restoration: verb = "restaurer"
-        case .addition: verb = "ajouter"
-        case .mirror: verb = "copier"
-        }
+        let name = browserName
 
         if isBrowserRunning {
-            return ("\(browserName) est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir \(verb).",
-                    "exclamationmark.triangle.fill", .orange)
+            let text: String
+            switch operation {
+            case .removal: text = String(localized: "\(name) is open. Quit it completely (Cmd + Q) to be able to delete.")
+            case .restoration: text = String(localized: "\(name) is open. Quit it completely (Cmd + Q) to be able to restore.")
+            case .addition: text = String(localized: "\(name) is open. Quit it completely (Cmd + Q) to be able to add.")
+            case .mirror: text = String(localized: "\(name) is open. Quit it completely (Cmd + Q) to be able to copy.")
+            }
+            return (text, "exclamationmark.triangle.fill", .orange)
         }
 
         switch (syncStatus, operation) {
         case (.enabled, .removal(let items)):
-            return ("La synchro des favoris est activée dans \(browserName) : à son prochain lancement, elle remettrait les favoris supprimés. Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil), ou supprime \(items) directement dans son gestionnaire de favoris.",
+            return (String(localized: "Bookmark sync is on in \(name): the next time it starts, it would bring back the deleted bookmarks. Turn it off in the browser's sync settings (the steps are on the Home screen), or delete \(items) directly in its bookmark manager."),
                     "arrow.triangle.2.circlepath", .orange)
         case (.enabled, .restoration):
-            return ("La synchro des favoris est activée dans \(browserName) : à son prochain lancement, elle peut remplacer les favoris restaurés par ceux de ton compte. Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil) avant de restaurer.",
+            return (String(localized: "Bookmark sync is on in \(name): the next time it starts, it may replace the restored bookmarks with the ones in your account. Turn it off in the browser's sync settings (the steps are on the Home screen) before restoring."),
                     "arrow.triangle.2.circlepath", .orange)
         case (.enabled, .addition):
-            return ("La synchro des favoris est activée dans \(browserName) : à son prochain lancement, elle peut mélanger les favoris ajoutés avec ceux de ton compte (doublons, ou retour à l'état du compte). Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil) avant d'ajouter.",
+            return (String(localized: "Bookmark sync is on in \(name): the next time it starts, it may mix the added bookmarks with the ones in your account (duplicates, or a return to the account's state). Turn it off in the browser's sync settings (the steps are on the Home screen) before adding."),
                     "arrow.triangle.2.circlepath", .orange)
         case (.enabled, .mirror):
-            return ("La synchro des favoris est activée dans \(browserName) : à son prochain lancement, elle remettrait les favoris supprimés et mélangerait la copie avec ceux de ton compte. Désactive-la dans les réglages de synchronisation du navigateur (la marche à suivre est dans l'écran Accueil) avant la copie complète.",
+            return (String(localized: "Bookmark sync is on in \(name): the next time it starts, it would bring back the deleted bookmarks and mix the copy with the ones in your account. Turn it off in the browser's sync settings (the steps are on the Home screen) before the full copy."),
                     "arrow.triangle.2.circlepath", .orange)
         case (.unknown, .mirror):
-            return ("Navloom ne sait pas lire l'état de la synchro de \(browserName). Si elle est activée, elle peut défaire la copie. Des sauvegardes sont créées automatiquement avant l'écriture.",
+            return (String(localized: "Navloom can't read the sync status of \(name). If sync is on, it may undo the copy. Backups are created automatically before writing."),
                     "info.circle", .secondary)
         case (.disabled, .mirror):
-            return ("Des sauvegardes du fichier Bookmarks (et de la base Favicons, si les icônes sont copiées) seront créées automatiquement avant la copie : tu pourras revenir en arrière depuis l'écran Sauvegardes.",
+            return (String(localized: "Backups of the Bookmarks file (and of the Favicons database, if icons are copied) will be created automatically before the copy: you'll be able to roll back from the Backups screen."),
                     "externaldrive", .secondary)
         case (.unknown, .removal):
-            return ("Navloom ne sait pas lire l'état de la synchro de \(browserName). Si elle est activée, elle peut remettre les favoris supprimés. Une sauvegarde du fichier Bookmarks sera créée avant la suppression.",
+            return (String(localized: "Navloom can't read the sync status of \(name). If sync is on, it may bring back the deleted bookmarks. A backup of the Bookmarks file will be created before deleting."),
                     "info.circle", .secondary)
         case (.unknown, .restoration):
-            return ("Navloom ne sait pas lire l'état de la synchro de \(browserName). Si elle est activée, elle peut défaire la restauration. L'état actuel est sauvegardé automatiquement avant.",
+            return (String(localized: "Navloom can't read the sync status of \(name). If sync is on, it may undo the restore. The current state is backed up automatically beforehand."),
                     "info.circle", .secondary)
         case (.unknown, .addition):
-            return ("Navloom ne sait pas lire l'état de la synchro de \(browserName). Si elle est activée, elle peut défaire l'ajout. Une sauvegarde est créée automatiquement avant l'écriture.",
+            return (String(localized: "Navloom can't read the sync status of \(name). If sync is on, it may undo the addition. A backup is created automatically before writing."),
                     "info.circle", .secondary)
         case (.disabled, .removal):
-            return ("Une sauvegarde du fichier Bookmarks sera créée automatiquement avant la suppression.",
+            return (String(localized: "A backup of the Bookmarks file will be created automatically before deleting."),
                     "externaldrive", .secondary)
         case (.disabled, .restoration):
-            return ("L'état actuel est sauvegardé automatiquement avant la restauration.",
+            return (String(localized: "The current state is backed up automatically before restoring."),
                     "externaldrive", .secondary)
         case (.disabled, .addition):
-            return ("Une sauvegarde du fichier Bookmarks (et de la base Favicons, si les icônes sont copiées) sera créée automatiquement avant l'ajout.",
+            return (String(localized: "A backup of the Bookmarks file (and of the Favicons database, if icons are copied) will be created automatically before adding."),
                     "externaldrive", .secondary)
         }
     }

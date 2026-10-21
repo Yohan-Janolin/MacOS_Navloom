@@ -21,7 +21,8 @@ final class DiskAccessNoticeState {
     }
 
     var message: String {
-        "macOS bloque l'accès aux données de \(DiskAccess.joinedNames(blocked.map(\.name))) : ils n'apparaissent donc pas dans la liste des navigateurs.\n\nPour les utiliser, ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + » s'il n'y est pas, active-le, puis relance Navloom."
+        let names = DiskAccess.joinedNames(blocked.map(\.name))
+        return String(localized: "macOS blocks access to the data of \(names), so they don't appear in the list of browsers.\n\nTo use them, open System Settings › Privacy & Security › Full Disk Access, add Navloom with the “+” button if it isn't there, turn it on, then relaunch Navloom.")
     }
 }
 
@@ -35,10 +36,10 @@ private struct DiskAccessAlertModifier: ViewModifier {
                 await state.loadIfNeeded()
                 isPresented = !state.blocked.isEmpty
             }
-            .alert("Accès complet au disque requis", isPresented: $isPresented) {
-                Button("Ouvrir les réglages") { DiskAccessActions.openFullDiskAccessSettings() }
-                Button("Relancer Navloom") { DiskAccessActions.relaunch() }
-                Button("Plus tard", role: .cancel) {}
+            .alert("Full Disk Access required", isPresented: $isPresented) {
+                Button("Open Settings") { DiskAccessActions.openFullDiskAccessSettings() }
+                Button("Relaunch Navloom") { DiskAccessActions.relaunch() }
+                Button("Later", role: .cancel) {}
             } message: {
                 Text(state.message)
             }

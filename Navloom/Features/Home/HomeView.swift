@@ -6,60 +6,58 @@ struct HomeView: View {
             VStack(spacing: 22) {
                 header
 
-                section("Les outils") {
+                section("Tools") {
                     ToolCard(feature: .faviconSync,
-                             text: "Récupère les icônes (favicons) manquantes de tes favoris et les écrit dans le navigateur. Le navigateur doit être fermé au moment d'écrire.")
+                             text: String(localized: "Fetches the missing icons (favicons) of your bookmarks and writes them into the browser. The browser must be closed when writing."))
                     ToolCard(feature: .twins,
-                             text: "Retrouve les favoris qui pointent sur exactement la même URL et supprime ceux que tu coches. Le navigateur doit être fermé, et la synchro des favoris désactivée (voir plus bas).")
+                             text: String(localized: "Finds bookmarks pointing to exactly the same URL and deletes the ones you check. The browser must be closed, and bookmark sync turned off (see below)."))
                     ToolCard(feature: .ghosts,
-                             text: "Ouvre chaque favori pour repérer ceux dont la page n'existe plus (page introuvable, domaine disparu, redirection vers l'accueil) et supprime ceux que tu coches. La recherche peut se faire navigateur ouvert ; pour supprimer, il doit être fermé et la synchro des favoris désactivée (voir plus bas). Double-clic sur un résultat pour le tester dans ton navigateur.")
+                             text: String(localized: "Opens each bookmark to spot the ones whose page no longer exists (page not found, domain gone, redirect to the home page) and deletes the ones you check. The scan can run with the browser open; to delete, it must be closed and bookmark sync turned off (see below). Double-click a result to test it in your browser."))
                     ToolCard(feature: .echo,
-                             text: "Réplique les favoris d'un navigateur (la source) vers un autre (la cible), avec leurs icônes, que les navigateurs importent mal. Deux modes : ajouter les favoris manquants, ou copie complète, qui rend la cible identique à la source (ce qui n'y est pas est supprimé). La comparaison se fait navigateurs ouverts ; pour écrire, la cible doit être fermée et sa synchro des favoris désactivée (voir plus bas). Des sauvegardes sont créées avant.")
+                             text: String(localized: "Replicates the bookmarks of one browser (the source) to another (the target), with their icons, which browsers import poorly. Two modes: add the missing bookmarks, or full copy, which makes the target identical to the source (anything not in the source is deleted). The comparison runs with the browsers open; to write, the target must be closed and its bookmark sync turned off (see below). Backups are created beforehand."))
                     ToolCard(feature: .ferry,
-                             text: "Rassemble en une seule liste les onglets ouverts de tous tes navigateurs, regroupés par fenêtre (avec le profil quand il y en a plusieurs, et les espaces d'Opera et de Vivaldi), avec une recherche et un export texte. Coche des onglets, des espaces ou des fenêtres pour les rouvrir dans un autre navigateur, en gardant le découpage par fenêtre (et une fenêtre par espace, les espaces ne pouvant pas être recréés). En option, les onglets d'origine sont fermés ensuite, seulement si leur copie est bien retrouvée dans la cible ; Opera refuse de fermer ceux de ses autres espaces. La première fois, macOS te demande d'autoriser Navloom à contrôler chaque navigateur. Les fenêtres de navigation privée sont masquées par défaut.")
+                             text: String(localized: "Gathers the open tabs of all your browsers in a single list, grouped by window (with the profile when there are several, and the Opera and Vivaldi workspaces), with search and a text export. Check tabs, workspaces or windows to reopen them in another browser, keeping the window layout (and one window per workspace, since workspaces can't be recreated). Optionally, the original tabs are closed afterwards, only if their copy is found in the target; Opera refuses to close those in its other workspaces. The first time, macOS asks you to allow Navloom to control each browser. Private windows are hidden by default."))
                     ToolCard(feature: .backups,
-                             text: "Liste les sauvegardes créées avant chaque écriture, par outil (FaviconSync, Twins, Ghosts, Echo), et permet de restaurer l'une d'elles.")
+                             text: String(localized: "Lists the backups created before each write, by tool (FaviconSync, Twins, Ghosts, Echo), and lets you restore one of them."))
                 }
 
-                section("Limites") {
+                section("Limitations") {
                     InfoCard(systemImage: "globe", tint: Brand.sky,
-                             title: "Navigateurs pris en charge",
-                             text: "\(supportedBrowsers). Arc n'est pas supporté, pas plus que Safari ou Firefox, qui n'utilisent pas le même format de favoris.")
+                             title: String(localized: "Supported browsers"),
+                             text: String(localized: "\(supportedBrowsers). Arc isn't supported, nor are Safari or Firefox, which don't use the same bookmark format."))
                     InfoCard(systemImage: "person.crop.circle.badge.exclamationmark", tint: Brand.coral,
-                             title: "Chrome et les favoris du compte Google",
-                             text: "Quand Chrome enregistre les favoris « dans ton compte Google » (Réglages › Dans votre compte Google › Favoris), il les range dans un fichier à part. Navloom les lit : FaviconSync, Twins et Ghosts les prennent en compte, avec une icône nuage. Mais ils ne sont jamais cochables, car Chrome les remettrait depuis le serveur : supprime-les à la main dans Chrome. Seuls tes favoris locaux se suppriment depuis Navloom. Si tu désactives l'option Favoris dans Chrome, il masque ceux du compte et Navloom les ignore aussi (d'après le réglage que Chrome écrit dans ses préférences).")
+                             title: String(localized: "Chrome and Google Account bookmarks"),
+                             text: String(localized: "When Chrome saves bookmarks “in your Google Account” (Settings › In your Google Account › Bookmarks), it stores them in a separate file. Navloom reads them: FaviconSync, Twins and Ghosts take them into account, with a cloud icon. But they can never be checked, because Chrome would restore them from the server: delete them by hand in Chrome. Only your local bookmarks can be deleted from Navloom. If you turn off the Bookmarks option in Chrome, it hides the account bookmarks and Navloom ignores them too (based on the setting Chrome writes in its preferences)."))
                     InfoCard(systemImage: "lock.shield.fill", tint: .orange,
-                             title: "Accès complet au disque",
-                             text: "Sur macOS 27, Chrome, Edge et Brave (versions stables) protègent leurs données : tant que Navloom n'a pas l'accès complet au disque, ils n'apparaissent pas dans la liste des navigateurs. Ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + », active-le, puis relance Navloom. Les autres navigateurs n'en ont pas besoin. Navloom ne lit que les favoris, les icônes et quelques réglages (noms de profils, état de la synchro).")
+                             title: String(localized: "Full Disk Access"),
+                             text: String(localized: "On macOS 27, Chrome, Edge and Brave (stable versions) protect their data: until Navloom has Full Disk Access, they don't appear in the list of browsers. Open System Settings › Privacy & Security › Full Disk Access, add Navloom with the “+” button, turn it on, then relaunch Navloom. The other browsers don't need it. Navloom only reads bookmarks, icons and a few settings (profile names, sync status)."))
                     InfoCard(systemImage: "power", tint: .orange,
-                             title: "Navigateur fermé",
-                             text: "Navloom modifie les fichiers du navigateur, qui les réécrirait à sa fermeture. Quitte-le complètement (Cmd + Q) avant d'écrire. Chaque écriture est précédée d'une sauvegarde.")
+                             title: String(localized: "Browser closed"),
+                             text: String(localized: "Navloom modifies the browser's files, which the browser would overwrite when it quits. Quit it completely (Cmd + Q) before writing. Every write is preceded by a backup."))
                 }
 
-                section("Twins / Ghosts / Echo - Problème avec la synchronisation") {
+                section("Twins / Ghosts / Echo - Trouble with sync") {
                     syncGuide
                 }
             }
             .padding(28)
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle("Navloom")
+        .navigationTitle(Text(verbatim: "Navloom"))
     }
 
     /// Liste tirée de la liste des navigateurs connus : elle ne peut pas être oubliée à l'ajout d'un navigateur.
     private var supportedBrowsers: String {
-        let names = ChromiumBrowser.known.map(\.name)
-        guard let last = names.last, names.count > 1 else { return names.first ?? "" }
-        return names.dropLast().joined(separator: ", ") + " et " + last
+        DiskAccess.joinedNames(ChromiumBrowser.known.map(\.name))
     }
 
     private var header: some View {
         VStack(spacing: 4) {
-            Text("Navloom")
+            Text(verbatim: "Navloom")
                 .font(.largeTitle.bold())
                 .foregroundStyle(LinearGradient(colors: [Brand.coral, Brand.violet],
                                                 startPoint: .leading, endPoint: .trailing))
-            Text("Des outils pour entretenir les favoris de ton navigateur")
+            Text("Tools to keep your browser bookmarks in shape")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -68,25 +66,25 @@ struct HomeView: View {
 
     private var syncGuide: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Pourquoi la synchro gêne", systemImage: "arrow.triangle.2.circlepath")
+            Label("Why sync gets in the way", systemImage: "arrow.triangle.2.circlepath")
                 .font(.headline)
                 .foregroundStyle(.orange)
-            Text("Quand la synchro des favoris est active, le navigateur remet au lancement les favoris que Navloom a supprimés. Twins et Ghosts refusent donc de supprimer, et Echo d’écrire dans la cible, tant qu’elle est active. Navloom ne peut pas la couper à ta place : elle se règle dans le navigateur, avec ton compte.")
+            Text("When bookmark sync is on, the browser brings back at launch the bookmarks Navloom deleted. So Twins and Ghosts refuse to delete, and Echo refuses to write to the target, while it's on. Navloom can't turn it off for you: it's set in the browser, with your account.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
 
             Divider()
 
-            Text("Avec Vivaldi")
+            Text("With Vivaldi")
                 .font(.subheadline.bold())
             VStack(alignment: .leading, spacing: 8) {
-                step(1, "Dans Vivaldi, ouvre Réglages › Synchronisation et décoche « Signets ».")
-                step(2, "Quitte Vivaldi (Cmd + Q), puis supprime tes doublons ou tes liens morts avec Navloom.")
-                step(3, "Pour réactiver la synchro des favoris sans faire revenir les favoris supprimés : retourne dans Réglages › Synchronisation et clique sur « Réinitialiser les données distantes ». Cela efface les données stockées chez Vivaldi, ton mot de passe de chiffrement et te déconnecte.")
-                step(4, "Reconnecte-toi, redéfinis ton mot de passe de chiffrement (tu peux reprendre le même), puis recoche « Signets ».")
+                step(1, "In Vivaldi, open Settings › Sync and uncheck “Bookmarks”.")
+                step(2, "Quit Vivaldi (Cmd + Q), then delete your duplicates or dead links with Navloom.")
+                step(3, "To turn bookmark sync back on without bringing back the deleted bookmarks: go back to Settings › Sync and click “Reset Remote Data”. This erases the data stored by Vivaldi and your encryption password, and signs you out.")
+                step(4, "Sign back in, set your encryption password again (you can reuse the same one), then check “Bookmarks” again.")
             }
 
-            Text("Navloom lit l'état de la synchro dans tous les navigateurs pris en charge. Pour Chrome, les favoris du compte Google sont dans un fichier séparé : la synchro complète est la seule à bloquer la suppression (voir « Limites »).")
+            Text("Navloom reads the sync status in every supported browser. For Chrome, Google Account bookmarks are in a separate file: only full sync blocks deletion (see “Limitations”).")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }
@@ -95,9 +93,9 @@ struct HomeView: View {
         .background(Color.orange.opacity(0.10), in: RoundedRectangle(cornerRadius: 12))
     }
 
-    private func step(_ number: Int, _ text: String) -> some View {
+    private func step(_ number: Int, _ text: LocalizedStringKey) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
-            Text("\(number)")
+            Text(verbatim: "\(number)")
                 .font(.caption.bold())
                 .foregroundStyle(.white)
                 .frame(width: 20, height: 20)
@@ -108,7 +106,7 @@ struct HomeView: View {
         }
     }
 
-    private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+    private func section<Content: View>(_ title: LocalizedStringKey, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.title3.bold())

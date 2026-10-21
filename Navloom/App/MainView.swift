@@ -74,7 +74,7 @@ struct MainView: View {
         case .about:
             AboutView()
         case nil:
-            ContentUnavailableView("Choisis un outil", systemImage: "sidebar.left")
+            ContentUnavailableView("Choose a tool", systemImage: "sidebar.left")
         }
     }
 }
