@@ -31,7 +31,9 @@ security find-identity -p codesigning | grep -q "$IDENTITY" \
 step "Archive Release"
 rm -rf "$BUILD"
 mkdir -p "$BUILD" dist
+# « generic » : app universelle (Apple Silicon + Intel), comme « Any Mac » dans Xcode.
 xcodebuild -project Navloom.xcodeproj -scheme Navloom -configuration Release \
+    -destination "generic/platform=macOS" \
     -archivePath "$ARCHIVE" archive -quiet
 
 APP="$ARCHIVE/Products/Applications/Navloom.app"
