@@ -12,10 +12,16 @@ final class FaviconSyncViewModel {
     }
 
     enum ResultCategory: String, CaseIterable, Identifiable {
-        case fetched = "Récupérées"
-        case none = "Sans favicon"
-        case failed = "Échecs"
+        case fetched, none, failed
         var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .fetched: String(localized: "Fetched")
+            case .none: String(localized: "No favicon")
+            case .failed: String(localized: "Failures")
+            }
+        }
     }
 
     struct ResultRow: Identifiable {
@@ -158,7 +164,7 @@ final class FaviconSyncViewModel {
             progressPass = 2
             progressDone = 0
             progressTotal = count
-            currentOrigin = "Pause avant le second passage…"
+            currentOrigin = String(localized: "Pausing before the second pass…")
         }
     }
 
@@ -213,7 +219,7 @@ final class FaviconSyncViewModel {
 
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.plainText]
-        panel.nameFieldStringValue = "faviconsync-rapport.txt"
+        panel.nameFieldStringValue = String(localized: "faviconsync-report.txt")
         panel.canCreateDirectories = true
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
@@ -221,7 +227,7 @@ final class FaviconSyncViewModel {
         do {
             try text.write(to: url, atomically: true, encoding: .utf8)
         } catch {
-            errorMessage = "Impossible d'écrire le rapport : \(error.localizedDescription)"
+            errorMessage = String(localized: "Couldn't write the report: \(error.localizedDescription)")
         }
     }
     

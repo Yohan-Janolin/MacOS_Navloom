@@ -9,8 +9,8 @@ nonisolated enum BackupCategory: String, CaseIterable, Identifiable, Hashable, S
     /// Ce que contient le fichier (l'outil qui l'a créé est un autre critère : voir `BackupTool`).
     var title: String {
         switch self {
-        case .favicons: "Favicons"
-        case .bookmarks: "Favoris"
+        case .favicons: String(localized: "Favicons")
+        case .bookmarks: String(localized: "Bookmarks")
         }
     }
 
@@ -29,11 +29,12 @@ nonisolated enum BackupCategory: String, CaseIterable, Identifiable, Hashable, S
         }
     }
 
-    /// Ce que contient une sauvegarde, pour l'affichage (« 120 favicons », « 340 favoris »).
-    var itemName: String {
+    /// Ce que contient une sauvegarde, pour l'affichage (« 120 favicons », « 340 favoris »),
+    /// avec le pluriel de la langue de l'app.
+    func countLabel(_ count: Int) -> String {
         switch self {
-        case .favicons: "favicons"
-        case .bookmarks: "favoris"
+        case .favicons: String(localized: "\(count) favicons")
+        case .bookmarks: String(localized: "\(count) bookmarks")
         }
     }
 }

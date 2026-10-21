@@ -10,15 +10,15 @@ struct FaviconSyncView: View {
                 ProgressView()
             } else if model.browsers.isEmpty {
                 ContentUnavailableView(
-                    "Aucun navigateur détecté",
+                    "No browser detected",
                     systemImage: "globe",
-                    description: Text("Navloom cherche Vivaldi, Chrome, Brave et Edge dans ~/Library/Application Support.")
+                    description: Text("Navloom looks for Vivaldi, Chrome, Brave and Edge in ~/Library/Application Support.")
                 )
             } else {
                 content
             }
         }
-        .navigationTitle("Navloom")
+        .navigationTitle(Text(verbatim: "Navloom"))
         .task { model.loadBrowsersIfNeeded() }
         .onChange(of: model.selectedBrowserID) { model.browserChanged() }
         .onChange(of: model.selectedProfileID) { model.reset() }
@@ -63,13 +63,13 @@ struct FaviconSyncView: View {
 
     private var titleHeader: some View {
         VStack(spacing: 4) {
-            Text("FaviconSync")
+            Text(verbatim: "FaviconSync")
                 .font(.largeTitle.bold())
                 .foregroundStyle(
                     LinearGradient(colors: [Brand.coral, Brand.pink],
                                    startPoint: .leading, endPoint: .trailing)
                 )
-            Text("Retrouve les favicons manquantes de tes favoris")
+            Text("Finds the missing favicons of your bookmarks")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -78,10 +78,10 @@ struct FaviconSyncView: View {
 
     private func stats(_ analysis: SyncAnalysis) -> some View {
         HStack(spacing: 12) {
-            StatCard(title: "Favoris web", value: analysis.webBookmarks, systemImage: "bookmark")
-            StatCard(title: "Avec favicon", value: analysis.withFaviconCount,
+            StatCard(title: "Web bookmarks", value: analysis.webBookmarks, systemImage: "bookmark")
+            StatCard(title: "With favicon", value: analysis.withFaviconCount,
                      systemImage: "checkmark.circle", tint: .green)
-            StatCard(title: "Sans favicon", value: analysis.missing.count,
+            StatCard(title: "Without favicon", value: analysis.missing.count,
                      systemImage: "questionmark.circle", tint: .orange)
         }
     }
@@ -93,16 +93,16 @@ struct FaviconSyncView: View {
         switch model.phase {
         case .idle:
             ContentUnavailableView(
-                "Prêt à analyser",
+                "Ready to analyze",
                 systemImage: "star.square",
-                description: Text("Navloom compare tes favoris aux favicons déjà connues du navigateur. L'analyse ne modifie rien.")
+                description: Text("Navloom compares your bookmarks with the favicons the browser already knows. The analysis doesn't change anything.")
             )
         case .analyzing:
-            ProgressView("Lecture des favoris…")
+            ProgressView("Reading bookmarks…")
         case .analyzed:
             if let analysis = model.analysis, analysis.missing.isEmpty {
-                ContentUnavailableView("Tout est en ordre", systemImage: "checkmark.seal",
-                                       description: Text("Tous tes favoris ont déjà une favicon."))
+                ContentUnavailableView("Everything is in order", systemImage: "checkmark.seal",
+                                       description: Text("All your bookmarks already have a favicon."))
             } else {
                 Spacer()
             }
@@ -121,7 +121,7 @@ struct FaviconSyncView: View {
             ThickProgressBar(value: Double(model.progressDone),
                              total: Double(max(model.progressTotal, 1)))
             HStack {
-                Text("Passage \(model.progressPass) · \(model.progressDone)/\(model.progressTotal)")
+                Text("Pass \(model.progressPass) · \(model.progressDone)/\(model.progressTotal)")
                 Spacer()
                 Text(model.currentOrigin).lineLimit(1).truncationMode(.middle)
             }
@@ -137,7 +137,7 @@ struct FaviconSyncView: View {
 
             Picker("", selection: $model.selectedCategory) {
                 ForEach(FaviconSyncViewModel.ResultCategory.allCases) { category in
-                    Text("\(category.rawValue) (\(model.rows[category]?.count ?? 0))").tag(category)
+                    Text(verbatim: "\(category.title) (\(model.rows[category]?.count ?? 0))").tag(category)
                 }
             }
             .pickerStyle(.segmented)
@@ -150,7 +150,7 @@ struct FaviconSyncView: View {
             .listStyle(.inset(alternatesRowBackgrounds: true))
             .overlay {
                 if rows.isEmpty {
-                    Text("Aucun élément").foregroundStyle(.secondary)
+                    Text("No items").foregroundStyle(.secondary)
                 }
             }
         }
@@ -160,14 +160,15 @@ struct FaviconSyncView: View {
     @ViewBuilder
     private var writeNotice: some View {
         if model.isBrowserRunning {
-            Label("\(model.selectedBrowser?.name ?? "Le navigateur") est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir écrire.",
+            let name = model.selectedBrowser?.name ?? String(localized: "The browser")
+            Label("\(name) is open. Quit it completely (Cmd + Q) to be able to write.",
                   systemImage: "exclamationmark.triangle.fill")
                 .foregroundStyle(.orange)
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
         } else {
-            Label("Une sauvegarde de la base sera créée automatiquement avant l'écriture.",
+            Label("A backup of the database will be created automatically before writing.",
                   systemImage: "externaldrive")
                 .foregroundStyle(.secondary)
                 .padding(12)
@@ -183,16 +184,17 @@ struct FaviconSyncView: View {
                 .foregroundStyle(.green)
 
             if let summary = model.summary {
-                Text("\(summary.success) favicons ajoutées")
+                Text("\(summary.success) favicons added")
                     .font(.title2.bold())
-                Text("\(summary.uniqueIcons) icônes uniques · \(summary.failure) échec(s)")
+                Text("\(summary.uniqueIcons) unique icons · \(summary.failure) failure(s)")
                     .foregroundStyle(.secondary)
 
                 if summary.backupURL != nil {
-                    Button("Afficher la sauvegarde dans le Finder") { model.revealBackup() }
+                    Button("Show Backup in Finder") { model.revealBackup() }
                 }
             }
-            Text("Relance \(model.selectedBrowser?.name ?? "le navigateur") pour voir les nouvelles icônes.")
+            let name = model.selectedBrowser?.name ?? String(localized: "the browser")
+            Text("Relaunch \(name) to see the new icons.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
         }
@@ -203,14 +205,14 @@ struct FaviconSyncView: View {
     private var actionBar: some View {
         HStack {
             if model.phase == .analyzed || model.phase == .fetched {
-                Button("Annuler") { model.reset() }
+                Button("Cancel") { model.reset() }
             }
 
             if model.fetchResult != nil, model.phase == .fetched || model.phase == .done {
                 Button {
                     model.exportReport()
                 } label: {
-                    Label("Exporter le rapport", systemImage: "square.and.arrow.up")
+                    Label("Export Report", systemImage: "square.and.arrow.up")
                 }
             }
 
@@ -219,7 +221,7 @@ struct FaviconSyncView: View {
                 Button {
                     model.analyze()
                 } label: {
-                    Label("Relancer l'analyse", systemImage: "arrow.clockwise")
+                    Label("Analyze Again", systemImage: "arrow.clockwise")
                 }
                 .controlSize(.large)
             }
@@ -233,23 +235,24 @@ struct FaviconSyncView: View {
     private var primaryAction: some View {
         switch model.phase {
         case .idle:
-            Button("Analyser") { model.analyze() }
+            Button("Analyze") { model.analyze() }
                 .disabled(model.selectedProfile == nil)
         case .analyzing:
-            Button("Analyse en cours…") {}.disabled(true)
+            Button("Analyzing…") {}.disabled(true)
         case .analyzed:
             if let analysis = model.analysis, !analysis.missing.isEmpty {
-                Button("Chercher \(analysis.missing.count) favicons") { model.fetch() }
+                Button("Find \(analysis.missing.count) favicons") { model.fetch() }
             }
         case .fetching:
-            Button("Recherche en cours…") {}.disabled(true)
+            Button("Searching…") {}.disabled(true)
         case .fetched:
-            Button("Appliquer à \(model.selectedBrowser?.name ?? "la base")") { model.apply() }
+            let target = model.selectedBrowser?.name ?? String(localized: "the database")
+            Button("Apply to \(target)") { model.apply() }
                 .disabled(model.isBrowserRunning || (model.fetchResult?.fetched.isEmpty ?? true))
         case .writing:
-            Button("Écriture en cours…") {}.disabled(true)
+            Button("Writing…") {}.disabled(true)
         case .done:
-            Button("Nouvelle analyse") { model.analyze() }
+            Button("New Analysis") { model.analyze() }
         }
     }
 }
@@ -265,8 +268,8 @@ private struct ResultRowView: View {
                 .frame(width: 20, height: 20)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(row.name).lineLimit(1)
-                Text(row.url)
+                Text(verbatim: row.name).lineLimit(1)
+                Text(verbatim: row.url)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)

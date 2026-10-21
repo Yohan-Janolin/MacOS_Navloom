@@ -18,9 +18,9 @@ nonisolated enum BackupFilter: Hashable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .all: "Tout"
+        case .all: String(localized: "All")
         case .tool(let tool): tool.title
-        case .legacy: "Anciennes"
+        case .legacy: String(localized: "Old")
         }
     }
 
@@ -202,10 +202,13 @@ final class BackupsViewModel {
                     try FaviconBackup.restore(entry, to: destination, label: profile.id)
                 }.value
 
-                let what = entry.category == .favicons ? "Base restaurée." : "Favoris restaurés."
-                var text = "\(what) Relance \(profile.browserName) pour voir le résultat."
+                let browserName = profile.browserName
+                var text = entry.category == .favicons
+                    ? String(localized: "Database restored. Relaunch \(browserName) to see the result.")
+                    : String(localized: "Bookmarks restored. Relaunch \(browserName) to see the result.")
                 if let safety {
-                    text += " L'état précédent est conservé dans « \(safety.lastPathComponent) »."
+                    let fileName = safety.lastPathComponent
+                    text += " " + String(localized: "The previous state is kept in “\(fileName)”.")
                 }
                 banner = Banner(text: text, isError: false)
             } catch {
@@ -219,7 +222,7 @@ final class BackupsViewModel {
     func delete(_ entry: BackupEntry) {
         do {
             try FaviconBackup.delete(entry)
-            banner = Banner(text: "Sauvegarde mise à la corbeille.", isError: false)
+            banner = Banner(text: String(localized: "Backup moved to the Trash."), isError: false)
         } catch {
             banner = Banner(text: error.localizedDescription, isError: true)
         }
@@ -242,7 +245,7 @@ nonisolated enum BackupError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .unreadable: "Cette sauvegarde est illisible : elle n'a pas été appliquée."
+        case .unreadable: String(localized: "This backup is unreadable: it wasn't applied.")
         }
     }
 }

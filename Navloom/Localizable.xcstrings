@@ -51,12 +51,292 @@
         }
       }
     },
+    "%@ is open. Quit it completely (Cmd + Q) to be able to write." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est ouvert. Ferme-le complètement (Cmd + Q) pour pouvoir écrire."
+          }
+        }
+      }
+    },
     "%@. Arc isn't supported, nor are Safari or Firefox, which don't use the same bookmark format." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@. Arc n'est pas supporté, pas plus que Safari ou Firefox, qui n'utilisent pas le même format de favoris."
+          }
+        }
+      }
+    },
+    "%lld backups moved to the Trash." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld backup moved to the Trash."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld backups moved to the Trash."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld sauvegarde mise à la corbeille."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld sauvegardes mises à la corbeille."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld backups moved." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld backup moved."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld backups moved."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld sauvegarde déplacée."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld sauvegardes déplacées."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld bookmarks" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bookmark"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bookmarks"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favori"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favoris"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld favicons" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favicon"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favicons"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favicon"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favicons"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld favicons added" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favicon added"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favicons added"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favicon ajoutée"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favicons ajoutées"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld unique icons · %lld failure(s)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld icônes uniques · %2$lld échec(s)"
+          }
+        }
+      }
+    },
+    "A backup is created automatically before every addition of bookmarks: the Bookmarks file and, if icons are copied, the favicon database." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une sauvegarde est créée automatiquement avant chaque ajout de favoris : le fichier Bookmarks et, si les icônes sont copiées, la base de favicons."
+          }
+        }
+      }
+    },
+    "A backup is created automatically before every deletion of dead links." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une sauvegarde est créée automatiquement avant chaque suppression de liens morts."
+          }
+        }
+      }
+    },
+    "A backup is created automatically before every deletion of duplicates." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une sauvegarde est créée automatiquement avant chaque suppression de doublons."
+          }
+        }
+      }
+    },
+    "A backup is created automatically before every write (favicon database for FaviconSync, Bookmarks file for Twins and Ghosts, both for Echo) and before every restore. Backups are counted separately for each browser profile and each tool; extra backups are moved to the Trash, not deleted permanently." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une sauvegarde est créée automatiquement avant chaque écriture (base de favicons pour FaviconSync, fichier Bookmarks pour Twins et Ghosts, les deux pour Echo) et avant chaque restauration. Le décompte se fait séparément pour chaque profil de navigateur et chaque outil ; les sauvegardes en trop sont mises à la corbeille, pas supprimées définitivement."
+          }
+        }
+      }
+    },
+    "A backup is created automatically before every write to a browser's files." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une sauvegarde est créée automatiquement avant chaque écriture dans les fichiers d'un navigateur."
+          }
+        }
+      }
+    },
+    "A backup is created automatically before every write to the favicon database." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une sauvegarde est créée automatiquement avant chaque écriture dans la base de favicons."
           }
         }
       }
@@ -81,6 +361,16 @@
         }
       }
     },
+    "A backup of the database will be created automatically before writing." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une sauvegarde de la base sera créée automatiquement avant l'écriture."
+          }
+        }
+      }
+    },
     "About" : {
       "localizations" : {
         "fr" : {
@@ -91,12 +381,122 @@
         }
       }
     },
+    "All" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout"
+          }
+        }
+      }
+    },
+    "All your bookmarks already have a favicon." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous tes favoris ont déjà une favicon."
+          }
+        }
+      }
+    },
+    "Analyze" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analyser"
+          }
+        }
+      }
+    },
+    "Analyze Again" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relancer l'analyse"
+          }
+        }
+      }
+    },
+    "Analyzing…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analyse en cours…"
+          }
+        }
+      }
+    },
+    "Appearance" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apparence"
+          }
+        }
+      }
+    },
+    "Apply to %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appliquer à %@"
+          }
+        }
+      }
+    },
     "Author" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Auteur"
+          }
+        }
+      }
+    },
+    "Automatically delete old backups" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer automatiquement les anciennes sauvegardes"
+          }
+        }
+      }
+    },
+    "Backup created by %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde créée par %@"
+          }
+        }
+      }
+    },
+    "Backup location" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emplacement des sauvegardes"
+          }
+        }
+      }
+    },
+    "Backup moved to the Trash." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde mise à la corbeille."
           }
         }
       }
@@ -117,6 +517,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Des sauvegardes du fichier Bookmarks (et de la base Favicons, si les icônes sont copiées) seront créées automatiquement avant la copie : tu pourras revenir en arrière depuis l'écran Sauvegardes."
+          }
+        }
+      }
+    },
+    "Before restore" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avant restauration"
+          }
+        }
+      }
+    },
+    "Before write" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avant écriture"
+          }
+        }
+      }
+    },
+    "Bookmark backup created before Navloom recorded which tool made it: Twins or Ghosts." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde de favoris créée avant que Navloom note quel outil l'a faite : Twins ou Ghosts."
           }
         }
       }
@@ -161,6 +591,26 @@
         }
       }
     },
+    "Bookmarks" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoris"
+          }
+        }
+      }
+    },
+    "Bookmarks restored. Relaunch %@ to see the result." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoris restaurés. Relance %@ pour voir le résultat."
+          }
+        }
+      }
+    },
     "Browser" : {
       "localizations" : {
         "fr" : {
@@ -181,12 +631,42 @@
         }
       }
     },
+    "Cancel" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
+          }
+        }
+      }
+    },
+    "Choose" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir"
+          }
+        }
+      }
+    },
     "Choose a tool" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choisis un outil"
+          }
+        }
+      }
+    },
+    "Choose…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir…"
           }
         }
       }
@@ -201,12 +681,62 @@
         }
       }
     },
+    "Clean Up Now" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nettoyer maintenant"
+          }
+        }
+      }
+    },
+    "Couldn't move them: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacement impossible : %@"
+          }
+        }
+      }
+    },
+    "Couldn't write the report: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d'écrire le rapport : %@"
+          }
+        }
+      }
+    },
     "Dark" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sombre"
+          }
+        }
+      }
+    },
+    "Database restored. Relaunch %@ to see the result." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Base restaurée. Relance %@ pour voir le résultat."
+          }
+        }
+      }
+    },
+    "Default" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Par défaut"
           }
         }
       }
@@ -221,6 +751,56 @@
         }
       }
     },
+    "Everything is in order" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout est en ordre"
+          }
+        }
+      }
+    },
+    "Export Report" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter le rapport"
+          }
+        }
+      }
+    },
+    "Failures" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échecs"
+          }
+        }
+      }
+    },
+    "Favicons" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favicons"
+          }
+        }
+      }
+    },
+    "Fetched" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récupérées"
+          }
+        }
+      }
+    },
     "Fetches the missing icons (favicons) of your bookmarks and writes them into the browser. The browser must be closed when writing." : {
       "localizations" : {
         "fr" : {
@@ -231,12 +811,62 @@
         }
       }
     },
+    "Find %lld favicons" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Find %lld favicon"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Find %lld favicons"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Chercher %lld favicon"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Chercher %lld favicons"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Finds bookmarks pointing to exactly the same URL and deletes the ones you check. The browser must be closed, and bookmark sync turned off (see below)." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Retrouve les favoris qui pointent sur exactement la même URL et supprime ceux que tu coches. Le navigateur doit être fermé, et la synchro des favoris désactivée (voir plus bas)."
+          }
+        }
+      }
+    },
+    "Finds the missing favicons of your bookmarks" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retrouve les favicons manquantes de tes favoris"
           }
         }
       }
@@ -271,6 +901,16 @@
         }
       }
     },
+    "General" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Général"
+          }
+        }
+      }
+    },
     "GitHub repository" : {
       "localizations" : {
         "fr" : {
@@ -301,12 +941,102 @@
         }
       }
     },
+    "Keep %lld backups “before restore”" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Keep %lld backup “before restore”"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Keep %lld backups “before restore”"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Conserver %lld sauvegarde « avant restauration »"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Conserver %lld sauvegardes « avant restauration »"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Keep %lld backups “before write”" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Keep %lld backup “before write”"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Keep %lld backups “before write”"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Conserver %lld sauvegarde « avant écriture »"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Conserver %lld sauvegardes « avant écriture »"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Later" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plus tard"
+          }
+        }
+      }
+    },
+    "Leave Them in Place" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laisser sur place"
           }
         }
       }
@@ -337,6 +1067,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Liste les sauvegardes créées avant chaque écriture, par outil (FaviconSync, Twins, Ghosts, Echo), et permet de restaurer l'une d'elles."
+          }
+        }
+      }
+    },
+    "Move %lld backups" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Move %lld backup"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Move %lld backups"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Déplacer %lld sauvegarde"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Déplacer %lld sauvegardes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Move existing backups?" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer les sauvegardes existantes ?"
+          }
+        }
+      }
+    },
+    "Move to Trash" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à la corbeille"
           }
         }
       }
@@ -381,12 +1171,32 @@
         }
       }
     },
+    "Navloom compares your bookmarks with the favicons the browser already knows. The analysis doesn't change anything." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom compare tes favoris aux favicons déjà connues du navigateur. L'analyse ne modifie rien."
+          }
+        }
+      }
+    },
     "Navloom is provided “as is”, without any warranty. It modifies your browser's files. A backup is created before every write, but the author can't be held responsible for any data loss or other damage. You use it at your own risk." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Navloom est fourni « tel quel », sans aucune garantie. Il modifie des fichiers de ton navigateur. Une sauvegarde est créée avant chaque écriture, mais l'auteur ne peut pas être tenu responsable d'une perte de données ou de tout autre dégât. Tu l'utilises à tes risques."
+          }
+        }
+      }
+    },
+    "Navloom looks for Vivaldi, Chrome, Brave and Edge in ~/Library/Application Support." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom cherche Vivaldi, Chrome, Brave et Edge dans ~/Library/Application Support."
           }
         }
       }
@@ -411,12 +1221,102 @@
         }
       }
     },
+    "New Analysis" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle analyse"
+          }
+        }
+      }
+    },
+    "No backups" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune sauvegarde"
+          }
+        }
+      }
+    },
+    "No browser detected" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun navigateur détecté"
+          }
+        }
+      }
+    },
+    "No favicon" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans favicon"
+          }
+        }
+      }
+    },
+    "No items" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun élément"
+          }
+        }
+      }
+    },
+    "No old backups." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune ancienne sauvegarde."
+          }
+        }
+      }
+    },
+    "Nothing to clean up." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien à nettoyer."
+          }
+        }
+      }
+    },
+    "Old" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anciennes"
+          }
+        }
+      }
+    },
     "On macOS 27, Chrome, Edge and Brave (stable versions) protect their data: until Navloom has Full Disk Access, they don't appear in the list of browsers. Open System Settings › Privacy & Security › Full Disk Access, add Navloom with the “+” button, turn it on, then relaunch Navloom. The other browsers don't need it. Navloom only reads bookmarks, icons and a few settings (profile names, sync status)." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sur macOS 27, Chrome, Edge et Brave (versions stables) protègent leurs données : tant que Navloom n'a pas l'accès complet au disque, ils n'apparaissent pas dans la liste des navigateurs. Ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + », active-le, puis relance Navloom. Les autres navigateurs n'en ont pas besoin. Navloom ne lit que les favoris, les icônes et quelques réglages (noms de profils, état de la synchro)."
+          }
+        }
+      }
+    },
+    "Open Folder" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le dossier"
           }
         }
       }
@@ -451,6 +1351,26 @@
         }
       }
     },
+    "Pass %lld · %lld/%lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passage %1$lld · %2$lld/%3$lld"
+          }
+        }
+      }
+    },
+    "Pausing before the second pass…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause avant le second passage…"
+          }
+        }
+      }
+    },
     "Profile" : {
       "localizations" : {
         "fr" : {
@@ -467,6 +1387,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quitte Vivaldi (Cmd + Q), puis supprime tes doublons ou tes liens morts avec Navloom."
+          }
+        }
+      }
+    },
+    "Reading bookmarks…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture des favoris…"
+          }
+        }
+      }
+    },
+    "Ready to analyze" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prêt à analyser"
+          }
+        }
+      }
+    },
+    "Relaunch %@ to see the new icons." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relance %@ pour voir les nouvelles icônes."
           }
         }
       }
@@ -511,12 +1461,72 @@
         }
       }
     },
+    "Restore" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurer"
+          }
+        }
+      }
+    },
+    "Restore this backup?" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurer cette sauvegarde ?"
+          }
+        }
+      }
+    },
+    "Searching…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recherche en cours…"
+          }
+        }
+      }
+    },
     "Settings" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Paramètres"
+          }
+        }
+      }
+    },
+    "Show" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher"
+          }
+        }
+      }
+    },
+    "Show Backup in Finder" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher la sauvegarde dans le Finder"
+          }
+        }
+      }
+    },
+    "Show in Finder" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher dans le Finder"
           }
         }
       }
@@ -551,12 +1561,102 @@
         }
       }
     },
+    "The bookmarks of %@ (Bookmarks file) will be replaced by the backup from %@. The current state is backed up automatically beforehand." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les favoris de %1$@ (fichier Bookmarks) seront remplacés par la sauvegarde du %2$@. L'état actuel est sauvegardé automatiquement avant."
+          }
+        }
+      }
+    },
+    "The browser" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le navigateur"
+          }
+        }
+      }
+    },
     "The current state is backed up automatically before restoring." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "L'état actuel est sauvegardé automatiquement avant la restauration."
+          }
+        }
+      }
+    },
+    "The favicon database of %@ will be replaced by the backup from %@. The current state is backed up automatically beforehand." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La base de favicons de %1$@ sera remplacée par la sauvegarde du %2$@. L'état actuel est sauvegardé automatiquement avant."
+          }
+        }
+      }
+    },
+    "The previous folder contains %lld backups. If you leave them in place, they won't appear on the Backups screen anymore." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The previous folder contains %lld backup. If you leave it in place, it won't appear on the Backups screen anymore."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The previous folder contains %lld backups. If you leave them in place, they won't appear on the Backups screen anymore."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Le dossier précédent contient %lld sauvegarde. Si tu la laisses sur place, elle n'apparaîtra plus dans l'écran Sauvegardes."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Le dossier précédent contient %lld sauvegardes. Si tu les laisses sur place, elles n'apparaîtront plus dans l'écran Sauvegardes."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "The previous state is kept in “%@”." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'état précédent est conservé dans « %@ »."
+          }
+        }
+      }
+    },
+    "This backup is unreadable: it wasn't applied." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette sauvegarde est illisible : elle n'a pas été appliquée."
           }
         }
       }
@@ -611,12 +1711,32 @@
         }
       }
     },
+    "Twins or Ghosts" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twins ou Ghosts"
+          }
+        }
+      }
+    },
     "Version" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version"
+          }
+        }
+      }
+    },
+    "Web bookmarks" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoris web"
           }
         }
       }
@@ -661,12 +1781,112 @@
         }
       }
     },
+    "With favicon" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avec favicon"
+          }
+        }
+      }
+    },
+    "Without favicon" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans favicon"
+          }
+        }
+      }
+    },
+    "Writing…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écriture en cours…"
+          }
+        }
+      }
+    },
+    "faviconsync-report.txt" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "faviconsync-rapport.txt"
+          }
+        }
+      }
+    },
     "macOS blocks access to the data of %@, so they don't appear in the list of browsers.\n\nTo use them, open System Settings › Privacy & Security › Full Disk Access, add Navloom with the “+” button if it isn't there, turn it on, then relaunch Navloom." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "macOS bloque l'accès aux données de %@ : ils n'apparaissent donc pas dans la liste des navigateurs.\n\nPour les utiliser, ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + » s'il n'y est pas, active-le, puis relance Navloom."
+          }
+        }
+      }
+    },
+    "reading…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lecture…"
+          }
+        }
+      }
+    },
+    "the browser" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "le navigateur"
+          }
+        }
+      }
+    },
+    "the database" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "la base"
+          }
+        }
+      }
+    },
+    "this browser" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ce navigateur"
+          }
+        }
+      }
+    },
+    "unreadable" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "illisible"
+          }
+        }
+      }
+    },
+    "“System” follows the macOS setting. The other two force the appearance, whatever that setting is." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« Système » suit le réglage de macOS. Les deux autres forcent l'apparence, quel que soit ce réglage."
           }
         }
       }

@@ -9,15 +9,15 @@ struct BackupsView: View {
                 ProgressView()
             } else if model.browsers.isEmpty {
                 ContentUnavailableView(
-                    "Aucun navigateur détecté",
+                    "No browser detected",
                     systemImage: "globe",
-                    description: Text("Navloom cherche Vivaldi, Chrome, Brave et Edge dans ~/Library/Application Support.")
+                    description: Text("Navloom looks for Vivaldi, Chrome, Brave and Edge in ~/Library/Application Support.")
                 )
             } else {
                 content
             }
         }
-        .navigationTitle("Sauvegardes")
+        .navigationTitle("Backups")
         .task { model.loadBrowsersIfNeeded() }
         .onAppear { model.reloadBackups() }   // une nouvelle sauvegarde a pu apparaître entre-temps
         .task {
@@ -30,7 +30,7 @@ struct BackupsView: View {
         .onChange(of: model.selectedBrowserID) { model.browserChanged() }
         .onChange(of: model.selectedProfileID) { model.reloadBackups() }
         .confirmationDialog(
-            "Restaurer cette sauvegarde ?",
+            "Restore this backup?",
             isPresented: Binding(
                 get: { model.pendingRestore != nil },
                 set: { if !$0 { model.pendingRestore = nil } }
@@ -38,20 +38,20 @@ struct BackupsView: View {
             titleVisibility: .visible,
             presenting: model.pendingRestore
         ) { entry in
-            Button("Restaurer") { model.restore(entry) }
+            Button("Restore") { model.restore(entry) }
         } message: { entry in
             Text(restoreMessage(for: entry))
         }
     }
 
     private func restoreMessage(for entry: BackupEntry) -> String {
-        let browser = model.selectedBrowser?.name ?? "ce navigateur"
+        let browser = model.selectedBrowser?.name ?? String(localized: "this browser")
         let date = entry.date.formatted(date: .long, time: .shortened)
         switch entry.category {
         case .favicons:
-            return "La base de favicons de \(browser) sera remplacée par la sauvegarde du \(date). L'état actuel est sauvegardé automatiquement avant."
+            return String(localized: "The favicon database of \(browser) will be replaced by the backup from \(date). The current state is backed up automatically beforehand.")
         case .bookmarks:
-            return "Les favoris de \(browser) (fichier Bookmarks) seront remplacés par la sauvegarde du \(date). L'état actuel est sauvegardé automatiquement avant."
+            return String(localized: "The bookmarks of \(browser) (Bookmarks file) will be replaced by the backup from \(date). The current state is backed up automatically beforehand.")
         }
     }
 
@@ -71,7 +71,7 @@ struct BackupsView: View {
 
             if model.items.isEmpty {
                 ContentUnavailableView(
-                    "Aucune sauvegarde",
+                    "No backups",
                     systemImage: "clock.arrow.circlepath",
                     description: Text(emptyDescription)
                 )
@@ -103,7 +103,7 @@ struct BackupsView: View {
             Button {
                 model.revealFolder()
             } label: {
-                Label("Ouvrir le dossier", systemImage: "folder")
+                Label("Open Folder", systemImage: "folder")
             }
             .controlSize(.large)
         }
@@ -114,7 +114,7 @@ struct BackupsView: View {
     private var filterPicker: some View {
         Picker("", selection: $model.selectedFilter) {
             ForEach(model.filters) { filter in
-                Text("\(filter.title) (\(model.count(in: filter)))").tag(filter)
+                Text(verbatim: "\(filter.title) (\(model.count(in: filter)))").tag(filter)
             }
         }
         .pickerStyle(.segmented)
@@ -125,17 +125,17 @@ struct BackupsView: View {
     private var emptyDescription: String {
         switch model.selectedFilter {
         case .all:
-            "Une sauvegarde est créée automatiquement avant chaque écriture dans les fichiers d'un navigateur."
+            String(localized: "A backup is created automatically before every write to a browser's files.")
         case .tool(.faviconSync):
-            "Une sauvegarde est créée automatiquement avant chaque écriture dans la base de favicons."
+            String(localized: "A backup is created automatically before every write to the favicon database.")
         case .tool(.twins):
-            "Une sauvegarde est créée automatiquement avant chaque suppression de doublons."
+            String(localized: "A backup is created automatically before every deletion of duplicates.")
         case .tool(.ghosts):
-            "Une sauvegarde est créée automatiquement avant chaque suppression de liens morts."
+            String(localized: "A backup is created automatically before every deletion of dead links.")
         case .tool(.echo):
-            "Une sauvegarde est créée automatiquement avant chaque ajout de favoris : le fichier Bookmarks et, si les icônes sont copiées, la base de favicons."
+            String(localized: "A backup is created automatically before every addition of bookmarks: the Bookmarks file and, if icons are copied, the favicon database.")
         case .legacy:
-            "Aucune ancienne sauvegarde."
+            String(localized: "No old backups.")
         }
     }
 
@@ -144,7 +144,7 @@ struct BackupsView: View {
     /// la synchro n'y change rien.
     @ViewBuilder
     private var notice: some View {
-        let browserName = model.selectedBrowser?.name ?? "Le navigateur"
+        let browserName = model.selectedBrowser?.name ?? String(localized: "The browser")
         if model.items.contains(where: { $0.entry.category == .bookmarks }) {
             SyncNotice(browserName: browserName,
                        isBrowserRunning: model.isBrowserRunning,
@@ -189,7 +189,7 @@ private struct ToolPill: View {
 
     var body: some View {
         let style = appearance
-        Label(style.title, systemImage: style.systemImage)
+        Label { Text(verbatim: style.title) } icon: { Image(systemName: style.systemImage) }
             .font(.caption.bold())
             .foregroundStyle(style.tint)
             .padding(.horizontal, 8)
@@ -201,10 +201,10 @@ private struct ToolPill: View {
     private var appearance: (title: String, systemImage: String, tint: Color, help: String) {
         if let tool {
             return (tool.title, tool.feature.systemImage, tool.feature.tint,
-                    "Sauvegarde créée par \(tool.title)")
+                    String(localized: "Backup created by \(tool.title)"))
         }
-        return ("Twins ou Ghosts", "questionmark.circle", .secondary,
-                "Sauvegarde de favoris créée avant que Navloom note quel outil l'a faite : Twins ou Ghosts.")
+        return (String(localized: "Twins or Ghosts"), "questionmark.circle", .secondary,
+                String(localized: "Bookmark backup created before Navloom recorded which tool made it: Twins or Ghosts."))
     }
 }
 
@@ -229,19 +229,19 @@ private struct BackupRow: View {
                     Text(item.entry.date.formatted(date: .long, time: .shortened))
                     ToolPill(tool: item.entry.effectiveTool)
                 }
-                Text("\(kindLabel) · \(countLabel) · \(sizeLabel)")
+                Text(verbatim: "\(kindLabel) · \(countLabel) · \(sizeLabel)")
                     .font(.caption)
                     .foregroundStyle(item.count == .unreadable ? AnyShapeStyle(.red) : AnyShapeStyle(.secondary))
             }
 
             Spacer()
 
-            Button("Restaurer", action: onRestore)
+            Button("Restore", action: onRestore)
                 .disabled(!canRestore)
 
             Menu {
-                Button("Afficher dans le Finder", action: onReveal)
-                Button("Mettre à la corbeille", role: .destructive, action: onDelete)
+                Button("Show in Finder", action: onReveal)
+                Button("Move to Trash", role: .destructive, action: onDelete)
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
@@ -253,14 +253,14 @@ private struct BackupRow: View {
     }
 
     private var kindLabel: String {
-        item.entry.kind == .beforeRestore ? "Avant restauration" : "Avant écriture"
+        item.entry.kind == .beforeRestore ? String(localized: "Before restore") : String(localized: "Before write")
     }
 
     private var countLabel: String {
         switch item.count {
-        case .loading: "lecture…"
-        case .value(let count): "\(count) \(item.entry.category.itemName)"
-        case .unreadable: "illisible"
+        case .loading: String(localized: "reading…")
+        case .value(let count): item.entry.category.countLabel(count)
+        case .unreadable: String(localized: "unreadable")
         }
     }
 
