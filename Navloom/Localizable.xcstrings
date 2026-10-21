@@ -1,12 +1,62 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ %@ Checked boxes make these URL variants count as identical; the trailing “/” always does. Careful with parameters (?…): if the page depends on them (a video, an article…), different bookmarks would be merged." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ Les cases cochées font traiter ces variantes d'URL comme identiques ; le « / » final l'est toujours. Attention aux paramètres (?…) : si la page en dépend (une vidéo, un article…), des favoris différents seraient fusionnés."
+          }
+        }
+      }
+    },
     "%@ (build %@)" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ (build %2$@)"
+          }
+        }
+      }
+    },
+    "%@ already contains all the source's web bookmarks." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ contient déjà tous les favoris web de la source."
+          }
+        }
+      }
+    },
+    "%@ already has exactly the source's bookmarks." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ a déjà exactement les favoris de la source."
+          }
+        }
+      }
+    },
+    "%@ is now identical to the source" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est maintenant identique à la source"
+          }
+        }
+      }
+    },
+    "%@ is open. Quit it completely (Cmd + Q) before writing to its bookmarks: nothing was changed." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est ouvert. Ferme-le complètement (Cmd + Q) avant d'écrire dans ses favoris : rien n'a été modifié."
           }
         }
       }
@@ -61,6 +111,16 @@
         }
       }
     },
+    "%@ will become identical to the source: %@, %@ %@. Backups are created beforehand: you'll be able to roll back from the Backups screen." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ deviendra identique à la source : %2$@, %3$@ %4$@. Des sauvegardes sont créées avant : tu pourras revenir en arrière depuis l'écran Sauvegardes."
+          }
+        }
+      }
+    },
     "%@. Arc isn't supported, nor are Safari or Firefox, which don't use the same bookmark format." : {
       "localizations" : {
         "fr" : {
@@ -104,6 +164,46 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%1$lld favoris du compte Google (icône nuage) : ils ne sont pas cochables, supprime-les à la main dans %2$@. Une copie du compte protège son groupe : les copies locales peuvent toutes être cochées."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld already present" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld already present"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld already present"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld déjà présent"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld déjà présents"
                 }
               }
             }
@@ -231,6 +331,86 @@
         }
       }
     },
+    "%lld bookmarks added" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bookmark added"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bookmarks added"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favori ajouté"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favoris ajoutés"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld bookmarks added to %@" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bookmark added to %@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bookmarks added to %@"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$lld favori ajouté à %2$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$lld favoris ajoutés à %2$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld bookmarks deleted" : {
       "localizations" : {
         "en" : {
@@ -271,6 +451,46 @@
         }
       }
     },
+    "%lld bookmarks without an icon in the source: FaviconSync can look for them." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bookmark without an icon in the source: FaviconSync can look for it."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld bookmarks without an icon in the source: FaviconSync can look for them."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favori sans icône dans la source : FaviconSync peut la chercher."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favoris sans icône dans la source : FaviconSync peut les chercher."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld checked" : {
       "localizations" : {
         "en" : {
@@ -304,6 +524,46 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld cochés"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld deleted" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld deleted"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld deleted"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld supprimé"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld supprimés"
                 }
               }
             }
@@ -391,12 +651,462 @@
         }
       }
     },
+    "%lld folders" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folder"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folders"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dossier"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dossiers"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld folders created" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folder created"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folders created"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dossier créé"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dossiers créés"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld folders deleted" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folder deleted"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folders deleted"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dossier supprimé"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dossiers supprimés"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld folders to create" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folder to create"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld folders to create"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dossier à créer"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dossiers à créer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld icons copied" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld icon copied"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld icons copied"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld icône copiée"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld icônes copiées"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld icons couldn't be written." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld icon couldn't be written."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld icons couldn't be written."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld icône n'a pas pu être écrite."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld icônes n'ont pas pu être écrites."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld identical" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld identical"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld identical"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld identique"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld identiques"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld non-web bookmarks" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld non-web bookmark"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld non-web bookmarks"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favori non web"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favoris non web"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld non-web bookmarks (vivaldi://, opera://…) skipped: they aren't copied from one browser to another." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld non-web bookmark (vivaldi://, opera://…) skipped: it isn't copied from one browser to another."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld non-web bookmarks (vivaldi://, opera://…) skipped: they aren't copied from one browser to another."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favori non web (vivaldi://, opera://…) ignoré : il ne se copie pas d'un navigateur à l'autre."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld favoris non web (vivaldi://, opera://…) ignorés : ils ne se copient pas d'un navigateur à l'autre."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld source duplicates skipped" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld source duplicate skipped"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld source duplicates skipped"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld doublon de la source ignoré"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld doublons de la source ignorés"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld to delete" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld à supprimer"
+          }
+        }
+      }
+    },
     "%lld unique icons · %lld failure(s)" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld icônes uniques · %2$lld échec(s)"
+          }
+        }
+      }
+    },
+    "(and %lld folders)" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "(and %lld folder)"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "(and %lld folders)"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "(et %lld dossier)"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "(et %lld dossiers)"
+                }
+              }
+            }
           }
         }
       }
@@ -491,12 +1201,162 @@
         }
       }
     },
+    "A bookmark is skipped if its URL already exists anywhere in the target: the safest option, no duplicate is created." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un favori est ignoré si son URL existe déjà n'importe où dans la cible : c'est le plus prudent, aucun doublon n'est créé."
+          }
+        }
+      }
+    },
+    "A bookmark is skipped only if its URL already exists in the same folder of the target: if you organize differently, this can create duplicates." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un favori est ignoré seulement si son URL existe déjà dans le même dossier de la cible : si tu ranges autrement, cela peut créer des doublons."
+          }
+        }
+      }
+    },
     "About" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "À propos"
+          }
+        }
+      }
+    },
+    "Add" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter"
+          }
+        }
+      }
+    },
+    "Add %lld bookmarks" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Add %lld bookmark"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Add %lld bookmarks"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ajouter %lld favori"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ajouter %lld favoris"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Add %lld bookmarks to %@?" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Add %lld bookmark to %@?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Add %lld bookmarks to %@?"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ajouter %1$lld favori à %2$@ ?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ajouter %1$lld favoris à %2$@ ?"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Add missing" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter les manquants"
+          }
+        }
+      }
+    },
+    "Add the missing bookmarks" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter les favoris manquants"
+          }
+        }
+      }
+    },
+    "Adding bookmarks…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajout des favoris…"
+          }
+        }
+      }
+    },
+    "Adding…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajout en cours…"
           }
         }
       }
@@ -527,6 +1387,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tous tes favoris répondent."
+          }
+        }
+      }
+    },
+    "Already identical" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déjà identiques"
+          }
+        }
+      }
+    },
+    "Already present" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déjà présents"
+          }
+        }
+      }
+    },
+    "Also copy the icons from %@ (without downloading them again)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier aussi les icônes depuis %@ (sans les retélécharger)"
           }
         }
       }
@@ -681,6 +1571,16 @@
         }
       }
     },
+    "Bookmark sync is on in %@: it would mix the written bookmarks with those of the account. Nothing was changed." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La synchro des favoris est activée dans %@ : elle mélangerait les favoris écrits avec ceux du compte. Rien n'a été modifié."
+          }
+        }
+      }
+    },
     "Bookmark sync is on in %@: the next time it starts, it may mix the added bookmarks with the ones in your account (duplicates, or a return to the account's state). Turn it off in the browser's sync settings (the steps are on the Home screen) before adding." : {
       "localizations" : {
         "fr" : {
@@ -727,6 +1627,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Favoris"
+          }
+        }
+      }
+    },
+    "Bookmarks bar" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Barre de favoris"
           }
         }
       }
@@ -781,6 +1691,16 @@
         }
       }
     },
+    "Checking the result failed: nothing was changed." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La vérification du résultat a échoué : rien n'a été modifié."
+          }
+        }
+      }
+    },
     "Choose" : {
       "localizations" : {
         "fr" : {
@@ -831,12 +1751,72 @@
         }
       }
     },
+    "Compare" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparer"
+          }
+        }
+      }
+    },
+    "Comparing…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparaison en cours…"
+          }
+        }
+      }
+    },
+    "Comparison" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparaison"
+          }
+        }
+      }
+    },
     "Copy URL" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copier l'URL"
+          }
+        }
+      }
+    },
+    "Copy the icons from %@ for all bookmarks that don't have one (without downloading them again)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier les icônes depuis %@ pour tous les favoris qui n'en ont pas (sans les retélécharger)"
+          }
+        }
+      }
+    },
+    "Copying bookmarks…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copie des favoris…"
+          }
+        }
+      }
+    },
+    "Copying…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copie en cours…"
           }
         }
       }
@@ -991,6 +1971,16 @@
         }
       }
     },
+    "Deleted · %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimés · %@"
+          }
+        }
+      }
+    },
     "Deleting bookmarks…" : {
       "localizations" : {
         "fr" : {
@@ -1037,6 +2027,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "URLs en double"
+          }
+        }
+      }
+    },
+    "Echo compares the source bookmarks with the target's and shows what would be added (and, in full copy, deleted). The comparison doesn't change anything: the browsers can stay open." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Echo compare les favoris de la source à ceux de la cible et montre ce qui serait ajouté (et, en copie complète, supprimé). La comparaison ne modifie rien : les navigateurs peuvent rester ouverts."
           }
         }
       }
@@ -1221,6 +2221,26 @@
         }
       }
     },
+    "Full copy" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copie complète"
+          }
+        }
+      }
+    },
+    "Full copy (perfect image)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copie complète (image parfaite)"
+          }
+        }
+      }
+    },
     "Gathers the open tabs of all your browsers in a single list, grouped by window (with the profile when there are several, and the Opera and Vivaldi workspaces), with search and a text export. Check tabs, workspaces or windows to reopen them in another browser, keeping the window layout (and one window per workspace, since workspaces can't be recreated). Optionally, the original tabs are closed afterwards, only if their copy is found in the target; Opera refuses to close those in its other workspaces. The first time, macOS asks you to allow Navloom to control each browser. Private windows are hidden by default." : {
       "localizations" : {
         "fr" : {
@@ -1287,6 +2307,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Accueil"
+          }
+        }
+      }
+    },
+    "Identical" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identiques"
+          }
+        }
+      }
+    },
+    "In %@: %lld to add" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans %1$@ : %2$lld à ajouter"
           }
         }
       }
@@ -1437,6 +2477,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Liste les sauvegardes créées avant chaque écriture, par outil (FaviconSync, Twins, Ghosts, Echo), et permet de restaurer l'une d'elles."
+          }
+        }
+      }
+    },
+    "Mobile bookmarks" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoris mobiles"
+          }
+        }
+      }
+    },
+    "Mode" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mode"
           }
         }
       }
@@ -1621,6 +2681,16 @@
         }
       }
     },
+    "New Comparison" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle comparaison"
+          }
+        }
+      }
+    },
     "No URL appears twice in your bookmarks." : {
       "localizations" : {
         "fr" : {
@@ -1637,6 +2707,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucune sauvegarde"
+          }
+        }
+      }
+    },
+    "No bookmarks to add." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun favori à ajouter."
           }
         }
       }
@@ -1697,6 +2777,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucune ancienne sauvegarde."
+          }
+        }
+      }
+    },
+    "Nothing to add" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien à ajouter"
           }
         }
       }
@@ -1781,6 +2871,16 @@
         }
       }
     },
+    "Other bookmarks" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres favoris"
+          }
+        }
+      }
+    },
     "Page not found (404/410) or domain doesn't exist. Watch out: some sites answer 404 to visitors who aren't signed in even though the page exists for you. Double-click to open it and check before deleting." : {
       "localizations" : {
         "fr" : {
@@ -1861,6 +2961,16 @@
         }
       }
     },
+    "Ready to compare" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prêt à comparer"
+          }
+        }
+      }
+    },
     "Ready to find duplicates" : {
       "localizations" : {
         "fr" : {
@@ -1931,12 +3041,42 @@
         }
       }
     },
+    "Replace the bookmarks of %@ with those of the source?" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer les favoris de %@ par ceux de la source ?"
+          }
+        }
+      }
+    },
+    "Replace with the Copy" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer par la copie"
+          }
+        }
+      }
+    },
     "Replicates the bookmarks of one browser (the source) to another (the target), with their icons, which browsers import poorly. Two modes: add the missing bookmarks, or full copy, which makes the target identical to the source (anything not in the source is deleted). The comparison runs with the browsers open; to write, the target must be closed and its bookmark sync turned off (see below). Backups are created beforehand." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réplique les favoris d'un navigateur (la source) vers un autre (la cible), avec leurs icônes, que les navigateurs importent mal. Deux modes : ajouter les favoris manquants, ou copie complète, qui rend la cible identique à la source (ce qui n'y est pas est supprimé). La comparaison se fait navigateurs ouverts ; pour écrire, la cible doit être fermée et sa synchro des favoris désactivée (voir plus bas). Des sauvegardes sont créées avant."
+          }
+        }
+      }
+    },
+    "Replicates the bookmarks of one browser to another" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réplique les favoris d'un navigateur vers un autre"
           }
         }
       }
@@ -2021,6 +3161,16 @@
         }
       }
     },
+    "Show Backups in Finder" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les sauvegardes dans le Finder"
+          }
+        }
+      }
+    },
     "Show in Finder" : {
       "localizations" : {
         "fr" : {
@@ -2041,12 +3191,42 @@
         }
       }
     },
+    "Source bookmarks" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoris de la source"
+          }
+        }
+      }
+    },
+    "Source browser" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigateur source"
+          }
+        }
+      }
+    },
     "Spots bookmarks whose page no longer exists" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Repère les favoris dont la page n'existe plus"
+          }
+        }
+      }
+    },
+    "Start Full Copy" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lancer la copie complète"
           }
         }
       }
@@ -2081,12 +3261,42 @@
         }
       }
     },
+    "Target browser" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigateur cible"
+          }
+        }
+      }
+    },
+    "The Bookmarks file doesn't have the expected format." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le fichier Bookmarks n'a pas le format attendu."
+          }
+        }
+      }
+    },
     "The bookmarks of %@ (Bookmarks file) will be replaced by the backup from %@. The current state is backed up automatically beforehand." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les favoris de %1$@ (fichier Bookmarks) seront remplacés par la sauvegarde du %2$@. L'état actuel est sauvegardé automatiquement avant."
+          }
+        }
+      }
+    },
+    "The bookmarks will be added to %@. No bookmark is deleted or modified. Backups are created beforehand." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les favoris seront ajoutés à %@. Aucun favori n'est supprimé ni modifié. Des sauvegardes sont créées avant."
           }
         }
       }
@@ -2127,6 +3337,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La base de favicons de %1$@ sera remplacée par la sauvegarde du %2$@. L'état actuel est sauvegardé automatiquement avant."
+          }
+        }
+      }
+    },
+    "The icons couldn't be written (%@): the Favicons database wasn't changed. The bookmarks are added without icons." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les icônes n'ont pas pu être écrites (%@) : la base Favicons n'a pas été modifiée. Les favoris sont ajoutés sans icône."
           }
         }
       }
@@ -2191,6 +3411,96 @@
         }
       }
     },
+    "The source and the target are the same profile: choose another one." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La source et la cible sont le même profil : choisis-en un autre."
+          }
+        }
+      }
+    },
+    "The source contains no web bookmarks: a full copy would empty the target. Nothing was changed." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La source ne contient aucun favori web : une copie complète viderait la cible. Rien n'a été modifié."
+          }
+        }
+      }
+    },
+    "The source icons couldn't be read (%@). The bookmarks are added without icons." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les icônes de la source n'ont pas pu être lues (%@). Les favoris sont ajoutés sans icône."
+          }
+        }
+      }
+    },
+    "The source or target bookmarks changed since the comparison. Run the comparison again: nothing was changed in the Bookmarks file." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les favoris de la source ou de la cible ont changé depuis la comparaison. Relance la comparaison : rien n'a été modifié dans le fichier Bookmarks."
+          }
+        }
+      }
+    },
+    "The source or the target has no Favicons database: the bookmarks are added without icons." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La source ou la cible n'a pas de base Favicons : les favoris sont ajoutés sans icône."
+          }
+        }
+      }
+    },
+    "The target becomes identical to the source: folders, order and names. Target bookmarks that aren't in the source are deleted (a backup is made beforehand)." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cible devient identique à la source : dossiers, ordre et noms. Les favoris de la cible qui ne sont pas dans la source sont supprimés (une sauvegarde est faite avant)."
+          }
+        }
+      }
+    },
+    "The target is already identical to the source." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cible est déjà identique à la source."
+          }
+        }
+      }
+    },
+    "The target keeps all its bookmarks; only the ones it's missing are added." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cible garde tous ses favoris ; seuls ceux qui lui manquent sont ajoutés."
+          }
+        }
+      }
+    },
+    "This %@ profile has no local Bookmarks file (bookmarks saved only in the account?)." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce profil de %@ n'a pas de fichier Bookmarks local (favoris enregistrés uniquement dans le compte ?)."
+          }
+        }
+      }
+    },
     "This backup is unreadable: it wasn't applied." : {
       "localizations" : {
         "fr" : {
@@ -2211,12 +3521,32 @@
         }
       }
     },
+    "To add" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À ajouter"
+          }
+        }
+      }
+    },
     "To check" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "À vérifier"
+          }
+        }
+      }
+    },
+    "To delete" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À supprimer"
           }
         }
       }
@@ -2281,6 +3611,26 @@
         }
       }
     },
+    "URL missing from the same folder" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL absente du même dossier"
+          }
+        }
+      }
+    },
+    "URL missing from the target" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL absente de la cible"
+          }
+        }
+      }
+    },
     "Uncheck All" : {
       "localizations" : {
         "fr" : {
@@ -2337,6 +3687,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pourquoi la synchro gêne"
+          }
+        }
+      }
+    },
+    "Will be deleted from the target: %@. They're listed in red below." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seront supprimés de la cible : %@. Ils sont listés en rouge ci-dessous."
           }
         }
       }
@@ -2411,6 +3771,26 @@
         }
       }
     },
+    "only the order or the folders change" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "seul l'ordre ou les dossiers changent"
+          }
+        }
+      }
+    },
+    "parameters ?…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "paramètres ?…"
+          }
+        }
+      }
+    },
     "reading…" : {
       "localizations" : {
         "fr" : {
@@ -2457,6 +3837,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "les doublons"
+          }
+        }
+      }
+    },
+    "the target" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "la cible"
           }
         }
       }

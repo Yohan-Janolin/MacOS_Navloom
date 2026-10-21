@@ -19,9 +19,9 @@ nonisolated struct EchoBookmark: Hashable, Sendable {
     var locationLabel: String {
         let root: String
         switch rootKey {
-        case "bookmark_bar": root = "Barre de favoris"
-        case "other": root = "Autres favoris"
-        case "synced": root = "Favoris mobiles"
+        case "bookmark_bar": root = String(localized: "Bookmarks bar")
+        case "other": root = String(localized: "Other bookmarks")
+        case "synced": root = String(localized: "Mobile bookmarks")
         default: root = rootKey
         }
         return ([root] + folderPath).joined(separator: " / ")
@@ -49,25 +49,25 @@ nonisolated enum EchoSyncMode: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .merge: "Ajouter les favoris manquants"
-        case .mirror: "Copie complète (image parfaite)"
+        case .merge: String(localized: "Add the missing bookmarks")
+        case .mirror: String(localized: "Full copy (perfect image)")
         }
     }
 
     /// Libellé court pour le sélecteur segmenté (un libellé long élargirait la fenêtre).
     var shortTitle: String {
         switch self {
-        case .merge: "Ajouter les manquants"
-        case .mirror: "Copie complète"
+        case .merge: String(localized: "Add missing")
+        case .mirror: String(localized: "Full copy")
         }
     }
 
     var hint: String {
         switch self {
         case .merge:
-            "La cible garde tous ses favoris ; seuls ceux qui lui manquent sont ajoutés."
+            String(localized: "The target keeps all its bookmarks; only the ones it's missing are added.")
         case .mirror:
-            "La cible devient identique à la source : dossiers, ordre et noms. Les favoris de la cible qui ne sont pas dans la source sont supprimés (une sauvegarde est faite avant)."
+            String(localized: "The target becomes identical to the source: folders, order and names. Target bookmarks that aren't in the source are deleted (a backup is made beforehand).")
         }
     }
 }
@@ -81,17 +81,17 @@ nonisolated enum EchoMatchMode: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .anywhere: "URL absente de la cible"
-        case .sameFolder: "URL absente du même dossier"
+        case .anywhere: String(localized: "URL missing from the target")
+        case .sameFolder: String(localized: "URL missing from the same folder")
         }
     }
 
     var hint: String {
         switch self {
         case .anywhere:
-            "Un favori est ignoré si son URL existe déjà n'importe où dans la cible : c'est le plus prudent, aucun doublon n'est créé."
+            String(localized: "A bookmark is skipped if its URL already exists anywhere in the target: the safest option, no duplicate is created.")
         case .sameFolder:
-            "Un favori est ignoré seulement si son URL existe déjà dans le même dossier de la cible : si tu ranges autrement, cela peut créer des doublons."
+            String(localized: "A bookmark is skipped only if its URL already exists in the same folder of the target: if you organize differently, this can create duplicates.")
         }
     }
 }
@@ -180,19 +180,19 @@ nonisolated enum EchoWriteError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .nothingToAdd:
-            "Aucun favori à ajouter."
+            String(localized: "No bookmarks to add.")
         case .nothingToChange:
-            "La cible est déjà identique à la source."
+            String(localized: "The target is already identical to the source.")
         case .sourceEmpty:
-            "La source ne contient aucun favori web : une copie complète viderait la cible. Rien n'a été modifié."
+            String(localized: "The source contains no web bookmarks: a full copy would empty the target. Nothing was changed.")
         case .browserRunning(let browser):
-            "\(browser) est ouvert. Ferme-le complètement (Cmd + Q) avant d'écrire dans ses favoris : rien n'a été modifié."
+            String(localized: "\(browser) is open. Quit it completely (Cmd + Q) before writing to its bookmarks: nothing was changed.")
         case .syncEnabled(let browser):
-            "La synchro des favoris est activée dans \(browser) : elle mélangerait les favoris écrits avec ceux du compte. Rien n'a été modifié."
+            String(localized: "Bookmark sync is on in \(browser): it would mix the written bookmarks with those of the account. Nothing was changed.")
         case .destinationChanged:
-            "Les favoris de la source ou de la cible ont changé depuis la comparaison. Relance la comparaison : rien n'a été modifié dans le fichier Bookmarks."
+            String(localized: "The source or target bookmarks changed since the comparison. Run the comparison again: nothing was changed in the Bookmarks file.")
         case .verificationFailed:
-            "La vérification du résultat a échoué : rien n'a été modifié."
+            String(localized: "Checking the result failed: nothing was changed.")
         }
     }
 }
@@ -204,9 +204,9 @@ nonisolated enum EchoError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidFormat:
-            "Le fichier Bookmarks n'a pas le format attendu."
+            String(localized: "The Bookmarks file doesn't have the expected format.")
         case .noLocalBookmarks(let browser):
-            "Ce profil de \(browser) n'a pas de fichier Bookmarks local (favoris enregistrés uniquement dans le compte ?)."
+            String(localized: "This \(browser) profile has no local Bookmarks file (bookmarks saved only in the account?).")
         }
     }
 }

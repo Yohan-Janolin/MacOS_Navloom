@@ -141,10 +141,10 @@ nonisolated enum EchoEngine {
                     icons = try await database.favicons(forPages: iconBookmarks.map(\.url))
                     iconsRead = true
                 } catch {
-                    note = "Les icônes de la source n'ont pas pu être lues (\(error.localizedDescription)). Les favoris sont ajoutés sans icône."
+                    note = String(localized: "The source icons couldn't be read (\(error.localizedDescription)). The bookmarks are added without icons.")
                 }
             } else {
-                note = "La source ou la cible n'a pas de base Favicons : les favoris sont ajoutés sans icône."
+                note = String(localized: "The source or the target has no Favicons database: the bookmarks are added without icons.")
             }
         }
 
@@ -199,7 +199,7 @@ nonisolated enum EchoEngine {
                 await database?.rollback()
                 copied = 0
                 failed = 0
-                note = "Les icônes n'ont pas pu être écrites (\(error.localizedDescription)) : la base Favicons n'a pas été modifiée. Les favoris sont ajoutés sans icône."
+                note = String(localized: "The icons couldn't be written (\(error.localizedDescription)): the Favicons database wasn't changed. The bookmarks are added without icons.")
             }
         }
 
@@ -215,7 +215,7 @@ nonisolated enum EchoEngine {
 
         let missing = iconsRead ? iconBookmarks.filter { icons[$0.url] == nil && !targetMapped.contains($0.url) }.count : 0
         if failed > 0 && note == nil {
-            note = "\(failed) icône\(failed > 1 ? "s" : "") n'ont pas pu être écrites."
+            note = String(localized: "\(failed) icons couldn't be written.")
         }
 
         return EchoApplySummary(mode: syncMode,

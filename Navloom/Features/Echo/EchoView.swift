@@ -13,15 +13,15 @@ struct EchoView: View {
                 ProgressView()
             } else if model.browsers.isEmpty {
                 ContentUnavailableView(
-                    "Aucun navigateur détecté",
+                    "No browser detected",
                     systemImage: "globe",
-                    description: Text("Navloom cherche Vivaldi, Chrome, Brave et Edge dans ~/Library/Application Support.")
+                    description: Text("Navloom looks for Vivaldi, Chrome, Brave and Edge in ~/Library/Application Support.")
                 )
             } else {
                 content
             }
         }
-        .navigationTitle("Navloom")
+        .navigationTitle(Text(verbatim: "Navloom"))
         .task { model.loadBrowsersIfNeeded() }
         .onChange(of: model.selectedBrowserID) { model.browserChanged() }
         .onChange(of: model.selectedProfileID) { model.profileChanged() }
@@ -45,9 +45,9 @@ struct EchoView: View {
         ) {
             switch model.syncMode {
             case .merge:
-                Button("Ajouter") { model.apply() }
+                Button("Add") { model.apply() }
             case .mirror:
-                Button("Remplacer par la copie", role: .destructive) { model.apply() }
+                Button("Replace with the Copy", role: .destructive) { model.apply() }
             }
         } message: {
             Text(confirmationMessage)
@@ -55,11 +55,11 @@ struct EchoView: View {
     }
 
     private var destinationBrowserName: String {
-        model.report?.destination.browserName ?? model.destinationBrowser?.name ?? "la cible"
+        model.report?.destination.browserName ?? model.destinationBrowser?.name ?? String(localized: "the target")
     }
 
     private var destinationLabel: String {
-        guard let destination = model.report?.destination else { return "la cible" }
+        guard let destination = model.report?.destination else { return String(localized: "the target") }
         return "\(destination.browserName) · \(destination.name)"
     }
 
@@ -67,19 +67,23 @@ struct EchoView: View {
         switch model.syncMode {
         case .merge:
             let count = model.report?.plan.toAdd.count ?? 0
-            return "Ajouter \(count) favori\(count > 1 ? "s" : "") à \(destinationBrowserName) ?"
+            return String(localized: "Add \(count) bookmarks to \(destinationBrowserName)?")
         case .mirror:
-            return "Remplacer les favoris de \(destinationBrowserName) par ceux de la source ?"
+            return String(localized: "Replace the bookmarks of \(destinationBrowserName) with those of the source?")
         }
     }
 
     private var confirmationMessage: String {
         switch model.syncMode {
         case .merge:
-            return "Les favoris seront ajoutés à \(destinationLabel). Aucun favori n'est supprimé ni modifié. Des sauvegardes sont créées avant."
+            return String(localized: "The bookmarks will be added to \(destinationLabel). No bookmark is deleted or modified. Backups are created beforehand.")
         case .mirror:
             guard let mirror = model.report?.mirror else { return "" }
-            return "\(destinationLabel) deviendra identique à la source : \(mirror.toAdd.count) favori\(mirror.toAdd.count > 1 ? "s" : "") ajouté\(mirror.toAdd.count > 1 ? "s" : ""), \(mirror.removalCount) supprimé\(mirror.removalCount > 1 ? "s" : "") (et \(mirror.foldersToRemove) dossier\(mirror.foldersToRemove > 1 ? "s" : "")). Des sauvegardes sont créées avant : tu pourras revenir en arrière depuis l'écran Sauvegardes."
+            let label = destinationLabel
+            let added = String(localized: "\(mirror.toAdd.count) bookmarks added")
+            let removed = String(localized: "\(mirror.removalCount) deleted")
+            let folders = String(localized: "(and \(mirror.foldersToRemove) folders)")
+            return String(localized: "\(label) will become identical to the source: \(added), \(removed) \(folders). Backups are created beforehand: you'll be able to roll back from the Backups screen.")
         }
     }
 
@@ -109,7 +113,7 @@ struct EchoView: View {
             }
 
             if model.isSameProfile && model.phase == .idle {
-                Label("La source et la cible sont le même profil : choisis-en un autre.",
+                Label("The source and the target are the same profile: choose another one.",
                       systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.orange)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -135,13 +139,13 @@ struct EchoView: View {
 
     private var titleHeader: some View {
         VStack(spacing: 4) {
-            Text("Echo")
+            Text(verbatim: "Echo")
                 .font(.largeTitle.bold())
                 .foregroundStyle(
                     LinearGradient(colors: Self.sourceGradient,
                                    startPoint: .leading, endPoint: .trailing)
                 )
-            Text("Réplique les favoris d'un navigateur vers un autre")
+            Text("Replicates the bookmarks of one browser to another")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -155,13 +159,13 @@ struct EchoView: View {
                                  profiles: model.profiles,
                                  browserID: $model.selectedBrowserID,
                                  profileID: $model.selectedProfileID,
-                                 browserTitle: "Navigateur source",
+                                 browserTitle: "Source browser",
                                  colors: Self.sourceGradient)
             BrowserProfileBanner(browsers: model.browsers,
                                  profiles: model.destinationProfiles,
                                  browserID: $model.destinationBrowserID,
                                  profileID: $model.destinationProfileID,
-                                 browserTitle: "Navigateur cible",
+                                 browserTitle: "Target browser",
                                  colors: Self.destinationGradient)
         }
         .disabled(model.isBusy)
@@ -172,7 +176,7 @@ struct EchoView: View {
         VStack(alignment: .leading, spacing: 10) {
             Picker("Mode", selection: $model.syncMode) {
                 ForEach(EchoSyncMode.allCases) { mode in
-                    Text(mode.shortTitle).tag(mode)
+                    Text(verbatim: mode.shortTitle).tag(mode)
                 }
             }
             .pickerStyle(.segmented)
@@ -189,12 +193,12 @@ struct EchoView: View {
                     Spacer(minLength: 0)
                 }
 
-                Text("\(model.syncMode.hint) \(model.matchMode.hint) Les cases cochées font traiter ces variantes d'URL comme identiques ; le « / » final l'est toujours. Attention aux paramètres (?…) : si la page en dépend (une vidéo, un article…), des favoris différents seraient fusionnés.")
+                Text("\(model.syncMode.hint) \(model.matchMode.hint) Checked boxes make these URL variants count as identical; the trailing “/” always does. Careful with parameters (?…): if the page depends on them (a video, an article…), different bookmarks would be merged.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             case .mirror:
-                Label(model.syncMode.hint, systemImage: "exclamationmark.triangle.fill")
+                Label { Text(verbatim: model.syncMode.hint) } icon: { Image(systemName: "exclamationmark.triangle.fill") }
                     .font(.caption)
                     .foregroundStyle(.red)
                     .fixedSize(horizontal: false, vertical: true)
@@ -207,9 +211,9 @@ struct EchoView: View {
     }
 
     private var modePicker: some View {
-        Picker("Comparaison", selection: $model.matchMode) {
+        Picker("Comparison", selection: $model.matchMode) {
             ForEach(EchoMatchMode.allCases) { mode in
-                Text(mode.title).tag(mode)
+                Text(verbatim: mode.title).tag(mode)
             }
         }
         .pickerStyle(.menu)
@@ -220,9 +224,9 @@ struct EchoView: View {
     /// Variantes d'URL à traiter comme identiques.
     private var urlToggles: some View {
         HStack(spacing: 16) {
-            Toggle("http/https", isOn: $model.ignoreScheme)
-            Toggle("www", isOn: $model.ignoreWWW)
-            Toggle("paramètres ?…", isOn: $model.ignoreQuery)
+            Toggle(isOn: $model.ignoreScheme) { Text(verbatim: "http/https") }
+            Toggle(isOn: $model.ignoreWWW) { Text(verbatim: "www") }
+            Toggle("parameters ?…", isOn: $model.ignoreQuery)
         }
         .toggleStyle(.checkbox)
         .lineLimit(1)
@@ -230,20 +234,20 @@ struct EchoView: View {
 
     private func stats(_ report: EchoReport) -> some View {
         HStack(spacing: 12) {
-            StatCard(title: "Favoris de la source", value: report.sourceCount,
+            StatCard(title: "Source bookmarks", value: report.sourceCount,
                      systemImage: "bookmark")
             switch model.syncMode {
             case .merge:
-                StatCard(title: "À ajouter", value: report.plan.toAdd.count,
+                StatCard(title: "To add", value: report.plan.toAdd.count,
                          systemImage: "plus.circle", tint: Brand.gold)
-                StatCard(title: "Déjà présents", value: report.plan.alreadyPresent,
+                StatCard(title: "Already present", value: report.plan.alreadyPresent,
                          systemImage: "checkmark.circle", tint: .green)
             case .mirror:
-                StatCard(title: "À ajouter", value: report.mirror.toAdd.count,
+                StatCard(title: "To add", value: report.mirror.toAdd.count,
                          systemImage: "plus.circle", tint: Brand.gold)
-                StatCard(title: "À supprimer", value: report.mirror.removalCount,
+                StatCard(title: "To delete", value: report.mirror.removalCount,
                          systemImage: "trash", tint: .red)
-                StatCard(title: "Identiques", value: report.mirror.unchanged,
+                StatCard(title: "Identical", value: report.mirror.unchanged,
                          systemImage: "checkmark.circle", tint: .green)
             }
         }
@@ -256,16 +260,16 @@ struct EchoView: View {
         switch model.phase {
         case .idle:
             ContentUnavailableView(
-                "Prêt à comparer",
+                "Ready to compare",
                 systemImage: "dot.radiowaves.left.and.right",
-                description: Text("Echo compare les favoris de la source à ceux de la cible et montre ce qui serait ajouté (et, en copie complète, supprimé). La comparaison ne modifie rien : les navigateurs peuvent rester ouverts.")
+                description: Text("Echo compares the source bookmarks with the target's and shows what would be added (and, in full copy, deleted). The comparison doesn't change anything: the browsers can stay open.")
             )
         case .comparing:
-            ProgressView("Lecture des favoris…")
+            ProgressView("Reading bookmarks…")
         case .done:
             resultView
         case .applying:
-            ProgressView(model.syncMode == .mirror ? "Copie des favoris…" : "Ajout des favoris…")
+            ProgressView(model.syncMode == .mirror ? String(localized: "Copying bookmarks…") : String(localized: "Adding bookmarks…"))
         case .applied:
             appliedView
         }
@@ -276,11 +280,12 @@ struct EchoView: View {
         if let report = model.report {
             VStack(spacing: 12) {
                 if !model.hasChanges {
-                    ContentUnavailableView(model.syncMode == .mirror ? "Déjà identiques" : "Rien à ajouter",
+                    let target = "\(report.destination.browserName) · \(report.destination.name)"
+                    ContentUnavailableView(model.syncMode == .mirror ? String(localized: "Already identical") : String(localized: "Nothing to add"),
                                            systemImage: "checkmark.seal",
                                            description: Text(model.syncMode == .mirror
-                                                             ? "\(report.destination.browserName) · \(report.destination.name) a déjà exactement les favoris de la source."
-                                                             : "\(report.destination.browserName) · \(report.destination.name) contient déjà tous les favoris web de la source."))
+                                                             ? String(localized: "\(target) already has exactly the source's bookmarks.")
+                                                             : String(localized: "\(target) already contains all the source's web bookmarks.")))
                 } else {
                     SyncNotice(browserName: report.destination.browserName,
                                isBrowserRunning: model.isDestinationRunning,
@@ -289,9 +294,10 @@ struct EchoView: View {
                     if model.syncMode == .mirror {
                         removalWarning(report.mirror)
                     }
+                    let sourceName = report.source.browserName
                     Toggle(model.syncMode == .mirror
-                           ? "Copier les icônes depuis \(report.source.browserName) pour tous les favoris qui n'en ont pas (sans les retélécharger)"
-                           : "Copier aussi les icônes depuis \(report.source.browserName) (sans les retélécharger)",
+                           ? String(localized: "Copy the icons from \(sourceName) for all bookmarks that don't have one (without downloading them again)")
+                           : String(localized: "Also copy the icons from \(sourceName) (without downloading them again)"),
                            isOn: $model.copyFavicons)
                         .toggleStyle(.checkbox)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -299,7 +305,7 @@ struct EchoView: View {
                 }
 
                 if report.ignoredCount > 0 {
-                    Label("\(report.ignoredCount) favori\(report.ignoredCount > 1 ? "s" : "") non web (vivaldi://, opera://…) ignoré\(report.ignoredCount > 1 ? "s" : "") : ils ne se copient pas d'un navigateur à l'autre.",
+                    Label("\(report.ignoredCount) non-web bookmarks (vivaldi://, opera://…) skipped: they aren't copied from one browser to another.",
                           systemImage: "info.circle")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -313,7 +319,7 @@ struct EchoView: View {
     @ViewBuilder
     private func removalWarning(_ mirror: EchoMirrorPlan) -> some View {
         if mirror.removalCount > 0 || mirror.foldersToRemove > 0 {
-            Label("Seront supprimés de la cible : \(Self.removalSummary(mirror)). Ils sont listés en rouge ci-dessous.",
+            Label("Will be deleted from the target: \(Self.removalSummary(mirror)). They're listed in red below.",
                   systemImage: "trash.fill")
                 .foregroundStyle(.red)
                 .padding(12)
@@ -325,20 +331,20 @@ struct EchoView: View {
     private static func removalSummary(_ mirror: EchoMirrorPlan) -> String {
         var parts: [String] = []
         if !mirror.toRemove.isEmpty {
-            parts.append("\(mirror.toRemove.count) favori\(mirror.toRemove.count > 1 ? "s" : "")")
+            parts.append(String(localized: "\(mirror.toRemove.count) bookmarks"))
         }
         if mirror.nonWebToRemove > 0 {
-            parts.append("\(mirror.nonWebToRemove) favori\(mirror.nonWebToRemove > 1 ? "s" : "") non web")
+            parts.append(String(localized: "\(mirror.nonWebToRemove) non-web bookmarks"))
         }
         if mirror.foldersToRemove > 0 {
-            parts.append("\(mirror.foldersToRemove) dossier\(mirror.foldersToRemove > 1 ? "s" : "")")
+            parts.append(String(localized: "\(mirror.foldersToRemove) folders"))
         }
         return parts.joined(separator: ", ")
     }
 
     private func planList(_ report: EchoReport) -> some View {
         VStack(spacing: 8) {
-            Text(summaryLine(for: report))
+            Text(verbatim: summaryLine(for: report))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -351,13 +357,13 @@ struct EchoView: View {
                         }
                     } header: {
                         HStack {
-                            Text(section.title)
+                            Text(verbatim: section.title)
                                 .font(.headline)
                                 .foregroundStyle(section.isRemoval ? Color.red : Color.primary)
                                 .lineLimit(1)
                                 .truncationMode(.head)
                             Spacer()
-                            Text("\(section.items.count) favori\(section.items.count > 1 ? "s" : "")")
+                            Text("\(section.items.count) bookmarks")
                                 .font(.callout)
                                 .foregroundStyle(.secondary)
                         }
@@ -374,26 +380,26 @@ struct EchoView: View {
         let name = "\(report.destination.browserName) · \(report.destination.name)"
         if model.syncMode == .mirror {
             let mirror = report.mirror
-            var parts = ["Dans \(name) : \(mirror.toAdd.count) à ajouter"]
+            var parts = [String(localized: "In \(name): \(mirror.toAdd.count) to add")]
             if mirror.foldersToAdd > 0 {
-                parts.append("\(mirror.foldersToAdd) dossier\(mirror.foldersToAdd > 1 ? "s" : "") à créer")
+                parts.append(String(localized: "\(mirror.foldersToAdd) folders to create"))
             }
-            parts.append("\(mirror.removalCount) à supprimer")
-            parts.append("\(mirror.unchanged) identique\(mirror.unchanged > 1 ? "s" : "")")
+            parts.append(String(localized: "\(mirror.removalCount) to delete"))
+            parts.append(String(localized: "\(mirror.unchanged) identical"))
             if mirror.toAdd.isEmpty && mirror.removalCount == 0 {
-                parts.append("seul l'ordre ou les dossiers changent")
+                parts.append(String(localized: "only the order or the folders change"))
             }
             return parts.joined(separator: " · ")
         }
 
         let plan = report.plan
-        var parts = ["Dans \(name) : \(plan.toAdd.count) à ajouter"]
+        var parts = [String(localized: "In \(name): \(plan.toAdd.count) to add")]
         if plan.newFolders > 0 {
-            parts.append("\(plan.newFolders) dossier\(plan.newFolders > 1 ? "s" : "") à créer")
+            parts.append(String(localized: "\(plan.newFolders) folders to create"))
         }
-        parts.append("\(plan.alreadyPresent) déjà présent\(plan.alreadyPresent > 1 ? "s" : "")")
+        parts.append(String(localized: "\(plan.alreadyPresent) already present"))
         if plan.skippedSourceDuplicates > 0 {
-            parts.append("\(plan.skippedSourceDuplicates) doublon\(plan.skippedSourceDuplicates > 1 ? "s" : "") de la source ignoré\(plan.skippedSourceDuplicates > 1 ? "s" : "")")
+            parts.append(String(localized: "\(plan.skippedSourceDuplicates) source duplicates skipped"))
         }
         return parts.joined(separator: " · ")
     }
@@ -410,7 +416,7 @@ struct EchoView: View {
         func grouped(_ bookmarks: [EchoBookmark], isRemoval: Bool) -> [PlanSection] {
             let groups = Dictionary(grouping: bookmarks, by: \.locationLabel)
             return groups.keys.sorted().map {
-                PlanSection(title: isRemoval ? "Supprimés · \($0)" : $0, items: groups[$0] ?? [], isRemoval: isRemoval)
+                PlanSection(title: isRemoval ? String(localized: "Deleted · \($0)") : $0, items: groups[$0] ?? [], isRemoval: isRemoval)
             }
         }
         switch model.syncMode {
@@ -430,44 +436,44 @@ struct EchoView: View {
                 .foregroundStyle(.green)
 
             if let summary = model.summary {
-                Text(appliedTitle(summary))
+                Text(verbatim: appliedTitle(summary))
                     .font(.title2.bold())
                     .multilineTextAlignment(.center)
 
                 VStack(spacing: 4) {
                     if summary.removed > 0 {
-                        Text("\(summary.removed) favori\(summary.removed > 1 ? "s" : "") supprimé\(summary.removed > 1 ? "s" : "")")
+                        Text("\(summary.removed) bookmarks deleted")
                     }
                     if summary.removedFolders > 0 {
-                        Text("\(summary.removedFolders) dossier\(summary.removedFolders > 1 ? "s" : "") supprimé\(summary.removedFolders > 1 ? "s" : "")")
+                        Text("\(summary.removedFolders) folders deleted")
                     }
                     if summary.createdFolders > 0 {
-                        Text("\(summary.createdFolders) dossier\(summary.createdFolders > 1 ? "s" : "") créé\(summary.createdFolders > 1 ? "s" : "")")
+                        Text("\(summary.createdFolders) folders created")
                     }
                     if summary.faviconsCopied > 0 {
-                        Text("\(summary.faviconsCopied) icône\(summary.faviconsCopied > 1 ? "s" : "") copiée\(summary.faviconsCopied > 1 ? "s" : "")")
+                        Text("\(summary.faviconsCopied) icons copied")
                     }
                     if summary.faviconsMissing > 0 {
-                        Text("\(summary.faviconsMissing) favori\(summary.faviconsMissing > 1 ? "s" : "") sans icône dans la source : FaviconSync peut les chercher.")
+                        Text("\(summary.faviconsMissing) bookmarks without an icon in the source: FaviconSync can look for them.")
                     }
                     if summary.faviconsFailed > 0 {
-                        Text("\(summary.faviconsFailed) icône\(summary.faviconsFailed > 1 ? "s" : "") n'ont pas pu être écrites.")
+                        Text("\(summary.faviconsFailed) icons couldn't be written.")
                     }
                 }
                 .font(.callout)
                 .foregroundStyle(.secondary)
 
                 if let note = summary.faviconNote {
-                    Label(note, systemImage: "exclamationmark.triangle.fill")
+                    Label { Text(verbatim: note) } icon: { Image(systemName: "exclamationmark.triangle.fill") }
                         .font(.callout)
                         .foregroundStyle(.orange)
                         .multilineTextAlignment(.leading)
                         .padding(.horizontal, 24)
                 }
 
-                Button("Afficher les sauvegardes dans le Finder") { model.revealBackups() }
+                Button("Show Backups in Finder") { model.revealBackups() }
             }
-            Text("Relance \(destinationBrowserName) pour voir le résultat.")
+            Text("Relaunch \(destinationBrowserName) to see the result.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
         }
@@ -476,9 +482,9 @@ struct EchoView: View {
     private func appliedTitle(_ summary: EchoApplySummary) -> String {
         switch summary.mode {
         case .merge:
-            return "\(summary.added) favori\(summary.added > 1 ? "s" : "") ajouté\(summary.added > 1 ? "s" : "") à \(destinationLabel)"
+            return String(localized: "\(summary.added) bookmarks added to \(destinationLabel)")
         case .mirror:
-            return "\(destinationLabel) est maintenant identique à la source"
+            return String(localized: "\(destinationLabel) is now identical to the source")
         }
     }
 
@@ -487,7 +493,7 @@ struct EchoView: View {
     private var actionBar: some View {
         HStack {
             if model.phase == .done {
-                Button("Annuler") { model.reset() }
+                Button("Cancel") { model.reset() }
             }
             Spacer()
             primaryActions
@@ -498,9 +504,9 @@ struct EchoView: View {
         switch model.syncMode {
         case .merge:
             let count = model.report?.plan.toAdd.count ?? 0
-            return "Ajouter \(count) favori\(count > 1 ? "s" : "")"
+            return String(localized: "Add \(count) bookmarks")
         case .mirror:
-            return "Lancer la copie complète"
+            return String(localized: "Start Full Copy")
         }
     }
 
@@ -508,17 +514,17 @@ struct EchoView: View {
     private var primaryActions: some View {
         switch model.phase {
         case .idle:
-            Button("Comparer") { model.compare() }
+            Button("Compare") { model.compare() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(!model.canCompare)
         case .comparing:
-            Button("Comparaison en cours…") {}
+            Button("Comparing…") {}
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(true)
         case .done where model.hasChanges:
-            Button("Nouvelle comparaison") { model.compare() }
+            Button("New Comparison") { model.compare() }
                 .controlSize(.large)
             Button(applyTitle) {
                 model.showConfirmation = true
@@ -528,11 +534,11 @@ struct EchoView: View {
             .controlSize(.large)
             .disabled(!model.canApply)
         case .done, .applied:
-            Button("Nouvelle comparaison") { model.compare() }
+            Button("New Comparison") { model.compare() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
         case .applying:
-            Button(model.syncMode == .mirror ? "Copie en cours…" : "Ajout en cours…") {}
+            Button(model.syncMode == .mirror ? String(localized: "Copying…") : String(localized: "Adding…")) {}
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(true)
@@ -553,10 +559,10 @@ private struct EchoRow: View {
                 .frame(width: 20)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(bookmark.name.isEmpty ? bookmark.url : bookmark.name)
+                Text(verbatim: bookmark.name.isEmpty ? bookmark.url : bookmark.name)
                     .foregroundStyle(isRemoval ? Color.red : Color.primary)
                     .lineLimit(1)
-                Text(bookmark.url)
+                Text(verbatim: bookmark.url)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
