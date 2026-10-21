@@ -16,7 +16,7 @@ struct StatCard: View {
                 .foregroundStyle(tint)
                 .frame(width: 32)
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(value)")
+                Text(value, format: .number)
                     .font(.title2.bold().monospacedDigit())
                 Text(title)
                     .font(.caption)
