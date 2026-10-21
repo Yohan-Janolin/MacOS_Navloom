@@ -10,8 +10,8 @@ nonisolated enum FaviconDatabaseError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .open(let message): "Impossible d'ouvrir la base Favicons : \(message)"
-        case .query(let message): "Erreur SQLite : \(message)"
+        case .open(let message): String(localized: "Couldn't open the Favicons database: \(message)")
+        case .query(let message): String(localized: "SQLite error: \(message)")
         }
     }
 }
@@ -36,7 +36,7 @@ actor FaviconDatabase {
         }
 
         guard status == SQLITE_OK, let db else {
-            let message = db.map { String(cString: sqlite3_errmsg($0)) } ?? "erreur inconnue"
+            let message = db.map { String(cString: sqlite3_errmsg($0)) } ?? String(localized: "unknown error")
             sqlite3_close(db)
             throw FaviconDatabaseError.open(message)
         }
@@ -212,7 +212,7 @@ actor FaviconDatabase {
 
     /// Insère une icône + ses bitmaps, retourne l'icon_id.
     func insertIcon(sourceURL: String, bitmaps: [FaviconBitmap]) throws -> Int64 {
-        guard !bitmaps.isEmpty else { throw FaviconDatabaseError.query("aucun bitmap à écrire") }
+        guard !bitmaps.isEmpty else { throw FaviconDatabaseError.query(String(localized: "no bitmap to write")) }
 
         let iconStmt = try prepare("INSERT INTO favicons (url, icon_type) VALUES (?, 1)")
         defer { sqlite3_finalize(iconStmt) }

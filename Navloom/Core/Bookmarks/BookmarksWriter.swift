@@ -9,13 +9,13 @@ nonisolated enum BookmarksWriteError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidFormat:
-            "Le fichier Bookmarks n'a pas le format attendu : rien n'a été modifié."
+            String(localized: "The Bookmarks file doesn't have the expected format: nothing was changed.")
         case .nothingToRemove:
-            "Aucun favori coché."
+            String(localized: "No bookmark checked.")
         case .fileChanged(let expected, let found):
-            "Le fichier Bookmarks a changé depuis l'analyse (\(found) favoris retrouvés sur \(expected)). Relance l'analyse : rien n'a été modifié."
+            String(localized: "The Bookmarks file changed since the analysis (\(found) of \(expected) bookmarks found). Run the analysis again: nothing was changed.")
         case .verificationFailed:
-            "La vérification du résultat a échoué : rien n'a été modifié."
+            String(localized: "Checking the result failed: nothing was changed.")
         }
     }
 }

@@ -61,7 +61,7 @@ nonisolated enum SyncError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .browserRunning(let name):
-            "\(name) est ouvert. Ferme-le complètement (Cmd + Q) avant d'écrire dans sa base."
+            String(localized: "\(name) is open. Quit it completely (Cmd + Q) before writing to its database.")
         }
     }
 }

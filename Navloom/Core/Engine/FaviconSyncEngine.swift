@@ -88,7 +88,7 @@ actor FaviconSyncEngine {
             guard let url = URL(string: bookmark.url),
                   let origin = Origin.from(url),
                   let result = results[origin.key] else {
-                failures.append(BookmarkIssue(bookmark: bookmark, reason: "URL invalide"))
+                failures.append(BookmarkIssue(bookmark: bookmark, reason: String(localized: "Invalid URL")))
                 continue
             }
             switch result {

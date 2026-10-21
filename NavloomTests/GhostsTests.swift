@@ -41,11 +41,11 @@ struct LinkCheckerTests {
     }
 
     @Test func redirectionVersUnAutreSiteEstSignalee() {
-        #expect(verdict(200, from: "https://a.fr/page", to: "https://b.fr/") == .moved("redirigé vers b.fr"))
+        #expect(verdict(200, from: "https://a.fr/page", to: "https://b.fr/") == .moved(String(localized: "redirected to \("b.fr")")))
     }
 
     @Test func redirectionVersLAccueilEstSignalee() {
-        #expect(verdict(200, from: "https://a.fr/page", to: "https://a.fr/") == .moved("redirigé vers la page d'accueil"))
+        #expect(verdict(200, from: "https://a.fr/page", to: "https://a.fr/") == .moved(String(localized: "redirected to the home page")))
     }
 
     @Test func redirectionsBanalesNeSontPasSignalees() {
@@ -191,7 +191,7 @@ struct GhostsReportTests {
 
         #expect(text.contains("[HTTP 404]"))
         #expect(text.contains("- A (https://a.fr)"))
-        #expect(text.contains("Dossier : Barre / Dev"))
-        #expect(text.contains("Dossier : Racine"))
+        #expect(text.contains(GhostsReport.folderLine("Barre / Dev", isAccount: false)))
+        #expect(text.contains(GhostsReport.folderLine(String(localized: "Root"), isAccount: false)))
     }
 }

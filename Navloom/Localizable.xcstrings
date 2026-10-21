@@ -111,6 +111,16 @@
         }
       }
     },
+    "%@ is open. Quit it completely (Cmd + Q) before writing to its database." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est ouvert. Ferme-le complètement (Cmd + Q) avant d'écrire dans sa base."
+          }
+        }
+      }
+    },
     "%@ is open. Quit it completely (Cmd + Q) to be able to add." : {
       "localizations" : {
         "fr" : {
@@ -187,6 +197,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@. Arc n'est pas supporté, pas plus que Safari ou Firefox, qui n'utilisent pas le même format de favoris."
+          }
+        }
+      }
+    },
+    "%@; home page: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ; page d'accueil : %2$@"
           }
         }
       }
@@ -2291,6 +2311,16 @@
         }
       }
     },
+    "Bookmarks without a favicon at the start: %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoris sans favicon au départ : %lld"
+          }
+        }
+      }
+    },
     "Browser" : {
       "localizations" : {
         "fr" : {
@@ -2307,6 +2337,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Navigateur fermé"
+          }
+        }
+      }
+    },
+    "Browser: %@ (profile %@)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigateur : %1$@ (profil %2$@)"
           }
         }
       }
@@ -2541,6 +2581,16 @@
         }
       }
     },
+    "Couldn't open the Favicons database: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d'ouvrir la base Favicons : %@"
+          }
+        }
+      }
+    },
     "Couldn't write the report: %@" : {
       "localizations" : {
         "fr" : {
@@ -2561,6 +2611,16 @@
         }
       }
     },
+    "Database backup: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde de la base : %@"
+          }
+        }
+      }
+    },
     "Database restored. Relaunch %@ to see the result." : {
       "localizations" : {
         "fr" : {
@@ -2577,6 +2637,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Morts"
+          }
+        }
+      }
+    },
+    "Dead links: %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liens morts : %lld"
           }
         }
       }
@@ -2831,12 +2901,42 @@
         }
       }
     },
+    "FaviconSync report — %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapport FaviconSync — %@"
+          }
+        }
+      }
+    },
     "Favicons" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Favicons"
+          }
+        }
+      }
+    },
+    "Favicons fetched (not written yet): %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favicons récupérées (pas encore écrites) : %lld"
+          }
+        }
+      }
+    },
+    "Favicons fetched and written: %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favicons récupérées et écrites : %lld"
           }
         }
       }
@@ -2951,6 +3051,26 @@
         }
       }
     },
+    "Folder: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dossier : %@"
+          }
+        }
+      }
+    },
+    "Folder: %@ (Google Account bookmark, delete it by hand)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dossier : %@ (favori du compte Google, à supprimer à la main)"
+          }
+        }
+      }
+    },
     "Full Disk Access" : {
       "localizations" : {
         "fr" : {
@@ -3017,6 +3137,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Général"
+          }
+        }
+      }
+    },
+    "Ghosts report — %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapport Ghosts — %@"
           }
         }
       }
@@ -3137,6 +3267,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Script AppleScript invalide"
+          }
+        }
+      }
+    },
+    "Invalid URL" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL invalide"
           }
         }
       }
@@ -3551,6 +3691,16 @@
         }
       }
     },
+    "No bookmark checked." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun favori coché."
+          }
+        }
+      }
+    },
     "No bookmarks to add." : {
       "localizations" : {
         "fr" : {
@@ -3961,6 +4111,16 @@
         }
       }
     },
+    "Reachable: %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibles : %lld"
+          }
+        }
+      }
+    },
     "Read Open Tabs" : {
       "localizations" : {
         "fr" : {
@@ -4067,6 +4227,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Redirigés"
+          }
+        }
+      }
+    },
+    "Redirected: %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redirigés : %lld"
           }
         }
       }
@@ -4211,6 +4381,16 @@
         }
       }
     },
+    "SQLite error: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur SQLite : %@"
+          }
+        }
+      }
+    },
     "Search a title or URL" : {
       "localizations" : {
         "fr" : {
@@ -4311,6 +4491,16 @@
         }
       }
     },
+    "Sites confirmed to have no favicon: %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sites confirmés sans favicon disponible : %lld"
+          }
+        }
+      }
+    },
     "Source bookmarks" : {
       "localizations" : {
         "fr" : {
@@ -4381,6 +4571,16 @@
         }
       }
     },
+    "TLS / certificate error" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "erreur TLS / certificat"
+          }
+        }
+      }
+    },
     "Tab shown in this window" : {
       "localizations" : {
         "fr" : {
@@ -4411,12 +4611,32 @@
         }
       }
     },
+    "The Bookmarks file changed since the analysis (%lld of %lld bookmarks found). Run the analysis again: nothing was changed." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le fichier Bookmarks a changé depuis l'analyse (%1$lld favoris retrouvés sur %2$lld). Relance l'analyse : rien n'a été modifié."
+          }
+        }
+      }
+    },
     "The Bookmarks file doesn't have the expected format." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le fichier Bookmarks n'a pas le format attendu."
+          }
+        }
+      }
+    },
+    "The Bookmarks file doesn't have the expected format: nothing was changed." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le fichier Bookmarks n'a pas le format attendu : rien n'a été modifié."
           }
         }
       }
@@ -4721,6 +4941,16 @@
         }
       }
     },
+    "To check by hand: %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À vérifier à la main : %lld"
+          }
+        }
+      }
+    },
     "To delete" : {
       "localizations" : {
         "fr" : {
@@ -4881,6 +5111,16 @@
         }
       }
     },
+    "Undetermined failures, to handle by hand: %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échecs indéterminés, à traiter à la main : %lld"
+          }
+        }
+      }
+    },
     "Unreadable window identifier" : {
       "localizations" : {
         "fr" : {
@@ -4907,6 +5147,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Favoris web"
+          }
+        }
+      }
+    },
+    "Web bookmarks analyzed: %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoris web analysés : %lld"
           }
         }
       }
@@ -5071,6 +5321,46 @@
         }
       }
     },
+    "connection closed by the server" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "connexion coupée par le serveur"
+          }
+        }
+      }
+    },
+    "domain not found (DNS)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "domaine introuvable (DNS)"
+          }
+        }
+      }
+    },
+    "favicon.ico isn't an image" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "favicon.ico n'est pas une image"
+          }
+        }
+      }
+    },
+    "favicon.ico redirected to %@ (not an image)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "favicon.ico redirigé vers %@ (pas une image)"
+          }
+        }
+      }
+    },
     "faviconsync-report.txt" : {
       "localizations" : {
         "fr" : {
@@ -5101,6 +5391,16 @@
         }
       }
     },
+    "icon declared but unreadable or unreachable (%lld tried, SVG?)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "icône déclarée mais illisible ou inaccessible (%lld essayée(s), SVG ?)"
+          }
+        }
+      }
+    },
     "kept open: %@" : {
       "localizations" : {
         "fr" : {
@@ -5111,12 +5411,92 @@
         }
       }
     },
+    "local network refused (macOS permission)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "réseau local refusé (permission macOS)"
+          }
+        }
+      }
+    },
     "macOS blocks access to the data of %@, so they don't appear in the list of browsers.\n\nTo use them, open System Settings › Privacy & Security › Full Disk Access, add Navloom with the “+” button if it isn't there, turn it on, then relaunch Navloom." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "macOS bloque l'accès aux données de %@ : ils n'apparaissent donc pas dans la liste des navigateurs.\n\nPour les utiliser, ouvre Réglages Système › Confidentialité et sécurité › Accès complet au disque, ajoute Navloom avec le bouton « + » s'il n'y est pas, active-le, puis relance Navloom."
+          }
+        }
+      }
+    },
+    "network error (code %lld)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "erreur réseau (code %lld)"
+          }
+        }
+      }
+    },
+    "no bitmap to write" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aucun bitmap à écrire"
+          }
+        }
+      }
+    },
+    "no favicon found" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aucune favicon trouvée"
+          }
+        }
+      }
+    },
+    "no favicon.ico (HTTP %lld)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pas de favicon.ico (HTTP %lld)"
+          }
+        }
+      }
+    },
+    "no icon declared (%@)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aucune icône déclarée (%@)"
+          }
+        }
+      }
+    },
+    "no icon declared (bookmark page)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aucune icône déclarée (page du favori)"
+          }
+        }
+      }
+    },
+    "not checked" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "non vérifié"
           }
         }
       }
@@ -5141,12 +5521,32 @@
         }
       }
     },
+    "overall time limit exceeded (%lld s)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "délai global dépassé (%lld s)"
+          }
+        }
+      }
+    },
     "parameters ?…" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "paramètres ?…"
+          }
+        }
+      }
+    },
+    "plain HTTP blocked (App Transport Security)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTP en clair bloqué (App Transport Security)"
           }
         }
       }
@@ -5177,6 +5577,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "lecture…"
+          }
+        }
+      }
+    },
+    "redirected to %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "redirigé vers %@"
+          }
+        }
+      }
+    },
+    "redirected to the home page" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "redirigé vers la page d'accueil"
           }
         }
       }
@@ -5241,12 +5661,42 @@
         }
       }
     },
+    "timed out" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "délai dépassé"
+          }
+        }
+      }
+    },
+    "unknown error" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "erreur inconnue"
+          }
+        }
+      }
+    },
     "unreadable" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "illisible"
+          }
+        }
+      }
+    },
+    "unreadable image" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "image illisible"
           }
         }
       }

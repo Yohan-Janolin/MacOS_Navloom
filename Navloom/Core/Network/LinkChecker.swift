@@ -105,12 +105,12 @@ nonisolated final class LinkChecker: LinkChecking, @unchecked Sendable {
         guard let final, let finalHost = normalizedHost(final) else { return nil }
 
         if let originalHost = normalizedHost(original), originalHost != finalHost {
-            return "redirigé vers \(finalHost)"
+            return String(localized: "redirected to \(finalHost)")
         }
         let originalIsDeep = !(original.path.isEmpty || original.path == "/")
         let finalIsRoot = final.path.isEmpty || final.path == "/"
         if originalIsDeep && finalIsRoot {
-            return "redirigé vers la page d'accueil"
+            return String(localized: "redirected to the home page")
         }
         return nil
     }

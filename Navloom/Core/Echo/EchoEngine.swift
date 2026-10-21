@@ -183,7 +183,7 @@ nonisolated enum EchoEngine {
                             iconIDs[stored.iconURL] = existing
                         } else {
                             let bitmaps = pngBitmaps(from: stored.bitmaps)
-                            guard !bitmaps.isEmpty else { throw FaviconDatabaseError.query("image illisible") }
+                            guard !bitmaps.isEmpty else { throw FaviconDatabaseError.query(String(localized: "unreadable image")) }
                             iconID = try await db.insertIcon(sourceURL: stored.iconURL, bitmaps: bitmaps)
                             iconIDs[stored.iconURL] = iconID
                         }

@@ -6,13 +6,13 @@ nonisolated enum NetworkFailure {
 
     var label: String {
         switch self {
-        case .dns: "domaine introuvable (DNS)"
-        case .timeout: "délai dépassé"
-        case .tls: "erreur TLS / certificat"
-        case .localNetwork: "réseau local refusé (permission macOS)"
-        case .connectionLost: "connexion coupée par le serveur"
-        case .insecureBlocked: "HTTP en clair bloqué (App Transport Security)"
-        case .other(let code): "erreur réseau (code \(code))"
+        case .dns: String(localized: "domain not found (DNS)")
+        case .timeout: String(localized: "timed out")
+        case .tls: String(localized: "TLS / certificate error")
+        case .localNetwork: String(localized: "local network refused (macOS permission)")
+        case .connectionLost: String(localized: "connection closed by the server")
+        case .insecureBlocked: String(localized: "plain HTTP blocked (App Transport Security)")
+        case .other(let code): String(localized: "network error (code \(code))")
         }
     }
 

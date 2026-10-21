@@ -9,14 +9,22 @@ nonisolated struct GhostsReport: Sendable {
     let moved: [BookmarkIssue]
 
     func text(browserName: String, profileName: String, date: Date = Date()) -> String {
-        var report = "Rapport Ghosts — \(date.formatted(date: .long, time: .shortened))\n\n"
-        report += "Navigateur : \(browserName) (profil \(profileName))\n"
-        report += "Favoris web analysés : \(webBookmarks)\n"
-        report += "Accessibles : \(aliveCount)\n"
-        report += "\nLiens morts : \(dead.count)\n" + Self.grouped(dead)
-        report += "\nÀ vérifier à la main : \(uncertain.count)\n" + Self.grouped(uncertain)
-        report += "\nRedirigés : \(moved.count)\n" + Self.grouped(moved)
+        let when = date.formatted(date: .long, time: .shortened)
+        var report = String(localized: "Ghosts report — \(when)") + "\n\n"
+        report += String(localized: "Browser: \(browserName) (profile \(profileName))") + "\n"
+        report += String(localized: "Web bookmarks analyzed: \(webBookmarks)") + "\n"
+        report += String(localized: "Reachable: \(aliveCount)") + "\n"
+        report += "\n" + String(localized: "Dead links: \(dead.count)") + "\n" + Self.grouped(dead)
+        report += "\n" + String(localized: "To check by hand: \(uncertain.count)") + "\n" + Self.grouped(uncertain)
+        report += "\n" + String(localized: "Redirected: \(moved.count)") + "\n" + Self.grouped(moved)
         return report
+    }
+
+    /// « Dossier : Barre / Dev », avec la mention du compte Google si besoin.
+    static func folderLine(_ folder: String, isAccount: Bool) -> String {
+        isAccount
+            ? String(localized: "Folder: \(folder) (Google Account bookmark, delete it by hand)")
+            : String(localized: "Folder: \(folder)")
     }
 
     private static func grouped(_ issues: [BookmarkIssue]) -> String {
@@ -25,10 +33,9 @@ nonisolated struct GhostsReport: Sendable {
         for reason in groups.keys.sorted() {
             text += "\n  [\(reason)]\n"
             for issue in groups[reason] ?? [] {
-                let folder = issue.bookmark.folder.isEmpty ? "Racine" : issue.bookmark.folder
-                let origin = issue.bookmark.source == .account ? " (favori du compte Google, à supprimer à la main)" : ""
+                let folder = issue.bookmark.folder.isEmpty ? String(localized: "Root") : issue.bookmark.folder
                 text += "    - \(issue.bookmark.name) (\(issue.bookmark.url))\n"
-                text += "      Dossier : \(folder)\(origin)\n"
+                text += "      " + folderLine(folder, isAccount: issue.bookmark.source == .account) + "\n"
             }
         }
         return text
@@ -73,7 +80,7 @@ actor GhostsEngine {
         var invalid: [BookmarkIssue] = []
         for bookmark in web {
             guard let url = URL(string: bookmark.url) else {
-                invalid.append(BookmarkIssue(bookmark: bookmark, reason: "URL invalide"))
+                invalid.append(BookmarkIssue(bookmark: bookmark, reason: String(localized: "Invalid URL")))
                 continue
             }
             if bookmarksByURL[bookmark.url] == nil { urls.append(url) }
@@ -101,7 +108,7 @@ actor GhostsEngine {
         var moved: [BookmarkIssue] = []
 
         for (key, bookmarks) in bookmarksByURL {
-            let result = results[key] ?? .uncertain("non vérifié", retryable: false)
+            let result = results[key] ?? .uncertain(String(localized: "not checked"), retryable: false)
             for bookmark in bookmarks {
                 switch result {
                 case .alive:

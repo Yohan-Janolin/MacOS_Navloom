@@ -10,24 +10,25 @@ nonisolated enum SyncReport {
                      summary: WriteSummary?,
                      date: Date = Date()) -> String {
 
-        var report = "Rapport FaviconSync — \(date.formatted(date: .long, time: .shortened))\n\n"
-        report += "Navigateur : \(browserName) (profil \(profileName))\n"
-        report += "Favoris web analysés : \(analysis.webBookmarks)\n"
-        report += "Favoris sans favicon au départ : \(analysis.missing.count)\n"
+        let when = date.formatted(date: .long, time: .shortened)
+        var report = String(localized: "FaviconSync report — \(when)") + "\n\n"
+        report += String(localized: "Browser: \(browserName) (profile \(profileName))") + "\n"
+        report += String(localized: "Web bookmarks analyzed: \(analysis.webBookmarks)") + "\n"
+        report += String(localized: "Bookmarks without a favicon at the start: \(analysis.missing.count)") + "\n"
 
         if let summary {
-            report += "Favicons récupérées et écrites : \(summary.success)\n"
+            report += String(localized: "Favicons fetched and written: \(summary.success)") + "\n"
             if let backup = summary.backupURL {
-                report += "Sauvegarde de la base : \(backup.path)\n"
+                report += String(localized: "Database backup: \(backup.path)") + "\n"
             }
         } else {
-            report += "Favicons récupérées (pas encore écrites) : \(fetchResult.fetched.count)\n"
+            report += String(localized: "Favicons fetched (not written yet): \(fetchResult.fetched.count)") + "\n"
         }
 
-        report += "\nSites confirmés sans favicon disponible : \(fetchResult.confirmedNone.count)\n"
+        report += "\n" + String(localized: "Sites confirmed to have no favicon: \(fetchResult.confirmedNone.count)") + "\n"
         report += grouped(fetchResult.confirmedNone)
 
-        report += "\nÉchecs indéterminés, à traiter à la main : \(fetchResult.failures.count)\n"
+        report += "\n" + String(localized: "Undetermined failures, to handle by hand: \(fetchResult.failures.count)") + "\n"
         report += grouped(fetchResult.failures)
 
         return report

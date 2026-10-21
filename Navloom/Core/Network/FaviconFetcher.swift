@@ -93,7 +93,7 @@ nonisolated final class FaviconFetcher: @unchecked Sendable {
             }
             let first = await group.next() ?? nil
             group.cancelAll()
-            return first ?? .failed("délai global dépassé (\(Self.originDeadlineSeconds) s)", retryable: true)
+            return first ?? .failed(String(localized: "overall time limit exceeded (\(Self.originDeadlineSeconds) s)"), retryable: true)
         }
     }
     
@@ -120,7 +120,7 @@ nonisolated final class FaviconFetcher: @unchecked Sendable {
             case .noIconDeclared:
                 // La page du favori répond bien et ne déclare rien : c'est une absence confirmée.
                 if !sawUndecodable, case .failed = result {
-                    result = .confirmedNone("aucune icône déclarée (page du favori)")
+                    result = .confirmedNone(String(localized: "no icon declared (bookmark page)"))
                 }
             case .pageUnavailable:
                 break
@@ -152,7 +152,7 @@ nonisolated final class FaviconFetcher: @unchecked Sendable {
 
         // Une vraie erreur (à réessayer) prime sur une absence confirmée.
         if let failure = firstFailure { return .failed(failure.reason, retryable: failure.retryable) }
-        return .confirmedNone(firstNone ?? "aucune favicon trouvée")
+        return .confirmedNone(firstNone ?? String(localized: "no favicon found"))
     }
 
     private func tryCandidate(origin: Origin, host: String) async -> HostResult {
@@ -174,10 +174,10 @@ nonisolated final class FaviconFetcher: @unchecked Sendable {
             case 200:
                 let finalHost = response.url?.host ?? host
                 rootNote = finalHost == host
-                    ? "favicon.ico n'est pas une image"
-                    : "favicon.ico redirigé vers \(finalHost) (pas une image)"
+                    ? String(localized: "favicon.ico isn't an image")
+                    : String(localized: "favicon.ico redirected to \(finalHost) (not an image)")
             case 204, 404, 410:
-                rootNote = "pas de favicon.ico (HTTP \(code))"
+                rootNote = String(localized: "no favicon.ico (HTTP \(code))")
             default:
                 rootNote = "favicon.ico : HTTP \(code)"
                 rootRetryable = NetworkFailure.isRetryableStatus(code)
@@ -196,11 +196,11 @@ nonisolated final class FaviconFetcher: @unchecked Sendable {
         case .found(let data):
             return .found(data)
         case .noIconDeclared:
-            return .confirmedNone("aucune icône déclarée (\(rootNote))")
+            return .confirmedNone(String(localized: "no icon declared (\(rootNote))"))
         case .undecodable(let reason):
             return .failed(reason, retryable: false)
         case .pageUnavailable(let reason, let pageRetryable):
-            return .failed("\(rootNote) ; page d'accueil : \(reason)", retryable: rootRetryable || pageRetryable)
+            return .failed(String(localized: "\(rootNote); home page: \(reason)"), retryable: rootRetryable || pageRetryable)
         }
     }
 
@@ -252,7 +252,7 @@ nonisolated final class FaviconFetcher: @unchecked Sendable {
         }
 
         if declared {
-            return .undecodable("icône déclarée mais illisible ou inaccessible (\(attempted) essayée(s), SVG ?)")
+            return .undecodable(String(localized: "icon declared but unreadable or unreachable (\(attempted) tried, SVG?)"))
         }
         return .noIconDeclared
     }
