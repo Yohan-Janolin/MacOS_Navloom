@@ -12,7 +12,7 @@ enum AppInfo {
 
     /// Date de la version courante : à mettre à jour à chaque release.
     static let releaseDate = DateComponents(calendar: .init(identifier: .gregorian),
-                                            year: 2026, month: 10, day: 4).date!
+                                            year: 2026, month: 10, day: 21).date!
 
     static var version: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"

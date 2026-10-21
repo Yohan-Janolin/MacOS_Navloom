@@ -38,7 +38,25 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : ""
+            "value" : "© 2026 Yohan Janolin. MIT License."
+          }
+        }
+      }
+    },
+    "NSLocalNetworkUsageDescription" : {
+      "comment" : "Privacy - Local Network Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Navloom checks the bookmarks that point to devices on your local network (router, NAS…), to fetch their icons or check that they respond."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navloom vérifie les favoris qui pointent vers des appareils de ton réseau local (box, NAS…), pour récupérer leurs icônes ou vérifier qu'ils répondent."
           }
         }
       }

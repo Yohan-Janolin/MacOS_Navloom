@@ -382,7 +382,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Navloom accesses the open tabs of your browsers to display them and transfer them with Ferry.";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Navloom checks the bookmarks that point to devices on your local network (router, NAS…), to fetch their icons or check that they respond.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Yohan Janolin. MIT License.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -418,7 +419,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Navloom accesses the open tabs of your browsers to display them and transfer them with Ferry.";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Navloom checks the bookmarks that point to devices on your local network (router, NAS…), to fetch their icons or check that they respond.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Yohan Janolin. MIT License.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
